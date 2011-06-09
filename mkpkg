@@ -174,6 +174,11 @@ linux:					# install Slackwkare Linux binaries
 	$set DIRS = "deimos lris lris2 lws nirspec"
 	!$(hlib)/mkfloat.csh linux -d $(DIRS)
 	;
+linux64:				# install Slackwkare Linux binaries
+	$verbose off
+	$set DIRS = "deimos lris lris2 lws nirspec"
+	!$(hlib)/mkfloat.csh linux64 -d $(DIRS)
+	;
 redhat:					# install Redhat Linux binaries
 	$verbose off
 	$set DIRS = "deimos lris lris2 lws nirspec"
