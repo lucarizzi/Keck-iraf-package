@@ -218,7 +218,7 @@ begin
 		call printf ("PA error is small...  ")
 		dcspa = clgetb ("dcs_rot")
 	    } else {
-		dcspa = YES
+		dcspa = true
 	    }
 # Apply rotation
 	    if (dcspa) {

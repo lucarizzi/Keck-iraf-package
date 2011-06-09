@@ -93,7 +93,7 @@ begin
 		call clgstr ("flatim", flatim, SZ_FNAME)
 		if (streq (flatim, "")) {
 			call eprintf ("WARNING: not flattened!\n")
-			flatten = NO
+			flatten = false
 		} else {
 			im2 = immap (flatim, READ_ONLY, 0)
 

@@ -114,6 +114,7 @@ real    bxs, def1err, def2err
 bool    dcs, dcspa
 
 char    poname[SZ_FITS]                         # Pointing Origin name
+char    binning[SZ_FITS]                         # CCD binning factor
 char    instrument[SZ_FITS]                     # instrument [LRIS|LRISBLUE]
 char    cmdline[SZ_LINE]                        # Command line for rsh
 real    rotposn                                 # PA = rotposn+90
@@ -227,7 +228,9 @@ begin
               binx = 1
               biny = 1
         }
-	call printf ("Using BINNING %d %d \n", binx, biny)
+	call eprintf ("Using BINNING %d %d \n")
+		call pargi(binx)
+		call pargi(biny)
         
 
 # Assign the proper rotation center for the PO
@@ -383,16 +386,16 @@ begin
 # Store box/star coordinates
 # Note -- unsure if better to subtract xoff,yoff (negligible if small)
                 if (stat == OK) {
-                        Memr[xbuf1+ndx] = (xstar - prepix)*binx
+                        Memr[xbuf1+ndx] = xstar*binx - prepix
                         Memr[ybuf1+ndx] = ystar * biny
-			if (xstar>xgap) {
-			    Memr[xbuf1+ndx] = (xstar - prepix) * binx + 96.627+0.00162*ystar*biny
+			if (xstar*binx >xgap) {
+			    Memr[xbuf1+ndx] = xstar*binx - prepix + 96.627+0.00162*ystar*biny
                             Memr[ybuf1+ndx] = ystar*biny + 2.982
 			}
-                        Memr[xbuf2+ndx] = (xb - prepix)*binx
+                        Memr[xbuf2+ndx] = xb * binx - prepix
                         Memr[ybuf2+ndx] = yb * biny
-			if (xb>xgap) {
-			    Memr[xbuf2+ndx] = (xb - prepix)*binx + 96.627+0.00162*yb*biny
+			if (xb*binx >xgap) {
+			    Memr[xbuf2+ndx] = xb*binx - prepix + 96.627+0.00162*yb*biny
                             Memr[ybuf2+ndx] = yb*biny + 2.982
 			}
                         ndx = ndx + 1
@@ -461,8 +464,8 @@ begin
         }
 
 # ON TO ALIGNING: setup
-        nx = ncols                      # TMP: should fix; also symmetrize
-        ny = nlines                     # TMP   ... maskalign
+        nx = ncols * binx               # TMP: should fix; also symmetrize
+        ny = nlines * biny              # TMP   ... maskalign
         bxs = -2. * clgetr ("box_size")
         niter = clgeti ("niter")
         def1err = clgetr ("def_ref_err")
