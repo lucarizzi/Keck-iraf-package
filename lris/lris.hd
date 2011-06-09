@@ -1,6 +1,0 @@
-# Help directory for the APEXTRACT package.
-
-$doc             = "./doc/"
-
-lccdproc	hlp=doc$lccdproc.hlp, src=lccdproc.hlp
-lrisbias	hlp=doc$lrisbias.hlp, src=lrisbias.hlp

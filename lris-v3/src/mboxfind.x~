@@ -618,7 +618,7 @@ begin
 
 		case 'i':
 			call gclose (gp)
-			return ((!OK))
+			return ((!true))
 			break
 
 		case '?':
@@ -630,7 +630,7 @@ begin
 	}
 
 	call gclose (gp)
-	return (OK)
+	return (true)
 end
 
 #

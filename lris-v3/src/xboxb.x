@@ -149,10 +149,10 @@ begin
 
         call clgstr ("pairs", coordfile, SZ_FNAME)
         if (streq (coordfile, "")) {
-                find_coord = YES
+                find_coord = true
         } else {
                 fdb = open (coordfile, READ_ONLY, TEXT_FILE)
-                find_coord = NO
+                find_coord = false
         }
 
 # Get relevant keywords ...
@@ -355,7 +355,7 @@ begin
 
 # Store box/star coordinates
 # Note -- unsure if better to subtract xoff,yoff (negligible if small)
-                if (stat == OK) {
+                if (stat == true) {
                         Memr[xbuf1+ndx] = xstar - prepix
                         Memr[ybuf1+ndx] = ystar
 			if (xstar>xgap) {
@@ -501,7 +501,7 @@ begin
 # Now adjust for existing PA (convert x,y into E,N):
 # Note that "angle" = (angle of "PA" wrt x-axis) - (PA = rotposn+90)
 #        ...        = 90 - (rotposn+90)
-        invert = NO                     # Left for historical reasons
+        invert = false                     # Left for historical reasons
         if (invert) {
                 call eprintf ("Sorry -- not yet tested\n")
                 pdeg = RADTODEG( atan2(coeff[1,2], coeff[1,1]))
@@ -562,20 +562,20 @@ begin
                         call pargr (rotposn+pdeg)
                 call eprintf ("\n(sending)  %s \n")
                         call pargstr (cmdline)
-                stat = oscmd (cmdline)
-                if (stat != OK) {
+                istat = oscmd (cmdline)
+                if (istat != OK) {
                         call eprintf ("command failed!  (%d)\n")
-                                call pargi (stat)
+                                call pargi (istat)
                 }
 
                 call sprintf (cmdline, SZ_LINE, "%s waitfor -s dcs ROTSTAT=8")
                         call pargstr ("rsh punaluu")    # (8=tracking)
                 call eprintf ("\n(sending)  %s \n")
                         call pargstr (cmdline)
-                stat = oscmd (cmdline)
-                if (stat != OK) {
+                istat = oscmd (cmdline)
+                if (istat != OK) {
                         call eprintf ("command failed!  (%d)\n")
-                                call pargi (stat)
+                                call pargi (istat)
                 }
 
                 # verify that guiding is back ON...
@@ -594,20 +594,20 @@ begin
                         call pargr (narcsec)
                 call eprintf ("\n(sending)  %s \n")
                         call pargstr (cmdline)
-                stat = oscmd (cmdline)
-                if (stat != OK) {
+                istat = oscmd (cmdline)
+                if (istat != OK) {
                         call eprintf ("command failed!  (%d)\n")
-                                call pargi (stat)
+                                call pargi (istat)
                 }
 
                 call sprintf (cmdline, SZ_LINE, "%s waitfor -s dcs AXESTAT=64")
                         call pargstr ("rsh punaluu")    # (64=tracking)
                 call eprintf ("\n(sending)  %s \n")
                         call pargstr (cmdline)
-                stat = oscmd (cmdline)
-                if (stat != OK) {
+                istat = oscmd (cmdline)
+                if (istat != OK) {
                         call eprintf ("command failed!  (%d)\n")
-                                call pargi (stat)
+                                call pargi (istat)
                 }
 
                 call eprintf ("... done! \007 \n")

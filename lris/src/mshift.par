@@ -1,9 +1,0 @@
-xobs,r,a,,,,"x coord observed"
-yobs,r,a,,,,"y coord observed"
-xref,r,h,,,,"x coord desired"
-yref,r,h,,,,"y coord desired"
-pa,r,h,,,,"current PA of CCD"
-beam,s,a,"red","red|blue",,"LRIS beam which took image"
-invert,b,h,n,,,"invert orientation (N-top, E-right)?"
-dcs,b,h,yes,,,"Send DCS commands? "
-mode,s,h,"ql",,,

@@ -210,7 +210,7 @@ begin
 				xb, yb, xsz, ysz, xfwhm, yfwhm, xstar, ystar)
 
 # Write out box/star coordinates
-		if (bxstat == OK) {
+		if (bxstat == true) {
 		    call fprintf (fdb,
 			"%7.2f %7.2f 0.5    %7.2f %7.2f  0.5   %7.2f  %7.2f\n")
 			call pargr (xb-0.5*xsz-prepix)
@@ -618,7 +618,7 @@ begin
 
 		case 'i':
 			call gclose (gp)
-			return ((!OK))
+			return ((!true))
 			break
 
 		case '?':
@@ -630,7 +630,7 @@ begin
 	}
 
 	call gclose (gp)
-	return (OK)
+	return (true)
 end
 
 #
