@@ -1,0 +1,5 @@
+# Root help directory for the LREDTEST packages.  This dummy package is
+# needed to have `lredtest' appear as a module in some package, so that
+# the user can type "help lredtest" (with `lredtest' given as a task).
+
+_lredtest	pkg = lredtest$lib/rootlredtest.hd

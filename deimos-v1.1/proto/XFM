@@ -1,0 +1,102 @@
+I need to develop the appropriate reflection and/or grating subroutines.
+
+Relection:  input angle, normal angle ==> output angle
+
+Grating: input angle, normal angle, output angle ==> wavelength
+
+(technically, I could add a refraction routine here, once the others are
+solved)
+
+
+Then, ready for trace and/or reduction
+
+
+DEIMOS elements:
+-- Telescope
+-- Collimator
+-- Tent mirror
+-- Grating/Mirror
+-- Camera
+-- CCD
+
+Inputs: coll x,y tilts
+	tent x,y tilts
+	Grating x,y,z tilts
+	Camera x,y tilts
+	CCD x,y offsets, rotation
+
+Also, possibly, the offset of the slitmask x,y, rotation
+	
+Need to define coordinates.  The nominal telescope/instrument axis is the
+obvious choice.  This is a line. Now need a _point_.  Previously used the
+intersection of the camera optical axis with the detector.
+
+Other choices:
+1. Camera Optical axis and slitmask zeropoint (telescope axis at slitmask)
+2. Camera optical axis and center of collimator
+
+Given that the light is being passed through the slitmask from the pupil image,
+I think the telescope axis is the best to adopt.  Consider the slitmask
+coordinates to be adjustable. Due to camera distortions, the intersection
+of the optical axis with the detector plane is also reasonable from the
+point of view of using radial symmetry.
+
+Thus:
+slitmask:    del-x del-y rot
+collimator:  theta-x, theta-y (decenter -- assume negligible)
+tent mirror: theta-x, theta-y
+grating:     theta-x (variable), theta-y, theta-z
+camera:      theta-x, theta-y
+CCD:         del-x, del-y, rot 
+
+
+There are nominal angles for certain elements to which the theta's refer
+
+slitmask:     (n/a,n/a,0)
+collimator:   (0,0)
+tent mirrir:  (XXX,0)
+grating:      (var,0,0)
+camera:       (XXX,0)
+CCD:          (n/a,n/a,0)
+
+
+
+
+		X	Y	Z	th-X	th-Y	th-Z
+
+slitmask:	0+	0+	n	n	n	0+
+collimator:	n	n	.	0	0	.
+tent mirrir:	.	.	.	XXX	0	.
+grating:	.	.	.	XXX	0	0
+camera:		n	n	.	XXX	0	.
+CCD*:		0	0	.	.	.	0
+CCDi:		Xi	Yi	.	.	n	Ri
+
+n = insensitive, ie, mechanical alignment should be close enough
+. = negligible or no impact
+* CCD refers to ideal mosaic, characterized by primary CCD #3
++ = note that the slitmask system actually _defines_ the canonical coord. sys.
+
+
+
+
+
+##############################
+The collimator has the following params:
+
+
+The tent Mirror surface is at (?) 18.5 degr from vertical, or theta=71.5
+from the z-axis
+
+
+The imaging mirror is _near_ 21.05 degr.
+
+
+IMPT: there is some kind of sign ambiguity in gen_xfm, whereby in order to
+change the sign of r[2], both phi and theta must be negated.  Do we have
+the xfm right?
+There are many, many small sign changes, tricks etc that are currently
+entered into refl.x.
+
+In particular, it is unclear to me why INTO and OUT OF cam CS produces
+the same result.

@@ -1,0 +1,98 @@
+XTENSION= 'BINTABLE'           /Binary table written by MWRFITS
+BITPIX  =                    8 /Required value
+NAXIS   =                    2 /Required value
+NAXIS1  =                  165 /Number of bytes per row
+NAXIS2  =                   43 /Number of rows
+PCOUNT  =                    0 /Normally 0 (no varying arrays)
+GCOUNT  =                    1 /Required value
+TFIELDS =                   40 /Number of columns in table
+COMMENT
+COMMENT  *** Column formats ***
+COMMENT
+TFORM1  = 'J       '           /
+TFORM2  = '8A      '           /
+TFORM3  = '2E      '           /
+TFORM4  = 'D       '           /
+TFORM5  = 'D       '           /
+TFORM6  = 'E       '           /
+TFORM7  = 'E       '           /
+TFORM8  = 'E       '           /
+TFORM9  = 'E       '           /
+TFORM10 = 'E       '           /
+TFORM11 = 'E       '           /
+TFORM12 = 'E       '           /
+TFORM13 = 'E       '           /
+TFORM14 = 'E       '           /
+TFORM15 = 'E       '           /
+TFORM16 = 'E       '           /
+TFORM17 = 'E       '           /
+TFORM18 = 'E       '           /
+TFORM19 = 'E       '           /
+TFORM20 = 'E       '           /
+TFORM21 = 'E       '           /
+TFORM22 = 'E       '           /
+TFORM23 = 'E       '           /
+TFORM24 = 'E       '           /
+TFORM25 = 'E       '           /
+TFORM26 = 'E       '           /
+TFORM27 = 'E       '           /
+TFORM28 = 'E       '           /
+TFORM29 = 'E       '           /
+TFORM30 = 'E       '           /
+TFORM31 = 'E       '           /
+TFORM32 = 'I       '           /
+TFORM33 = 'E       '           /
+TFORM34 = 'E       '           /
+TFORM35 = 'E       '           /
+TFORM36 = 'B       '           /
+TFORM37 = 'A       '           /
+TFORM38 = 'E       '           /
+TFORM39 = 'E       '           /
+TFORM40 = 'B       '           /
+COMMENT
+COMMENT  *** Column Names ***
+COMMENT
+TTYPE1  = 'OBJNO   '           /
+TTYPE2  = 'PATH    '           /
+TTYPE3  = 'XS      '           /
+TTYPE4  = 'RA      '           /
+TTYPE5  = 'DEC     '           /
+TTYPE6  = 'MAGU    '           /
+TTYPE7  = 'MAGB    '           /
+TTYPE8  = 'MAGV    '           /
+TTYPE9  = 'MAGR    '           /
+TTYPE10 = 'MAGI    '           /
+TTYPE11 = 'MAGB3RG '           /
+TTYPE12 = 'MAGB6RG '           /
+TTYPE13 = 'MAGB1S  '           /
+TTYPE14 = 'MAGB2S  '           /
+TTYPE15 = 'MAGR3RG '           /
+TTYPE16 = 'MAGR6RG '           /
+TTYPE17 = 'MAGR1S  '           /
+TTYPE18 = 'MAGR2S  '           /
+TTYPE19 = 'MAGI3RG '           /
+TTYPE20 = 'MAGI6RG '           /
+TTYPE21 = 'MAGI1S  '           /
+TTYPE22 = 'MAGI2S  '           /
+TTYPE23 = 'MAGBERR '           /
+TTYPE24 = 'MAGRERR '           /
+TTYPE25 = 'MAGIERR '           /
+TTYPE26 = 'RG      '           /
+TTYPE27 = 'NU      '           /
+TTYPE28 = 'RH      '           /
+TTYPE29 = 'RP      '           /
+TTYPE30 = 'RQL     '           /
+TTYPE31 = 'RQU     '           /
+TTYPE32 = 'NBAD    '           /
+TTYPE33 = 'FMAX    '           /
+TTYPE34 = 'PA      '           /
+TTYPE35 = 'E2      '           /
+TTYPE36 = 'QUALITY '           /
+TTYPE37 = 'CLASS   '           /
+TTYPE38 = 'PHOTOZ  '           /
+TTYPE39 = 'PROBGT07 '          /
+TTYPE40 = 'BADFLAG '           /
+COMMENT
+COMMENT  *** End of required fields ***
+COMMENT
+END

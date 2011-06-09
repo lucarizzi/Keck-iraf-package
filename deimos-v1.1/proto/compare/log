@@ -1,0 +1,659 @@
+# NEED REPLACING
+dmos.x
+(dsim.x)
+dsim2.x
+dsim3.x
+dsimgraph.x
+etc.x
+qmodel.x
+qtrmap.x   qtrmap.par
+refl.x
+trace.x
+xb2.x
+xbox.x
+#
+deimos.h	(trivial)
+keck.h		(trivial)
+fitsio.h	(added constants from FITSIO)
+instrument.h
+
+
+/n###### deimos_util.x
+
+/n###### dmos.x
+445c445
+< int	stridx(), nscan()
+---
+> int	stridx(), sscan(), nscan()
+498c498
+< 	call sscan (wkstr)
+---
+> 	i = sscan (wkstr)
+
+/n###### dsim.x
+137d136
+< call test_mod (sdat, nslit)
+143d141
+< 
+165d162
+< call test_mod (sdat, nslit)
+561,582d557
+< ### COPIED FROM DSIM2:  WORK HERE
+< # For simplicity, we calculate the endpoints in X here; note use of FLIP
+< ##		xgeom = FLIP * cos (rangle)
+< ##		ygeom = sin (rangle)
+< ##		if (PROJ_LEN(indat) == YES) {
+< ##			xgeom = xgeom / abs (cos (rangle))
+< ##			ygeom = ygeom / abs (cos (rangle))
+< ##		}
+< # We always want X1 < X2, so:
+< ##		if (xgeom > 0) {
+< ##			X1(tdat,i) = XARCS(tdat,i) - LEN1(tdat,i) * xgeom
+< ##			Y1(tdat,i) = YARCS(tdat,i) - LEN1(tdat,i) * ygeom
+< ##			X2(tdat,i) = XARCS(tdat,i) + LEN2(tdat,i) * xgeom
+< ##			Y2(tdat,i) = YARCS(tdat,i) + LEN2(tdat,i) * ygeom
+< ##		} else {
+< ##			X2(tdat,i) = XARCS(tdat,i) - LEN1(tdat,i) * xgeom
+< ##			Y2(tdat,i) = YARCS(tdat,i) - LEN1(tdat,i) * ygeom
+< ##			X1(tdat,i) = XARCS(tdat,i) + LEN2(tdat,i) * xgeom
+< ##			Y1(tdat,i) = YARCS(tdat,i) + LEN2(tdat,i) * ygeom
+< ##		}
+< ## XXX
+< # END COPY .....
+584d558
+< 
+954c928
+< int	nscan()
+---
+> int	sscan(), nscan()
+961c935
+< 	call fprintf (fd, "# Mask name, center:\n%-16s %12.2h %12.1h %7.1f PA=%6.2f ##\n")
+---
+> 	call fprintf (fd, "# Mask name, center:\n%-16s %12.2h %12.1h %7.1f PA=%6.3f ##\n")
+972,973c946
+< 	call fprintf (fd, "\n# Guider center:  %s  %11.2h  %11.1h  %6f  pa=%-6.2f\n")
+< 		call pargstr (GUINAME(indat))
+---
+> 	call fprintf (fd, "\n#  Guider center:  %12.2h %12.1h\n")
+976,977d948
+< 		call pargd (STD_EQX(indat))
+< 		call pargd (RADTODEG(PA_ROT(indat)))
+986c957
+< 			call sscan (DATLINE(tdat,i))
+---
+> 			stat = sscan (DATLINE(tdat,i))
+1048c1019
+< 		call sscan (DATLINE(tdat,i))
+---
+> 		stat = sscan (DATLINE(tdat,i))
+1124c1095
+< 			call sscan (DATLINE(tdat,i))
+---
+> 			stat = sscan (DATLINE(tdat,i))
+1231,1248d1201
+< end
+< 
+< # Test_MODE: temp test routine
+< 
+< procedure	test_mod (sdat, nslit)
+< 
+< pointer	sdat
+< int	nslit
+< 
+< 
+< int	i
+< 
+< begin
+< 	do i = 0, nslit-1 {
+< 		call printf ("%7.3f %7.3f\n")
+< 			call pargd ((RA0[sdat,i]-RA[sdat,i])*206205.d0)
+< 			call pargd ((DEC0[sdat,i]-DEC[sdat,i])*206205.d0)
+< 	}
+
+/n###### dsim2.x
+118c118
+< int	fscan(), nscan(), strlen()
+---
+> int	fscan(), sscan(), nscan(), strlen()
+152,154c152,154
+< 				call sscan (workstr[4])
+< 				call gargr (pangle)
+< 				if (nscan() != 0) {
+---
+> 				if (sscan (workstr[4]) != EOS) {
+> 				    call gargr (pangle)
+> 				    if (nscan() != 0) {
+157c157
+< 				} else {
+---
+> 				    } else {
+158a159
+> 				    }
+173,174c174
+< 			call eprintf ("Bad format on input line -- skipped\n`%s...'\n")
+< 				call pargstr (idstr)
+---
+> 			call eprintf ("Bad format on input line -- skipped\n`%s'\n")
+689c689
+< int	stridx(), nscan()
+---
+> int	stridx(), sscan(), nscan()
+708c708
+< 	call sscan (wkstr)
+---
+> 	i = sscan (wkstr)
+
+/n###### dsim3.x
+205c205
+< int	nscan()
+---
+> int	sscan()
+353,358c353,359
+< 		call sscan (xline)
+< 		call gargi (INDEX(sdat,i))
+< 		if (INDEX(sdat,i) != i)
+< 			call eprintf ("Sequencing error in Slitname!\n")
+< # XXX		if (nscan() != 1)
+< # XXX			INDEX(sdat,i) = nslit		# XXX BOGUS!!
+---
+> 		if (sscan (xline) != EOS) {
+> 			call gargi (INDEX(sdat,i))
+> 			if (INDEX(sdat,i) != i)
+> 				call eprintf ("Sequencing error in Slitname!\n")
+> 		} else {
+> 			INDEX(sdat,i) = nslit		# XXX BOGUS!!
+> 		}
+418,420c419,421
+< 		call sscan (xline)
+< 		call gargi (SLNDX(tdat,i))
+< 		if (nscan() < 1)
+---
+> 		if (sscan (xline) != EOS)
+> 			call gargi (SLNDX(tdat,i))
+> 		else
+
+/n###### dsimgraph.x
+49a50
+> int	sscan()
+211c212
+< 			call sscan (DATLINE(tdat,i))
+---
+> 			j = sscan (DATLINE(tdat,i))
+213,214c214
+< j = SLNDX(tdat,i)
+< 			call printf ("%-s   code=%d   %5.2f_%1s  (x,y)= %.1f %.1f arcsec  x1,2=(%5f %5f)\n")
+---
+> 			call printf ("%-s   code=%d   %5.2f_%1s  (x,y)= %.1f %.1f arcsec\n")
+221,222d220
+< 				call pargr (X1(sdat,j))
+< 				call pargr (X2(sdat,j))
+228c226
+< 			call sscan (DATLINE(tdat,i))
+---
+> 			j = sscan (DATLINE(tdat,i))
+
+/n###### dsplot.x
+/n###### dswd.x
+/n###### etc.x
+58c58
+< int	fscan(), nscan()
+---
+> int	fscan(), sscan(), nscan()
+70,71c70
+< 		} else {
+< 			call sscan (valstr)
+---
+> 		} else if (sscan (valstr) != EOS) {	# (always true)
+110c109
+< int	fscan(), nscan()
+---
+> int	fscan(), sscan(), nscan()
+122,123c121
+< 		} else {
+< 			call sscan (valstr)
+---
+> 		} else if (sscan (valstr) != EOS) {	# (always true)
+
+/n###### fitsgen.x
+/n###### futil.x
+/n###### keck_util.x
+/n###### qmodel.x
+80c80
+< 	stat = qxfm (map, a3, sys, ccd, xmm, ymm, wave, scaling, xics, yics, xpix, ypix, chip, YES, YES)
+---
+> 	stat = qxfm (map, a3, sys, ccd, xmm, ymm, wave, scaling, xics, yics, xpix, ypix, chip)
+82c82
+< 	if (stat != ON_CHIP) {
+---
+> 	if (stat == OFF_CHIP) {
+116c116
+< int	procedure qxfm (map, a3, sys, ccd, xmm, ymm, wave, scaling, xics, yics, xpix, ypix, chip, find_chip, mos_coords)
+---
+> int	procedure qxfm (map, a3, sys, ccd, xmm, ymm, wave, scaling, xics, yics, xpix, ypix, chip)
+131,132d130
+< int	find_chip		# find the chip (or force to existing value)?
+< int	mos_coords		# return mosaic (or individual) coords?
+139c137
+< int	ident_ccd()
+---
+> int	mosim_coord(), ident_ccd()
+191a190
+> 	call ics_to_ccd (xics, yics, ccd, n, xpix, ypix)
+193,201d191
+< 	if (find_chip == YES) {
+< 		chip = n
+< 	} else {
+< 		n = chip		# XXX check?
+< 	}
+< 
+< # Put coordinates into desired form:
+< 	if (mos_coords == YES) {
+< 		call ics_to_ccd (xics, yics, ccd, n, xpix, ypix, stat)
+203,207c193,194
+< 		call mosim_coord (xpix, ypix, n)
+< 	} else {
+< 		call ics_to_ccd (xics, yics, ccd, chip, xpix, ypix, stat)
+< 	}
+< 	
+---
+> 	stat = mosim_coord (xpix, ypix, n)
+> 	chip = n
+
+/n###### qrevmod.x
+/n###### qtrmap.x
+129c129
+< double	xstep, ystep, yoff
+---
+> double	xstep, ystep
+135d134
+< bool	mask					# mask coords (rather than sky)?
+149d147
+< 	mask = clgetb ("mask")
+151,167c149,153
+< 	if (mask) {
+< 		xstep = 364. / (nx-1)
+< 		ystep = 220. / (ny-1)
+< 		yoff = 0.
+< 		if (reverse)
+< 			call fprintf (fda, "## Alpha-tanx tany | xmask ymask\n")
+< 		else
+< 			call fprintf (fda, "## xmask ymask | Alpha-tanx tany\n")
+< 	} else {
+< 		xstep = 500. / (nx-1)
+< 		ystep = 300. / (ny-1)
+< 		yoff = 180.
+< 		if (reverse)
+< 		    call fprintf (fda, "## Alpha-tanx tany  |  xarcs yarcs\n")
+< 		else
+< 		    call fprintf (fda, "## xarcs yarcs  |  Alpha-tanx tany\n")
+< 	}
+---
+> 	xstep = 364. / (nx-1)
+> 	ystep = 220. / (ny-1)
+> 	xstep = 500. / (nx-1)
+> 	ystep = 300. / (ny-1)
+> call eprintf ("\n###############\nNB!!! SKY PROJECTION!\n\n")
+173c159,160
+< 		y = j * ystep + yoff
+---
+> #		y = j * ystep
+> 		y = j * ystep + 180.
+176,179c163,164
+< 			if (mask)
+< 				call pre_grating (x, y, e1, a2, sys, r)
+< 			else
+< 				call sky_grating (x, y, e1, a2, sys, r)
+---
+> #			call pre_grating (x, y, e1, a2, sys, r)
+> 			call sky_grating (x, y, e1, a2, sys, r)
+203c188
+< # Write the bmap
+---
+> # Write the amap
+207,211d191
+< 	if (reverse)
+< 		call fprintf (fdb, "## xics yics  |  beta-tanx tany\n")
+< 	else
+< 		call fprintf (fdb, "## beta-tanx tany  |  xics yics\n")
+< 
+
+/n###### refl.x
+76d75
+< int	stat
+265c264
+< 	call ics_to_ccd (xpix, ypix, ccd, n, xpix, ypix, stat)
+---
+> 	call ics_to_ccd (xpix, ypix, ccd, n, xpix, ypix)
+277c276
+< 		call ics_to_ccd (xpix, ypix, ccd, n, xpix, ypix, stat)
+---
+> 		call ics_to_ccd (xpix, ypix, ccd, n, xpix, ypix)
+589,590d587
+< ###
+< # XXX Chip size hard-coded in
+592c589
+< procedure	ics_to_ccd (xics, yics, ccd, n, xccd, yccd, stat)
+---
+> procedure	ics_to_ccd (xics, yics, ccd, n, xccd, yccd)
+598d594
+< int	stat				# returned status
+623,632d618
+< 	stat = 0
+< 	if (x < 0.5)
+< 		stat = or (stat, LOX)
+< 	if (x > 2048.5)
+< 		stat = or (stat, HIX)
+< 	if (y < 0.5)
+< 		stat = or (stat, LOY)
+< 	if (x > 4096.5)
+< 		stat = or (stat, HIY)
+< 
+
+/n###### refr.x
+/n###### tr_util.x
+/n###### trace.x
+383a384
+> int	mosim_coord()
+399c400
+< 		call ics_to_ccd (xpix, ypix, ccd, n, xpix, ypix, stat)
+---
+> 		call ics_to_ccd (xpix, ypix, ccd, n, xpix, ypix)
+402c403
+< 		call mosim_coord (xpix, ypix, n)
+---
+> 		stat = mosim_coord (xpix, ypix, n)
+437a439,440
+> real	xp, yp
+> 
+523a527
+> #	call ics_to_ccd (xpix, ypix, ccd, n, xpix, ypix)
+530c534
+< procedure	mosim_coord (xpix, ypix, n)
+---
+> int	procedure mosim_coord (xpix, ypix, n)
+535a540
+> real	flagx, flagy
+545a551,561
+> # flag if off chip:
+> 	if (xpix < 1. || xpix > 2048.)
+> 		flagx = -1.
+> 	else
+> 		flagx = 1.
+> 
+> 	if (ypix < 1. || ypix > 4096.)
+> 		flagy = -1.
+> 	else
+> 		flagy = 1.
+> 
+548a565,571
+> 	xpix = xpix * flagx
+> 	ypix = ypix * flagy
+> 
+> 	if (flagx > 0. && flagy > 0.)
+> 		return (ON_CHIP)
+> 	else
+> 		return (OFF_CHIP)
+581c604
+< #pointer	im				# image descriptor
+---
+> pointer	im				# image descriptor
+606c629
+< # int	ncol
+---
+> int	ncol
+608c631
+< # real	xics, yics		# TMP for FCS work
+---
+> real	xics, yics		# TMP for FCS work
+610a634
+> int	mosim_coord()
+667c691
+< 	if (outfile && access (output, 0, 0) == YES) {
+---
+> 	if (outfile && access (output, 0, 0,) == YES) {
+746c770
+< 	call ics_to_ccd (Memr[bufx+i], Memr[bufy+i], ccd, n, Memr[bufx+i], Memr[bufy+i], stat)
+---
+> 	call ics_to_ccd (Memr[bufx+i], Memr[bufy+i], ccd, n, Memr[bufx+i], Memr[bufy+i])
+757c781
+< 	call mosim_coord (Memr[bufx+i], Memr[bufy+i], n)
+---
+> 	stat = mosim_coord (Memr[bufx+i], Memr[bufy+i], n)
+805,807c829,831
+< 					Memr[bufx+i], Memr[bufy+i], stat)
+< 			    call mosim_coord (Memr[bufx+i], Memr[bufy+i], n)
+< 			    if (stat != ON_CHIP) {
+---
+> 						Memr[bufx+i], Memr[bufy+i])
+> 			    stat = mosim_coord (Memr[bufx+i], Memr[bufy+i], n)
+> 			    if (stat == OFF_CHIP) {
+817c841
+< 					Memr[bufx+i], Memr[bufy+i], stat)
+---
+> 						Memr[bufx+i], Memr[bufy+i])
+821c845
+< 			call mosim_coord (Memr[bufx+i], Memr[bufy+i], n)
+---
+> 			stat = mosim_coord (Memr[bufx+i], Memr[bufy+i], n)
+823c847
+< 			if (stat != ON_CHIP)
+---
+> 			if (stat == OFF_CHIP)
+1018a1043
+> int	mosim_coord()
+1040c1065
+< 		call ics_to_ccd (xpix, ypix, ccd, n, xpix, ypix, stat)
+---
+> 		call ics_to_ccd (xpix, ypix, ccd, n, xpix, ypix)
+1050c1075
+< #		call mosim_coord (Memr[bufx+ndx], Memr[bufy+ndx], n)
+---
+> #		stat = mosim_coord (Memr[bufx+ndx], Memr[bufy+ndx], n)
+
+/n###### xb2.x
+176c176
+< 			scaling, x0ics, y0ics, xrot, yrot, chip, YES, YES)
+---
+> 			scaling, x0ics, y0ics, xrot, yrot, chip)
+
+/n###### xb_util.x
+/n###### xbox.x
+/n###### dsimulator.par
+/n###### qmodel.par
+/n###### qrevmod.par
+/n###### qtrmap.par
+7d6
+< mask,b,h,,,,"mask <--> alpha (vs. sky <--> alpha)?"
+
+/n###### trace.par
+/n###### xbox.par
+/n###### align.h
+26,27c26
+< # define	DYNA_DIR "/net/polo/local/kroot/data/deiccd/dyna/"
+< define	DYNA_DIR "./"
+---
+> define	DYNA_DIR "/net/polo/local/kroot/data/deiccd/dyna/"
+
+/n###### deimos.h
+17a18,20
+> # define	MM_PIX	0.15767		# mm per pixel
+> # define	ASEC_PIX 0.21		# arcsec per pixel (unbinned)
+
+/n###### dmos.h
+/n###### dsimulator.h
+/n###### fitsio.h
+2d1
+< # This file created from cfitsio/fitsio.h
+70,221d68
+< 
+< 
+< 
+< #* Image compression algorithm types */
+< define MAX_COMPRESS_DIM     6
+< define RICE_1      11
+< define GZIP_1      21
+< define PLIO_1      31
+< define HCOMPRESS_1 41
+< 
+< #* error status codes */
+< 
+< define SKIP_TABLE       -104  ## move to 1st image when opening file */
+< define SKIP_IMAGE       -103  ## move to 1st table when opening file */
+< define SKIP_NULL_PRIMARY -102 ## skip null primary array when opening file */
+< define USE_MEM_BUFF     -101  ## use memory buffer when opening file */
+< define OVERFLOW_ERR      -11  ## overflow during datatype conversion */
+< define PREPEND_PRIMARY    -9  ## used in ffiimg to insert new primary array */
+< define SAME_FILE         101  ## input and output files are the same */
+< define TOO_MANY_FILES    103  ## tried to open too many FITS files */
+< define FILE_NOT_OPENED   104  ## could not open the named file */
+< define FILE_NOT_CREATED  105  ## could not create the named file */
+< define WRITE_ERROR       106  ## error writing to FITS file */
+< define END_OF_FILE       107  ## tried to move past end of file */
+< define READ_ERROR        108  ## error reading from FITS file */
+< define FILE_NOT_CLOSED   110  ## could not close the file */
+< define ARRAY_TOO_BIG     111  ## array dimensions exceed internal limit */
+< define READONLY_FILE     112  ## Cannot write to readonly file */
+< define MEMORY_ALLOCATION 113  ## Could not allocate memory */
+< define BAD_FILEPTR       114  ## invalid fitsfile pointer */
+< define NULL_INPUT_PTR    115  ## NULL input pointer to routine */
+< define SEEK_ERROR        116  ## error seeking position in file */
+< 
+< define BAD_URL_PREFIX    121  ## invalid URL prefix on file name */
+< define TOO_MANY_DRIVERS  122  ## tried to register too many IO drivers */
+< define DRIVER_INIT_FAILED 123  ## driver initialization failed */
+< define NO_MATCHING_DRIVER 124  ## matching driver is not registered */
+< define URL_PARSE_ERROR    125  ## failed to parse input file URL */
+< define RANGE_PARSE_ERROR  126  ## failed to parse input file URL */
+< 
+< 
+< define HEADER_NOT_EMPTY  201  ## header already contains keywords */
+< define KEY_NO_EXIST      202  ## keyword not found in header */
+< define KEY_OUT_BOUNDS    203  ## keyword record number is out of bounds */
+< define VALUE_UNDEFINED   204  ## keyword value field is blank */
+< define NO_QUOTE          205  ## string is missing the closing quote */
+< define BAD_KEYCHAR       207  ## illegal character in keyword name or card */
+< define BAD_ORDER         208  ## required keywords out of order */
+< define NOT_POS_INT       209  ## keyword value is not a positive integer */
+< define NO_END            210  ## couldn't find END keyword */
+< define BAD_BITPIX        211  ## illegal BITPIX keyword value*/
+< define BAD_NAXIS         212  ## illegal NAXIS keyword value */
+< define BAD_NAXES         213  ## illegal NAXISn keyword value */
+< define BAD_PCOUNT        214  ## illegal PCOUNT keyword value */
+< define BAD_GCOUNT        215  ## illegal GCOUNT keyword value */
+< define BAD_TFIELDS       216  ## illegal TFIELDS keyword value */
+< define NEG_WIDTH         217  ## negative table row size */
+< define NEG_ROWS          218  ## negative number of rows in table */
+< define COL_NOT_FOUND     219  ## column with this name not found in table */
+< define BAD_SIMPLE        220  ## illegal value of SIMPLE keyword  */
+< define NO_SIMPLE         221  ## Primary array doesn't start with SIMPLE */
+< define NO_BITPIX         222  ## Second keyword not BITPIX */
+< define NO_NAXIS          223  ## Third keyword not NAXIS */
+< define NO_NAXES          224  ## Couldn't find all the NAXISn keywords */
+< define NO_XTENSION       225  ## HDU doesn't start with XTENSION keyword */
+< define NOT_ATABLE        226  ## the CHDU is not an ASCII table extension */
+< define NOT_BTABLE        227  ## the CHDU is not a binary table extension */
+< define NO_PCOUNT         228  ## couldn't find PCOUNT keyword */
+< define NO_GCOUNT         229  ## couldn't find GCOUNT keyword */
+< define NO_TFIELDS        230  ## couldn't find TFIELDS keyword */
+< define NO_TBCOL          231  ## couldn't find TBCOLn keyword */
+< define NO_TFORM          232  ## couldn't find TFORMn keyword */
+< define NOT_IMAGE         233  ## the CHDU is not an IMAGE extension */
+< define BAD_TBCOL         234  ## TBCOLn keyword value < 0 or > rowlength */
+< define NOT_TABLE         235  ## the CHDU is not a table */
+< define COL_TOO_WIDE      236  ## column is too wide to fit in table */
+< define COL_NOT_UNIQUE    237  ## more than 1 column name matches template */
+< define BAD_ROW_WIDTH     241  ## sum of column widths not = NAXIS1 */
+< define UNKNOWN_EXT       251  ## unrecognizable FITS extension type */
+< define UNKNOWN_REC       252  ## unrecognizable FITS record */
+< define END_JUNK          253  ## END keyword is not blank */
+< define BAD_HEADER_FILL   254  ## Header fill area not blank */
+< define BAD_DATA_FILL     255  ## Data fill area not blank or zero */
+< define BAD_TFORM         261  ## illegal TFORM format code */
+< define BAD_TFORM_DTYPE   262  ## unrecognizable TFORM datatype code */
+< define BAD_TDIM          263  ## illegal TDIMn keyword value */
+< define BAD_HEAP_PTR      264  ## invalid BINTABLE heap address */
+< 
+< define BAD_HDU_NUM       301  ## HDU number < 1 or > MAXHDU */
+< define BAD_COL_NUM       302  ## column number < 1 or > tfields */
+< define NEG_FILE_POS      304  ## tried to move before beginning of file  */
+< define NEG_BYTES         306  ## tried to read or write negative bytes */
+< define BAD_ROW_NUM       307  ## illegal starting row number in table */
+< define BAD_ELEM_NUM      308  ## illegal starting element number in vector */
+< define NOT_ASCII_COL     309  ## this is not an ASCII string column */
+< define NOT_LOGICAL_COL   310  ## this is not a logical datatype column */
+< define BAD_ATABLE_FORMAT 311  ## ASCII table column has wrong format */
+< define BAD_BTABLE_FORMAT 312  ## Binary table column has wrong format */
+< define NO_NULL           314  ## null value has not been defined */
+< define NOT_VARI_LEN      317  ## this is not a variable length column */
+< define BAD_DIMEN         320  ## illegal number of dimensions in array */
+< define BAD_PIX_NUM       321  ## first pixel number greater than last pixel */
+< define ZERO_SCALE        322  ## illegal BSCALE or TSCALn keyword = 0 */
+< define NEG_AXIS          323  ## illegal axis length < 1 */
+< 
+< #define NOT_GROUP_TABLE         340
+< #define HDU_ALREADY_MEMBER      341
+< #define MEMBER_NOT_FOUND        342
+< #define GROUP_NOT_FOUND         343
+< #define BAD_GROUP_ID            344
+< #define TOO_MANY_HDUS_TRACKED   345
+< #define HDU_ALREADY_TRACKED     346
+< #define BAD_OPTION              347
+< #define IDENTICAL_POINTERS      348
+< #define BAD_GROUP_ATTACH        349
+< #define BAD_GROUP_DETACH        350
+< 
+< #define BAD_I2C           401  ## bad int to formatted string conversion */
+< #define BAD_F2C           402  ## bad float to formatted string conversion */
+< #define BAD_INTKEY        403  ## can't interprete keyword value as integer */
+< #define BAD_LOGICALKEY    404  ## can't interprete keyword value as logical */
+< #define BAD_FLOATKEY      405  ## can't interprete keyword value as float */
+< #define BAD_DOUBLEKEY     406  ## can't interprete keyword value as double */
+< #define BAD_C2I           407  ## bad formatted string to int conversion */
+< #define BAD_C2F           408  ## bad formatted string to float conversion */
+< #define BAD_C2D           409  ## bad formatted string to double conversion */
+< #define BAD_DATATYPE      410  ## bad keyword datatype code */
+< #define BAD_DECIM         411  ## bad number of decimal places specified */
+< #define NUM_OVERFLOW      412  ## overflow during datatype conversion */
+< 
+< # define DATA_COMPRESSION_ERR 413  ## error in imcompress routines */
+< # define DATA_DECOMPRESSION_ERR 414 ## error in imcompress routines */
+< # define NO_COMPRESSED_TILE  415 ## compressed tile doesn't exist */
+< 
+< #define BAD_DATE          420  ## error in date or time conversion */
+< 
+< #define PARSE_SYNTAX_ERR  431  ## syntax error in parser expression */
+< #define PARSE_BAD_TYPE    432  ## expression did not evaluate to desired type */
+< #define PARSE_LRG_VECTOR  433  ## vector result too large to return in array */
+< #define PARSE_NO_OUTPUT   434  ## data parser failed not sent an out column */
+< #define PARSE_BAD_COL     435  ## bad data encounter while parsing column */
+< #define PARSE_BAD_OUTPUT  436  ## Output file not of proper type          */
+< 
+< #define ANGLE_TOO_BIG     501  ## celestial angle too large for projection */
+< #define BAD_WCS_VAL       502  ## bad celestial coordinate or pixel value */
+< #define WCS_ERROR         503  ## error in celestial coordinate calculation */
+< #define BAD_WCS_PROJ      504  ## unsupported type of celestial projection */
+< #define NO_WCS_KEY        505  ## celestial coordinate keywords not found */
+< #define APPROX_WCS_KEY    506  ## approximate WCS keywords were calculated */
+< 
+< #define NO_CLOSE_ERROR    999  ## special value used internally to switch off */
+<                                ## the error message from ffclos and ffchdu */
+
+
+/n###### ftab.h
+/n###### ftutil.h
+
+/n###### instrument.h
+31,35c31
+< define	OFF_CHIP	16
+< define	LOX	1
+< define	HIX	2
+< define	LOY	4
+< define	HIY	8
+---
+> define	OFF_CHIP	1
+
+/n###### keck.h
+2c2
+< # NB redfine FL_TEL/TEL_FOC; etc, plate_scales -- currently set in deimos.h
+---
+> # NB redfine FL_TEL/TEL_FOC; etc, plate_scales

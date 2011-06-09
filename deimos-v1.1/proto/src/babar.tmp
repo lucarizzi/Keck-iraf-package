@@ -1,0 +1,39 @@
+
+#
+# TEL2RADEC:  from tel axis and rotator PA, calc celest coords of any point
+#
+
+procedure	tel2radec (indat, xas, yas, ra_pt, dec_pt)
+
+pointer	indat
+real	xas, yas
+double	ra_pt, dec_pt
+
+double	r, pa_pt
+
+double	cosd, sind, cosa, sina, cost, sint, cosr, sinr
+
+begin
+# convert field center offset (arcsec) to radians
+	r = sqrt (xas**2 + yas**2) / 206204.8D0
+
+### working here
+# get PA of field center
+	pa_pt = atan2 (yas, xas)
+
+	cosr = cos (r)
+	sinr = sin (r)
+	cosd = cos (DEC_TEL(indat))
+	sind = sin (DEC_TEL(indat))
+
+	cost = cos (pa_pt - PA_ROT(indat))
+	sint = sin (pa_pt - PA_ROT(indat))
+
+	sina = sinr * sint / cosd		# ASSUME not at dec=90
+	cosa = sqrt (1. - sina*sina)
+
+	ra_pt = RA_TEL(indat) - asin (sina)
+	dec_pt = asin ((sind*cosd*cosa - cosr*sinr*cost) /
+				(cosr*cosd*cosa - sinr*sind*cost))
+
+end

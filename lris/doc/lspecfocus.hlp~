@@ -1,0 +1,274 @@
+.help lspecfocus Jan2006 lris
+.ih
+NAME
+lspecfocus -- derive best focus from a series of LRIS arc exposures
+.ih
+USAGE	
+lspecfocus images
+.ih
+PARAMETERS
+.ls images
+List of input CCD images to process.  If the image list matches the
+special pattern "last N red" or "last N blue", where N is a positive
+integer, then the last N red or blue images are used in the analysis.
+.le
+.ls start1
+Number of the first row or column in the first image region to
+analyze.  Ignored unless interactive=yes.
+.le
+.ls end1
+Number of the last row or column in the first image region to
+analyze. Ignored unless interactive=yes.
+.le
+.ls start2
+Number of the first row or column in the second image region to
+analyze.  The second region is typically used only for the case of
+LRIS polarimetry.  Ignored unless interactive=yes.
+.le
+.ls end2
+Number of the last row or column in the second image region to
+analyze.  Ignored unless interactive=yes.
+.le
+.ls interactive = yes
+Define first and last row of slit regions interactively?  If yes
+(default), then a cut along the spatial axis is plotted and the user
+can use the graphics cursor to define the region to analyze.  If no,
+then the values of the parameters start1, end1, start2, and end2 are
+used to define the slit region.
+.le
+.ls bestfocus
+This parameter will contain the value of the measured best focus after
+the program runs successfully.
+.le
+.ls logfile
+Name of the logfile to generate.  The logfile must be a writeable
+file, because the 
+.le
+
+.ce
+PROCESSING SWITCHES
+.ls fixpix = yes
+Fix bad CCD lines and columns by linear interpolation from neighboring
+lines and columns?  If yes then a bad pixel mask, image, or file must be
+specified.
+.le
+.ls overscan = yes
+Apply overscan or prescan bias correction?  If yes then the overscan
+image section will be determined from the keywords in the image header.
+.le
+.ls trim = yes
+Trim the image of the overscan region and bad edge lines and columns?
+If yes then the data section will be determined from the keywords in
+the image header.
+.le
+.ls zerocor = yes
+Apply zero level correction?  If yes a zero level image must be specified.
+.le
+.ls darkcor = yes
+Apply dark count correction?  If yes a dark count image must be specified.
+.le
+.ls flatcor = yes
+Apply flat field correction?  If yes flat field images must be specified.
+.le
+.ls illumcor = no
+Apply illumination correction?  If yes illumination images must be specified.
+.le
+.ls fringecor = no
+Apply fringe correction?  If yes fringe images must be specified.
+.le
+.ls readcor = no
+Convert zero level images to readout correction images?  If yes then
+zero level images are averaged across the readout axis to form one
+dimensional zero level readout correction images.
+.le
+.ls scancor = no
+Convert zero level, dark count and flat field images to scan mode flat
+field images?  If yes then the form of scan mode correction is specified by
+the parameter \fIscantype\fR.
+.le
+
+.ce
+PROCESSING PARAMETERS
+.ls readaxis = "line"
+Read out axis specified as "line" or "column".
+.le
+.ls fixfile
+Bad pixel mask, image, or file.  If "image" is specified then the name is
+specified in the image header or instrument translation file.  If "BPM" is
+specified then the standard BPM image header keyword defines a bad pixel
+mask.  A bad pixel mask is a compact format (".pl" extension) with zero
+values indicating good pixels and non-zero values indicating bad pixels.  A
+bad pixel image is a regular image in which zero values are good pixels and
+non-zero values are bad pixels.  A bad pixel file specifies bad pixels or
+rectangular bad pixel regions as described later.  The direction of
+interpolation is determined by the mask value with a value of two
+interpolating across columns, a value of three interpolating across lines,
+and any other non-zero value interpolating along the narrowest dimension.
+.le
+.ls zero = ""
+Zero level calibration image.  The zero level image may be one or two
+dimensional.  The CCD image type and subset are not checked for these
+images and they take precedence over any zero level calibration images
+given in the input list.
+.le
+.ls dark = ""
+Dark count calibration image.  The CCD image type and subset are not checked
+for these images and they take precedence over any dark count calibration
+images given in the input list.
+.le
+.ls flat = ""
+Flat field calibration images.  The flat field images may be one or
+two dimensional.  The CCD image type is not checked for these
+images and they take precedence over any flat field calibration images given
+in the input list.  The flat field image with the same subset as the
+input image being processed is selected.
+.le
+.ls illum = ""
+Illumination correction images.  The CCD image type is not checked for these
+images and they take precedence over any illumination correction images given
+in the input list.  The illumination image with the same subset as the
+input image being processed is selected.
+.le
+.ls fringe = ""
+Fringe correction images.  The CCD image type is not checked for these
+images and they take precedence over any fringe correction images given
+in the input list.  The fringe image with the same subset as the
+input image being processed is selected.
+.le
+.ls minreplace = 1.
+When processing flat fields, pixel values below this value (after
+all other processing such as overscan, zero, and dark corrections) are
+replaced by this value.  This allows flat fields processed by \fBccdproc\fR
+to be certain to avoid divide by zero problems when applied to object
+images.
+.le
+.ls scantype = "shortscan"
+Type of scan format used in creating the CCD images.  The modes are:
+.ls "shortscan"
+The CCD is scanned over a number of lines and then read out as a regular
+two dimensional image.  In this mode unscanned zero level, dark count and
+flat fields are numerically scanned to form scanned flat fields comparable
+to the observations.
+.le
+.ls "longscan"
+In this mode the CCD is clocked and read out continuously to form a long
+strip.  Flat fields are averaged across the readout axis to
+form a one dimensional flat field readout correction image.  This assumes
+that all recorded image lines are clocked over the entire active area of the
+CCD.
+.le
+.le
+.ls nscan
+Number of object scan readout lines used in short scan mode.  This parameter
+is used when the scan type is "shortscan" and the number of scan lines
+cannot be determined from the object image header (using the keyword
+nscanrows or it's translation).
+.le
+
+
+.ce
+OVERSCAN FITTING PARAMETERS
+
+There are two types of overscan (or prescan) determinations.  One determines
+a independent overscan value for each line  and is only available for a
+\fIreadaxis\fR of 1.  The other averages the overscan along the readout
+direction to make an overscan vector, fits a smoothing function to the vector,
+and then evaluate and then evaluates the smooth function at each readout
+line or column.  The line-by-line determination only uses the
+\fIfunction\fR parameter and the smoothing determinations uses all
+the following parameters.
+
+.ls interactive = no
+Fit the overscan vector interactively?  If yes and the overscan function type
+is one of the \fBicfit\fR types then the average overscan vector is fit
+interactively using the \fBicfit\fR package.  If no then the fitting parameters
+given below are used.
+.le
+.ls function = "legendre"
+Line-by-line determination of the overscan is specified by:
+
+.nf
+      average - the average of the biassec columns at each line
+       median - the median of the biassec columns at each line
+       minmax - the average at each line with the min and max excluded
+.fi
+
+The smoothed overscan vector may be fit by one of the functions:
+
+.nf
+     legendre - legendre polynomial
+    chebyshev - chebyshev polynomial
+      spline1 - linear spline
+      spline3 - cubic spline
+.fi
+.le
+.ls order = 1
+Number of polynomial terms or spline pieces in the overscan fit.
+.le
+.ls sample = "*"
+Sample points to use in the overscan fit.  The string "*" specified all
+points otherwise an \fBicfit\fR range string is used.
+.le
+.ls naverage = 1
+Number of points to average or median to form fitting points.  Positive
+numbers specify averages and negative numbers specify medians.
+.le
+.ls niterate = 1
+Number of rejection interations to remove deviant points from the overscan fit.
+If 0 then no points are rejected.
+.le
+.ls low_reject = 3., high_reject = 3.
+Low and high sigma rejection factors for rejecting deviant points from the
+overscan fit.
+.le
+.ls grow = 0.
+One dimensional growing radius for rejection of neighbors to deviant points.
+.le
+
+.ce
+DETECTOR PARAMETERS
+.ls rdnoise
+CCD readout noise in electrons per pixel.  If specified, the value is
+written to the image header as the keyword \fBrdnoise\fR.
+.le
+.ls gain
+CCD inverse gain in electrons per ADU.  If specified, the value is
+stored in the image header as the keyword \fBgain\fR.
+.le
+.ih
+DESCRIPTION
+\fBlccdproc\fR is a version of the customary noao.imred.ccdred.ccdproc task
+specifically modified for use with LRIS.  The only substantive changes 
+are as follows:
+.ls
+(1) Overscan subtraction is performed by invoking the \fBlrisbias\fR task
+which reduces properly data taken in both single- or dual-amp mode.
+.le
+.ls 
+(2) The overscan region(s) and trim data section are determined
+automatically from keywords present in the image header.
+.le
+.ls
+(3) The readout noise and gain, if specified, are stored in the image
+header for future reference.
+.le
+
+After removing the overscan and trimming the image with \fBlrisbias\fR, this 
+task invokes the ccdproc task to complete the data reduction.
+.ih
+AUTHOR
+Gregory D. Wirth
+.br
+W. M. Keck Observatory
+.br
+lris@keck.hawaii.edu
+.ih
+REVISIONS
+.ls lccdproc v0.0 1999-Feb-24
+Original release.
+.le
+.ih
+SEE ALSO
+.nf
+ccdproc, lrisbias
+.endhelp

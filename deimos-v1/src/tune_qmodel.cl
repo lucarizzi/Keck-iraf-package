@@ -1,0 +1,174 @@
+#-----------------------------------------------------------------------
+procedure tune_qmodel( image)
+#-----------------------------------------------------------------------
+# Name:
+#	tune_qmodel.cl
+# 
+# Purpose:
+#	This procedure will refine the DEIMOS optical model to achieve
+#	agreement between the predicetd and actual positions of the
+#	alignment boxes.  This is a necessary prerequisite to running the
+#	"xbox" task for slitmask alignment.
+# 
+# Parameters:
+#	image = name of the DEIMOS calibration image to use.  This is any
+#			direct image of a slitmask with alignment boxes.
+#
+# Restrictions:
+#	- In order for the software to generate the box file automatically,
+#	the slitmask must currently be loaded into the instrument
+# 
+# Modification history:
+#	2002-Oct-04		GDW		Original version
+#-----------------------------------------------------------------------
+
+string	image	{ prompt="Alignment image" }
+struct  *ilist
+
+begin
+	string	i_image		# internal copy of image
+	string	box_file	# 
+    string  slmsknam	# name of slitmask in use
+    string  buf         # string buffer
+    char    key         # key pressed by user
+	real	d2			# distance
+	real	d2_min		# minimum distance
+    real    x,y         # cursor position
+	real	x0,y0		# coordinates of current alignment box
+	real	x_min,y_min	# coordinates of closest alignment box
+	real	dx,dy		# offset from predicted to measured coords
+	real	droll		# change in droll parameter
+	real	dmu			# change in dmu parameter
+	real	tol=1.0		# convergence tolerance [squared pixels]
+    int     box_size    # box length for tvmark
+	int		itermax=10	# maximum number of iterations
+	int		i			# counter
+    int     frame=1     # frame in which to display
+    int     offset      # x/y offset for tvmark labels
+	int		n			# number of params scanned
+
+	# prompt...
+	i_image = image
+
+	# parse image header...
+	hselect( i_image//"[0]", "SLMSKNAM", "yes") | scan( slmsknam)
+	if ( nscan() != 1 )
+		error( 1, "keyword SLMSKNAM not present in image header")
+
+	# clear space...
+	box_file = "box." // slmsknam
+	if( access( box_file))
+		delete( box_file, ver+, def+)
+	if( access( box_file))
+		error( 1, "operation would clobber existing box file")
+
+	# get boxes...
+    get_boxes( i_image)
+	if( ! access( box_file))
+		error( 1, "box file was not generated")
+
+	# display image...
+	printf( "Displaying image...\n")
+	dmosdisplay( i_image, frame, zscale-, zra-, z1=1000, z2=10000)
+
+    # define params for tvmark...
+    box_size = min(xbox.nxwin,xbox.nywin)
+    offset = 3+box_size/2
+
+	# mark boxes...
+	printf( "Marking box locations on image...\n")
+	tvmark( frame=frame, coords=box_file, logfile="", autolog-,
+		outimage="", deletions="", commands="", mark="circle",
+		lengths=str(box_size), radii=str(nint(0.5*box_size+0.5)), 
+		font="raster", color=204, 
+		label=no, number=yes,
+		nxoffset=offset, nyoffset=offset, pointsize=2,
+		txsize=6, tolerance=1.5, interactive-)
+	tvmark( frame=frame, coords=box_file, logfile="", autolog-,
+		outimage="", deletions="", commands="", mark="point",
+		lengths=str(box_size), radii=str(nint(0.5*box_size+0.5)), 
+		font="raster", color=204, 
+		label=yes, number=yes,
+		nxoffset=offset, nyoffset=offset, pointsize=5,
+		txsize=6, tolerance=1.5, interactive-)
+
+	# get center of a box...
+	printf( "Please center the cursor on any alignment box and press a key...\n")
+    n = fscan( imcur, x, y, buf, key)
+
+	# loop...
+	for( i=1 ; i<=itermax ; i+=1 ){
+
+		# generate new box file...
+		delete( box_file, ver-)
+    	get_boxes( i_image, >& "dev$null")
+
+		# determine the closest box to the predicted position...	
+	    ilist = box_file
+		d2_min = 1.e10
+	    while( fscan( ilist, x0, y0) != EOF ){
+
+			# skip bad lines...
+			if( nscan() != 2)
+				next
+
+			# check distance from (x,y)...
+			d2 = (x-x0)**2 + (y-y0)**2 
+			if( d2 < d2_min){
+				d2_min = d2
+				x_min = x0
+				y_min = y0
+			}
+		}
+
+		# determine offsets in x and y...
+		dx = x - x_min
+		dy = y - y_min
+
+		printf( "Interation %d:", i)
+		printf( " dx=%.1f", dx)
+		printf( " dy=%.1f", dy)
+		printf( " d2=%.1f", d2_min)
+		printf( " roll3=%.4f", qmodel.roll3)
+		printf( " mu=%.4f", qmodel.mu)
+		printf( "\n")
+
+		# test for convergence...
+		if ( d2_min < tol ){
+			printf( "Converged in %d iterations.\n", i)
+			break
+		}
+
+		# modify the qmodel parameters...
+		droll = -0.001*dx
+		dmu   = -0.001*dy
+		qmodel.mu    = qmodel.mu    + dmu
+		qmodel.roll3 = qmodel.roll3 + droll
+
+	}
+
+	# mark boxes...
+	printf( "Marking NEW box locations on image...\n")
+	tvmark( frame=frame, coords=box_file, logfile="", autolog-,
+		outimage="", deletions="", commands="", mark="circle",
+		lengths=str(box_size), radii=str(nint(0.5*box_size+0.5)), 
+		font="raster", color=205, 
+		label=no, number=yes,
+		nxoffset=offset, nyoffset=offset, pointsize=2,
+		txsize=6, tolerance=1.5, interactive-)
+	tvmark( frame=frame, coords=box_file, logfile="", autolog-,
+		outimage="", deletions="", commands="", mark="point",
+		lengths=str(box_size), radii=str(nint(0.5*box_size+0.5)), 
+		font="raster", color=205, 
+		label=yes, number=yes,
+		nxoffset=offset, nyoffset=offset, pointsize=5,
+		txsize=6, tolerance=1.5, interactive-)
+	delete( box_file, ver-)
+
+	# run xbox to verify...
+	xbox( i_image, input="", prac+)
+
+	# clean up...
+	ilist = ""
+
+end

@@ -1,0 +1,9 @@
+# Global environment definitions for the DEIMOS package.
+
+reset	deimosbin	= "deimos$bin(arch)/"
+reset	pkgbin		= deimosbin$
+reset	pkglibs		= deimos$lib/
+
+set	proto		= deimos$proto/
+
+keep

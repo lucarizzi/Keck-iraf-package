@@ -1,0 +1,103 @@
+.help mktracer 2001-Jan-04 wmkonspec.mktracer
+.ih
+NAME
+mktracer -- create a trace image from NIRSPEC low-dispersion flat
+.ih
+USAGE
+
+.sp
+.nf
+mktracer input output
+.fi
+.sp
+
+.ih
+PARAMETERS
+
+.le
+.ls input
+ Name of input image.  This image should be a flat image taken
+with NIRSPEC in low-dispersion mode.
+.le
+.ls output
+ Name of output image.  This image should contain two lines
+available for tracing.
+.le
+
+.ih
+DESCRIPTION
+The 'mktracer' task will take as input a NIRSPEC
+low-dispersion flat and generate an image which can be used to map and 
+remove the \fIx\fR distortions from accompanying NIRSPEC
+images.  The following manipulations are performed on the input
+image in order to generate the output image:
+.ls (1)
+ an 11&times;11 pixel boxcar filter is passed over the image 
+to eliminate small-scale features such as hot pixels and
+grunge on the slit, while still maintaining the large-scale
+features of the image
+.le
+.ls (2)
+ a gradient filter is used to locate places where the flux
+changes along each image row
+.le
+.ls (3)
+ the temporary image is renormalized to a maximum value of 1
+.le
+.ls (4)
+ the temporary image is squared to make both the up and down 
+slopes of the illuminated region be positive, and also to
+reduce the width of the gradient peaks for easier detection
+.le
+.ls (5)
+ an 11&times;1 median filter is passed over the image to
+smooth over insignificant peaks in each row
+.le
+.ls (6)
+ the temporary image is convolved with a wide Gaussian
+filter in the \fIx\fR direction in order to merge double
+peaks into single ones
+.le
+All operations take place on temporary images in the current
+directory.  The input image is not affected by these operations.
+The output image is suitable as input to the task \fBxdistcor\fR.
+.ih
+EXAMPLES
+.ls
+ Given an image '24des0057.fits' which is a NIRSPEC
+low-dispersion flat, produce a trace image called
+'trace':
+
+.sp
+.nf
+mktracer mktracer 24des0057 trace
+.fi
+.sp
+
+.le
+.ih
+NOTES
+.ls (1)
+ Several temporary images will be created and deleted in the 
+current working directory.
+.le
+.ih
+BUGS
+.ih
+SEE ALSO
+\fBboxcar\fR
+\fBgradient\fR
+\fBmedian\fR
+\fBgauss\fR
+.br
+\fBThe cl script mktracer.cl\fR
+.br
+\fBThe package wmkonspec\fR
+
+
+.ih
+LAST MODIFIED
+ Tue Apr 17 16:25:47 HST 2001
+
+.sp
+Converted from source help file mktracer.html via html2lroff

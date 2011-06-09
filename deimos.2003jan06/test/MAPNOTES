@@ -1,0 +1,10 @@
+geom amap  aamap -600. 600. -40. 260. xxo=7 xyo=6 yyo=7 yxo=5 calc=double
+
+GEOM xxord=7 xyord=6 yxord=5 yyord=7 works very well, rms=3e-8; range +/- 5e-8
+
+
+geom bmap  aamap -5080. 5080. -5080. 5080. xxo=8 xyo=7 yxo=7 yyo=8 calc=double
+rms 3.3e-8 rangge +/- 6e-8 with a few outliers from edge.
+
+geom revbmap bbmap -0.2 0.2 -0.16 0.25 xxo=6 xyo=5 yxo=5 yyo=6 calc=double
+rms = 0.03px with rangel +/-0.06 px and some outliers at 0.1px

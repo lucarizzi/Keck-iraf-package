@@ -1,0 +1,21 @@
+!clear;date
+[H[2JWed Aug  7 10:04:50 HST 2002
+--------------------- DEIMOS ---------------------
+Library libpkg.a is up to date
+Object x_deimos.o is up to date
+xc -/Bstatic -p keck x_deimos.o libpkg.a -lxtools -liminterp -lsurfit -lgsurfit -lcurfit -lslalib ../cfitsio/libcfitsio.a -o xx_deimos.e
+move `xx_deimos.e' to `keckbin$x_deimos.e'
+--------------------- LRIS ---------------------
+Library libpkg.a is up to date
+Object x_lris.o is up to date
+xc -/Bstatic -p keck x_lris.o libpkg.a -lxtools -liminterp -lsurfit -lgsurfit -lcurfit -o xx_lris.e
+move `xx_lris.e' to `keckbin$x_lris.e'
+--------------------- LWS ---------------------
+Library libpkg.a is up to date
+Object x_lws.o is up to date
+xc -/Bstatic -p keck x_lws.o libpkg.a  -lxtools -o xx_lws.e
+move `xx_lws.e' to `keckbin$/x_lws.e'
+--------------------- NIRSPEC ---------------------
+purge directory `keckbin$'
+!date
+Wed Aug  7 10:05:01 HST 2002

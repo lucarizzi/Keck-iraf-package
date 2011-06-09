@@ -1,0 +1,165 @@
+These notes refer to adapting dsimulator for LRIS
+
+
+dsim.x -- some specific items, mostly general, including overall process.
+
+dsim2.x -- some specific items (limits, etc), but some are simply names that
+could be specified in include files.
+
+dsim3.x	-- general procs + UCB decode ("marc") routines; shared or not needed
+
+dsimgraph.x -- may be pretty general
+
+
+deimos.h -- instrument-related: "lris.h"
+
+dsimulator.h -- mostly same, but some specific items (files names, CCD outlines)	NEW VERS "lsimulator.h"
+
+PLAN:
+0. Generate a parallel directory for work.
+
+1. Clean up general business:
+-- Put control proc and specific procs in one file;
+-- put general procs in other(s); note that these may require modified include
+	files, however.
+-- for the graphics file, put all specific items in one location
+-- create a new routine (null in DSIMULATOR) that translates slit coords
+	into appropriate reference frame for masks. IS THIS NEEDED FOR LRIS?
+	HOW ARE LRIS MASKS MILLED??
+
+2. Generate a "rosetta stone" figure for each instrument. DEIMOS had different
+coordinate systems and other instruments will, too.
+
+3. For the FITS-table writing routines, many character strings unique to the
+instrument should be placed in include files.
+
+------------------------------------------------------------------
+------------------------------------------------------------------
+
+DSIM.X -- Overall control program
+
+S  dsim.x:procedure	t_dsimulator()
+G  dsim.x:procedure	selector (indat, tdat, ntarg, nlist, minsep, psum)
+G  dsim.x:procedure	sel_rank (tdat, indat, tndex, sel, npt, isel, xlow, xupp, minsep, nsel)
+G  dsim.x:procedure	sel_sort (px1, px2, npre, index, x, pri, nopt)
+G  dsim.x:procedure	mask_coords (sdat, nslit)
+S! dsim.x:procedure	metal_check (sdat, nslit)
+G  dsim.x:procedure	sky_coords (sdat, nslit, indat)
+G  dsim.x:procedure	slit_sort (x, index, n)
+G? dsim.x:procedure	len_slits (tdat, ntarg, sdat, nslit, indat)
+S* dsim.x:procedure	list_dat (fd, indat, tdat, ntarg, sdat, nslit, delpa, std_fmt, plotfile) ## specific to output needs; needs guider astrometric mapping!!
+G  dsim.x:procedure	tel2radec (indat, xas, yas, ra_pt, dec_pt)
+
+
+
+G  dsim2.x:procedure	data_init (indat)
+	# Dsimsulator version and INSTRUMENT
+G  dsim2.x:procedure	targ_init (fd, tdat, ntarg, indat)
+G  dsim2.x:procedure	targ_alloc (tdat, ntarg)	## goes w/ targ_init
+G  dsim.x:procedure	fld2telax (indat)
+G  dsim2.x:procedure	tel_coords (tdat, ntarg, indat)
+S! dsim2.x:int procedure	chk_stat (x, y, full_check)
+	## called in tel_coords and gen_slit
+G  dsim2.x:procedure	gen_slits (tdat, ntarg, sdat, nslit, indat)
+G  dsim2.x:procedure	slit_alloc (sdat, nslit) ## called in gen_slits only
+G  dsim2.x:int	procedure date_decode (date_str, epoch)	## called in data_init
+G  dsim2.x:int	procedure	name_check (name)	## called in data_init
+G  dsim2.x:procedure	bpstd (fd, kdat, tabname, npk, nfk, nam1, nam2, nam3)
+				## called in dswd.x
+
+
+DSIM3.X -- unsure why first two routines are here ... all four called in dsim.x
+
+G  dsim3.x:procedure	refr_coords (tdat, ntarg, indat)
+G  dsim3.x:procedure	unrefr_coords (sdat, nslit, indat)
+x  dsim3.x:procedure	marc (fname, tdat, ntarg, sdat, nslit, indat)
+x  dsim3.x:procedure	marc2 (sdat, nslit, tdat, ntarg)
+
+
+
+DSWD.X -- write design; there are some hardcode inconsistencies here ...
+
+G  dswd.x:procedure	write_design (indat, tdat, ntarg, sdat, nslit, fd, objfile)
+G  dswd.x:procedure	rdb_map (fd)
+
+
+
+DSIMGRAPH.X -- graphical display
+
+F? dsimgraph.x:procedure	gselect_targ (tdat, ntarg, sdat, nslit, indat)
+	# some definitions which could go elsewhere ...
+	# case 'z' is special
+G  dsimgraph.x:procedure	get_outlines (mdat)
+G? dsimgraph.x:procedure	fp_layout (gp, mdat, indat, tdat, ntarg, sdat, nslit, nlist, lab1, lab2, lab3)
+	# this may be somewhat specific -- check!!
+G  dsimgraph.x:procedure	mark_obj (gp, tdat, i, nlist)
+G  dsimgraph.x:procedure	mark_slit (gp, sdat, i)
+G  dsimgraph.x:int procedure get_sw_nearest0 (gp, xdata, ydata, isw, ndata, sw_val, wx, wy, wcs)
+
+DEIMOS_UTIL.X:
+the routine proj_to_mask is used in dsim: mask_coords
+
+DSPLOT.X:
+F*  dsplot.:procedure       write_mongo (fdp, tdat, nt, sdat, nslit, indat, fdtv1, fdtv2, gsndx, ngs, delpa, plotfile)
+
+TO FIX:
+1. In both list_data and write_mongo, there is a break-point for using MIRR/MASK
+TV_MAP
+
+2. Names of SIMULATOR TASKS
+
+3. Plotting labels (make part of struct?)
+
+4. Move routine around to better locations
+
+
+FP_FILE is specific
+
+
+NOTE THAT THERE ARE VARIOUS MAPPINGS THAT MUST BE DETERMINED:
+TV_MIRR_MAP (list_dat,write_mongo to give pix coords of guide stars on MIRROR)
+TV_MASK_MAP (list_dat,write_mongo to give pix coords of guide stars on MASK)
+XPROJ_MAP (needed in len_slits to avoid spetral overlap).
+
+
+PLAN for LRIS:
+A. FP_FILE -- Design for LRIS; may need two versions, one ea for offset, pickoff
+B. Gather parameters for LRIS (sizes, angles, radii, etc.)
+C. Needs mappings ...
+
+
+05may:
+ADDED A NEW INCLUDE FILE "INST_FILE.H" to make switch easier -- just 2 lines
+to be changed. Note that changes to lsimulator.h and lris.h may not take
+effect unless forced! (They are not included in the mkpkg dependencies list)
+ALSO CHANGE CHK_STAT in DSIM2
+
+-- Add new pickoff mirror location, including in chk_stat
+-- Find out from Keck how LRIS masks are milled (ie coord sys)
+-- NEED TO CHECK ALL FOC_PLANE NUMBERS!
+
+New pickoff mirror is +/- 15.24mm wide and from -21.793 to -59.995 mm wrt center
+Must take cos(8.06) and convert to arcsec (assume center at 7 arcmin)
+= 420-cos(8.06/57.293)*21.793/0.7252
+= 420-cos(8.06/57.293)*59.995/0.7252
+= 15.24/0.7252
+arcsec: 390.25 to 338.08 +/- 21.02 wide (outside)
+Inside: 
+= 420-cos(8.06/57.293)*24.13/0.7252
+= 420-(cos(8.06/57.293)*24.13+cos(11.76/57.293)*31.75)/0.7252
+= 12.7/0.7252
+arcsec: 387.05 to 344.20 and width +/- 17 arcsec
+
+According to ZEMAX, 7.0 arcmin point is 304.28mm from axis (in y) without ADC;
+it is 303.85 w/ ADC
+
+NB DSPLOT has hard-coded plate scale in it!!
+NB THERE ARE DISCEPANCIES BETWEEN FL_TEL, MM_ARCS and ???
+	-- it appears MM_ARCS on used in fp_coord which appears unused.
+NB There is a possible error in pt_xfm; see 2008may08 note internally.
+
+============================================================================
+
+There remains the measure of distortion used in gnom_to_dproj specific to
+LRIS (or other instrument) ... Can we get this from ZEMAX (how?) and is
+it ADC specific??

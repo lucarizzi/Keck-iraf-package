@@ -1,0 +1,144 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>check_boxes Sep2001 ucsclris.check_boxes</title>
+  </head>
+  <body>
+    
+    <h1><a href="check_boxes.cl">check_boxes.cl</a></h1>
+    
+    <h2>Name</h2>
+    check_boxes -- define and verify slitmask alignment box coordinates
+    
+    <h3>Usage</h3>
+    <pre>check_boxes image input</pre>
+    
+    <h3>Parameters</h3>
+    <dl>
+      
+      <dt> images
+      <dd> Name of the input LRIS image showing slitmask alignment boxes.
+	
+      <dt> input
+      <dd> Name of the file listing alignment box coordinates.
+
+      <dt> doxbox = yes
+      <dd> Flag whether to run the <b>xbox</b> task after boxes have
+	been verified.
+	
+    </dl>
+    
+    <h3>Description</h3>
+
+    The <b>check_boxes</b> task allows you to define interactively the
+    list of box coordinates required by the <b>xbox</b> program for
+    slitmask alignment, and to verify visually that existing
+    coordinates match up with their respective boxes.  The program
+    applies the same shifts to the coordinates as does <b>xbox</b>, and
+    hence prevents confusion caused by the change in coordinates
+    between IRAF and FIGDISP coordinates.
+
+    <p>
+    The task starts by sending the input image on the image display
+    tool.  If the specified input file exists, the task reads
+    alignment box coordinates and labels from the file and draws red
+    circles around these coordinates on the image.  The program then
+    enters interactive mode, in which you can issue the following
+    keyboard commands:
+
+    <dl>
+      <dt> <b>m</b>
+      <dd> Mark a new box at the current cursor location.
+
+      <dt> <b>d</b>
+      <dd> Delete the box nearest to the current cursor position.
+
+      <dt> <b>D</b>
+      <dd> Delete all boxes.
+
+      <dt> <b>s</b>
+      <dd> Shift one box.  The program will ask you to indicate which
+	box to shift  and the new location of the box.
+
+      <dt> <b>S</b>
+      <dd> Shift all boxes.  The program will ask you to indicate one
+	box to shift and its new location.  All boxes will be shifted
+	this amount. 
+
+      <dt> <b>+</b>
+      <dd> Shift all boxes to the right by 21 pixels.
+
+      <dt> <b>-</b>
+      <dd> Shift all boxes to the right by 21 pixels.
+
+    </dl>
+
+    The image display is updated whenever the box locations are changed.
+
+    <p>
+    By default, <b>check_boxes</b> will run <b>xbox</b> after the box
+    list is defined.
+
+    <h3>Examples</h3>
+    
+    <h4>Creating a New Coordinate List</h4>
+
+	
+    It isn't necessary to spend time tabulating slitmask alignment
+    box coordinates into files because with <b>check_boxes</b> you
+    can do it in a few seconds.  Follow these steps to generate a
+    new coordinate list and run <b>xbox</b>:
+    
+    <ol>
+      <li> Type "check_boxes doxbox+" to run the program; you will be 
+	prompted to enter the name of the input image and the name
+	of the box file to create.  The program will send the
+	image to the image display.
+	    
+      <li> For each alignment box, put the image cursor over the
+	center of the box and press "m" to mark the box.  The
+	program will draw a red circle around each box.
+	
+      <li> Type "q" to quit the task and proceed with <b>xbox</b>.
+    </ol>
+    
+    <h4>Verifying an Existing Coordinate List</h4>
+      
+
+    If you have a coordinate list already, you can use
+    <b>check_boxes</b> as a "sanity check" to preview your box
+    coordinates and ensure that <b>xbox</b> will be able to find
+    them.
+    
+    <ol>
+      
+      <li> Type "check_boxes doxbox+" to run the program; you will
+	be prompted to enter the name of the input image and the
+	name of the box file to create.  The program will send the
+	image to the image display and mark the positions of the
+	boxes you've defined.
+	
+      <li> Visually inspect the image and verify that each
+	alignment box lies within the corresponding red circle,
+	which indicates the coordinates you input.  If a single box
+	requires adjustment, use the "s" key to shift it.  If all
+	boxes are off by a constant amount, use the "S" key to shift
+	them all in parallel.
+	
+      <li> Type "q" to quit the task and proceed with <b>xbox</b>.
+    </ol>
+
+    <h3>Bugs</h3>
+    
+    <h3>See Also</h3>
+
+    xbox, tvmark
+    
+    <hr>
+    <address>Gregory D. Wirth</a> <a href="mailto:wirth@keck.hawaii.edu">&lt;wirth@keck.hawaii.edu&gt;</a></address>
+    <!-- Created: Fri Jan  5 09:05:27 HST 2001 -->
+    <!-- hhmts start -->
+Last modified: Wed Sep 12 16:48:25 HST 2001
+<!-- hhmts end -->
+  </body> 
+</html>

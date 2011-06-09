@@ -1,0 +1,8 @@
+# Make the NIRSPEC package.
+
+$call	update
+$exit
+
+update:
+	$exit
+	;

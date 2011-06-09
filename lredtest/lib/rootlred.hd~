@@ -1,0 +1,8 @@
+# Root task entry for the LRED package help tree.  Defines `lred'
+# as both a task and a package in the lred help database.
+
+lred	men  = lred$lred.men,
+		hlp  = lred$lred.men,
+		sys  = lred$lred.hlp,
+		pkg  = lred$lred.hd,
+		src  = lred$lred.cl

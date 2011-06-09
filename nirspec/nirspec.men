@@ -1,0 +1,8 @@
+     mktracer - Create a trace image from NIRSPEC low-dispersion flat
+     xdistcor - Remove x distortion from NIRSPEC image
+     ydistcor - Remove y distortion from NIRSPEC image
+     plotcuts - Overplot cuts from multiple places along a spectrum
+     spec_s2n - Estimate the S/N for multispec-format spectra
+      skyplot - Create simlulated sky spectrum and corresponding line list
+    skyinterp - Interpolate over spectral regions affected by strong sky lines
+      donspec - Rectify, extract, and calibrate NIRSPEC low-d spectra

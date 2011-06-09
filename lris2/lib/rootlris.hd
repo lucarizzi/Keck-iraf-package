@@ -1,0 +1,8 @@
+# Root task entry for the LRIS package help tree.  Defines
+# `lris' as both a task and a package in the lris help database.
+
+lris        men = lris$lris.men,
+                hlp = lris$lris.men,
+                sys = lris$lris.hlp,
+                pkg = lris$lris.hd,
+                src = lris$lris.cl

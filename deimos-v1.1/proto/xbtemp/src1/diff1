@@ -1,0 +1,264 @@
+3a4
+> 
+8,10d8
+< include	<math.h>
+< include "instrument.h"
+< include "align.h"
+12a11,21
+> # Define the struct for the box data
+> define	BDATLEN		9
+> define	PTSLTNO		Memi[$1]
+> define	PTOBJNO		Memi[$1+1]
+> define	PTMAG		Memi[$1+2]
+> define	PTPBAND		Memi[$1+3]
+> define	PTXMM		Memi[$1+4]
+> define	PTYMM		Memi[$1+5]
+> define	PTXPX		Memi[$1+6]
+> define	PTYPX		Memi[$1+7]
+> define	PTNAME		Memi[$1+8]
+14c23,31
+< procedure	t_get_boxes ()
+---
+> define	SLITNO		Memi[PTSLTNO($1)+$2]		# dSlitId
+> define	OBJNO		Memi[PTOBJNO($1)+$2]		# ObjectId
+> define	MAG		Memr[PTMAG($1)+$2]		# Magnitude
+> define	PBAND		Memc[PTPBAND($1)+$2]		# Passband for magnitude
+> define	XMM		Memr[PTXMM($1)+$2]		# X slitmask (mm)
+> define	YMM		Memr[PTYMM($1)+$2]		# Y slitmask (mm)
+> define	XPX		Memr[PTXPX($1)+$2]		# X in pixels
+> define	YPX		Memr[PTYPX($1)+$2]		# Y in pixels
+> define	OBJNAME		Memc[PTNAME($1)+$2*SZ_ID]	# full data line
+16c33
+< int	pos			# Slot number
+---
+> define	SZ_ID	41
+18,23c35,36
+< char	outname[SZ_FNAME]
+< char	guiname[SZ_GUINAM]
+< int	i
+< int	nbox
+< pointer	bdat
+< pointer	fd			# output file descriptor
+---
+> define	DYNA_DIR "test/xbtest/"
+> # define	DYNA_DIR "/net/polo/local/kroot/data/deiccd/dyna/"
+25,29c38
+< bool	streq()
+< int	clgeti()
+< pointer	open()
+< begin
+< 	pos = clgeti ("SLMSKPOS")		# eventually we read SLMSKPOS
+---
+> procedure	t_get_boxes ()
+31,76d39
+< 	call get_boxes (pos, bdat, nbox, guiname)
+< 
+< 	if (nbox == 0)
+< 		call fatal (0, "No Alignment Boxes Found!")
+< 
+< # Construct output file name; open
+< 	if (streq (guiname, "")) {
+< 		call sprintf (outname, SZ_FNAME, "box.%02d")
+< 			call pargi (pos)
+< 	} else {
+< 		call sprintf (outname, SZ_FNAME, "box.%s")
+< 			call pargstr (guiname)
+< 	}
+< 	fd = open (outname, NEW_FILE, TEXT_FILE)
+< 	call eprintf ("Writing file %s \n")
+< 		call pargstr (outname)
+< 
+< 	do i = 0, nbox-1 {
+< 		if (XPX(bdat,i) == INDEF || YPX(bdat,i) == INDEF) {
+< 		    call fprintf (fd,
+< 			"# OFF_CHIP %s   # Mag_%s=%5.2f %8.3f %7.3f\n")
+< 			call pargstr (OBJNAME(bdat,i))
+< 			call pargc (PBAND(bdat,i))
+< 			call pargr (MAG(bdat,i))
+< 			call pargr (XMM(bdat,i))
+< 			call pargr (YMM(bdat,i))
+< 		} else {
+< 		    call fprintf (fd,
+< 			"%6.1f %6.1f  %s   # Mag_%s=%5.2f %8.3f %7.3f\n")
+< 			call pargr (XPX(bdat,i))
+< 			call pargr (YPX(bdat,i))
+< 			call pargstr (OBJNAME(bdat,i))
+< 			call pargc (PBAND(bdat,i))
+< 			call pargr (MAG(bdat,i))
+< 			call pargr (XMM(bdat,i))
+< 			call pargr (YMM(bdat,i))
+< 		}
+< 	}
+< 
+< 	call close (fd)
+< 
+< end
+< 
+< 
+< procedure	get_boxes (pos, bdat, nbox, guiname)
+< 
+78,80d40
+< pointer	bdat
+< int	nbox
+< char	guiname[SZ_GUINAM]
+82a43
+> char	outname[SZ_FNAME]
+83a45,46
+> pointer	bdat
+> int	nbox
+86,87c49
+< # needed for qxfm
+< char	amap[SZ_FNAME], bmap[SZ_FNAME]		# input mappings
+---
+> int	clgeti()
+89,104d50
+< pointer	fda, fdb
+< pointer	map[4]				# pointers to surf fits (1,2=amap;3,4=b)
+< 
+< double	sys[NPARAM]			# system parameters
+< real	ccd[NCCD,3]			# CCD geometry
+< double	a3[3,3]				# grating transform
+< real	xics, yics			# pixel values in ICS
+< real	scaling
+< int	stat
+< int	chip
+< 
+< int	qxfm(), qxfm_init()
+< 
+< real	clgetr()
+< pointer	open()
+< 
+105a52,53
+> 	pos = clgeti ("SLMSKPOS")		# eventually we read SLMSKPOS
+> 
+116c64
+< 	call get_all_info (fname, bdat, nbox, guiname)
+---
+> 	call get_all_info (fname, bdat, nbox)
+118,121c66
+< # Now get qmodel values:
+< 	MU(sys) = DEGTORAD (clgetr ("qmodel.mu"))
+< 	GR_YERR(sys) = DEGTORAD (clgetr ("qmodel.roll3"))
+< 	GR_ZERR(sys) = DEGTORAD (clgetr ("qmodel.o3"))
+---
+> #  GET QMOD VALUES HERE
+123,137d67
+< 	scaling = 1. + clgetr ("qmodel.scale_adj")
+< 
+< 	ORDER(sys) = 0		# always zeroth order
+< 	GRLINES(sys) = 1	# always zeroth order
+< 
+< 	call clgstr ("qmodel.amap", amap, SZ_FNAME)
+< 	fda = open (amap, READ_ONLY, TEXT_FILE)
+< 
+< 	call clgstr ("qmodel.bmap", bmap, SZ_FNAME)
+< 	fdb = open (bmap, READ_ONLY, TEXT_FILE)
+< 
+< # Initialize the mappings
+< 	stat = qxfm_init (fda, fdb, map, a3, sys, ccd)
+< 
+< 
+139,147c69,78
+< 
+< # calculate the mapping
+< 		stat = qxfm (map, a3, sys, ccd, XMM(bdat,i), YMM(bdat,i), 1.,
+< 			scaling, xics, yics, XPX(bdat,i), YPX(bdat,i), chip)
+< 
+< 		if (stat == OFF_CHIP) {
+< 			XPX(bdat,i) = INDEF
+< 			YPX(bdat,i) = INDEF
+< 		}
+---
+> XPX(bdat,i) = 0.
+> YPX(bdat,i) = 0.
+> 		call printf ("%6.1f %6.1f  %s   # Mag_%s=%5.2f %8.3f %7.3f\n")
+> 			call pargr (XPX(bdat,i))
+> 			call pargr (YPX(bdat,i))
+> 			call pargstr (OBJNAME(bdat,i))
+> 			call pargc (PBAND(bdat,i))
+> 			call pargr (MAG(bdat,i))
+> 			call pargr (XMM(bdat,i))
+> 			call pargr (YMM(bdat,i))
+149a81
+> 	
+151a84
+> procedure	get_all_info (fname, bdat, nbox)
+153,154d85
+< procedure	get_all_info (fname, bdat, nbox, guiname)
+< 
+156,158c87,88
+< pointer	bdat			# box data struct
+< int	nbox			# number of boxes
+< char	guiname[ARB]		# GI Name for slitmask
+---
+> pointer	bdat
+> int	nbox
+173d102
+< int	nobj
+187c116
+< # call eprintf ("DEBUG: table[3]:\n")
+---
+> call eprintf ("DEBUG: table[3]:\n")
+232c161
+< # call eprintf ("DEBUG: table[6]:\n")
+---
+> call eprintf ("DEBUG: table[6]:\n")
+294c223
+< # call eprintf ("DEBUG: table[4]:\n")
+---
+> call eprintf ("DEBUG: table[4]:\n")
+316d244
+< 	nobj = nr
+319c247
+< 		do k = 0, nobj-1 {
+---
+> 		do k = 0, nslit-1 {
+326d253
+< 			break
+334c261
+< # call eprintf ("DEBUG: table[1]:\n")
+---
+> call eprintf ("DEBUG: table[1]:\n")
+358c285
+< 		do k = 0, nobj-1 {
+---
+> 		do k = 0, nslit-1 {
+372d298
+< 			break
+377,412d302
+< 
+< # Get MaskBlu table (5) for guiname (col 17)
+< # call eprintf ("DEBUG: table[5]:\n")
+< 
+< 	call strcpy (fname, xname, SZ_FNAME)
+< 	call strcat ("[5]", xname, SZ_FNAME)
+< 	call f77pak (xname, f77nam, SZ_FNAME)
+< 
+< 	call ftgiou (lu, stat)
+< 	call ftnopn (lu, f77nam, READONLY, stat)
+< 
+< 	call ftgncl (lu, nc, stat)
+< 	call ftgnrw (lu, nr, stat)
+< 
+< # check format:
+< 	if (nc != 18 || nr!= 1) {
+< 		call eprintf ("%s, nc=%d nr=%d stat=%d\n")
+< 		call pargstr (xname)
+< 		call pargi (nc)
+< 		call pargi (nr)
+< 		call pargi (stat)
+< 		call fatal (0, "Unexpected format in input FITS table")
+< 	}
+< 
+< 	call ftgcvs (lu, 17, 1, 1, 1, f77nul, f77lin, isnul, stat)
+< 	if (isnul)
+< 		call strcpy ("", guiname, SZ_GUINAM)
+< 	else
+< 		call f77upk (f77lin, guiname, SZ_GUINAM)
+< 
+< call eprintf ("DEBUG: guiname= %s\n")
+< call pargstr (guiname)
+< 
+< 	call ftclos (lu, stat)
+< 
+< 

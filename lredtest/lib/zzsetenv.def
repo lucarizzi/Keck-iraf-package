@@ -1,0 +1,7 @@
+# Global environment definitions for the LREDTEST package.
+
+reset	lredtestbin	= "lredtest$bin(arch)/"
+reset	pkgbin		= lredtestbin$
+reset	pkglibs		= lredtest$lib/
+
+keep

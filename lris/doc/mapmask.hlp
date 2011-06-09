@@ -1,0 +1,23 @@
+.help mapmask 27oct97 ucsclris.prep
+.ih
+NAME
+mapmask -- Map targets and slits from celestial coordinates onto physical mask.
+.ih
+USAGE
+mapmask input output HA Epoch
+.ih
+PARAMETERS
+.ih
+DESCRIPTION
+SIMULATOR produces a list of target objects and associated slit parameters;
+MAPMASK transformes these into physical coordinates on the slitmask surface
+and lengthens slits into unused spaces and shortens slits as needed to
+resolve overlaps.  The output is ready for FABMASK.  The output file also
+contains an updated mask PA in the equinox of stated Epoch, and TV coordinates
+for the Guide Star on the Pickoff mirror, if any.
+.ih
+EXAMPLES
+.ih
+SEE ALSO
+simulator, fabmask
+.endhelp

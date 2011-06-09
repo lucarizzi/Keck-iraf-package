@@ -1,0 +1,9 @@
+# Fix the xiter in trace;  I believe relscale has already been worked out
+# by the time we get to the call.
+
+# OK, have created a new program called qrev.
+# First model is for well-aligned system (although I'm leaving the tent mirror
+# angle at -0.45 for now, but all else is OK
+# this mapping produced by:
+qtrmap revamap0 revbmap0 rev+
+

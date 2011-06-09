@@ -1,0 +1,63 @@
+.help WMKONSPEC Package
+This package contains the following IRAF tasks related to
+reductions of low-dispersion spectra from the NIRSPEC instrument
+at the W. M. Keck Observatory.
+.ih
+TASKS
+The following tasks are available in this package:
+
+.le
+.ls \fBmktracer\fR
+ Create a trace image from NIRSPEC low-dispersion flat
+.le
+.ls \fBxdistcor\fR
+ Remove \fIx\fR distortion from NIRSPEC image
+.le
+.ls \fBydistcor\fR
+ Remove \fIy\fR distortion from NIRSPEC image
+.le
+.ls \fBplotcuts\fR
+ Overplot cuts from multiple places along a spectrum
+.le
+.ls \fBspec_s2n\fR
+ Estimate the S/N for multispec-format spectra
+.le
+.ls \fBskyplot\fR
+ Create simulated sky spectrum and corresponding line list
+.le
+.ls \fBskyinterp\fR
+ Interpolate over spectral regions affected by strong sky lines
+.le
+.ls \fBdonspec\fR
+ Rectify, extract, and calibrate NIRSPEC low-d spectra
+.le
+
+.ih
+SEE ALSO
+.ls (1)
+ \fBIRAF Reduction of NIRSPEC Low-Dispersion Spectra\fR
+.le
+.ls (2)
+ \fBInfrared Argon Emission Lines\fR
+.le
+.ls (3)
+ \fBInfrared Neon Emission Lines\fR
+.le
+.ls (4)
+ \fBHigh-Resolution Infrared OH Lines\fR
+.le
+.ls (5)
+ \fBLow-Resolution Infrared OH Lines\fR
+.le
+
+.ih
+AUTHOR
+Gregory D. Wirth (wirth@keck.hawaii.edu)
+
+
+.ih
+LAST MODIFIED
+ Wed Jan 10 17:15:09 HST 2001
+
+.sp
+Converted from source help file index.html via html2lroff

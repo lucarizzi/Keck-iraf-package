@@ -1,0 +1,84 @@
+#-----------------------------------------------------------------------
+procedure multi2flat( inimage, outimage)
+#-----------------------------------------------------------------------
+# Name:
+#	multi2flat
+# 
+# Purpose:
+#	Convert Multi-HDU FITS image to "old-style" flat image
+# 
+# Author:
+#	Gregory D. Wirth, W. M. Keck Observatory
+# 
+# Modification history:
+#	2009-May-29     GDW     original version
+#-----------------------------------------------------------------------
+string  inimage		{ prompt="Name of input LRIS Multi-HDU image" }
+string  outimage	{ prompt="Name of output LRIS flat image" }
+
+begin
+	string	iimage	   # internal copy of iimage
+	string	oimage	   # internal copy of oimage
+	#----
+	string	tmpprefix	# prefix for temp files
+	string	instrume	# name of instrument
+	string	detsec
+	string	datasec
+	int		i
+	int		ix1,ix2,iy1,iy2
+	int		nhdu		# number of HDUs
+	
+
+	# prompt...
+	iimage = inimage
+	oimage = outimage
+
+	# verify input...
+	if ( ! imaccess( iimage))
+		error( 1, "requested input image "//iimage//" not found")
+
+	# verify non-existence of output image...
+	if ( imaccess( oimage))
+		error( 1, "operation would clobber existing output image "//oimage)
+
+	# verify that this is a blue LRIS image...
+	hselect( iimage//"[0]", "INSTRUME", "yes") | scan( instrume)
+	if ( instrume != "LRISBLUE" )
+		error( 1, "input image is not from LRISBLUE")
+
+	# count number of extensions...
+	fxheader( iimage, format_file="", long_header-, count_lines-) \
+		| match( "IMAGE", files="STDIN", stop-, print_file_names-, meta-) \
+		| count( "STDIN") \
+		| scan( nhdu)
+	if( nhdu < 1 )
+		error( 1, "no valid HDUs found!")
+	
+	# get detector size from DETSEC keyword...
+	hselect( iimage//"[1]", "DETSIZE", "yes") \
+		| translit( "STDIN", "[:,]", " ", del-, col-) \
+		| scan( ix1, ix2, iy1, iy2)
+	if ( ix1 != 1 )
+		error( 1, "error reading DETSIZE")
+	if ( iy1 != 1 )
+		error( 1, "error reading DETSIZE")
+
+	# create new image...
+	imcreate( oimage, naxis=2, naxis1=ix2, naxis2=iy2,
+		header="copy", pixtype="ushort", reference=iimage//"[0]")
+
+	# put stuff in...
+	for ( i=1 ; i<=nhdu ; i+=1 ) {
+		
+		# get from section...
+		s1 = "["//i//"]"
+		hselect( iimage//s1, "DATASEC", "yes") | scan( datasec)
+
+		# get to section...
+		hselect( iimage//s1, "DETSEC", "yes") | scan( detsec)
+
+		# copy...
+		imcopy( iimage//s1//datasec, oimage//detsec, verb+)
+	}
+
+end

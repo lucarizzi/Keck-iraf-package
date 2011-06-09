@@ -1,0 +1,12 @@
+image,f,a,,,,"image"
+input,f,h,,,,"input file (box locations)"
+logfile,f,h,,,,"logfile"
+nxwin,i,h,80,10,,"nx of extraction window (pix)"
+nywin,i,h,80,10,,"ny of extraction window (pix)"
+xsz,r,h,4.,1.,,"x box length (px)"
+ysz,r,h,4.,1.,,"y box height (px)"
+fwhm,r,h,0.7,0.2,,"star FWHM in x (px)"
+xoff,r,h,0.,,,"add'n. x shift to apply (pix)"
+yoff,r,h,0.,,,"add'n. y shift to apply (pix)"
+coord,*gcur,h,,,,"graphics cursor input"
+mode,s,h,"ql",,,

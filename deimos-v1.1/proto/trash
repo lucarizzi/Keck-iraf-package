@@ -1,0 +1,68 @@
+Marc,
+	Christopher has examined the alignment stars used in the
+masks, and here are the results -- not very encouraging, especially for
+the original 5 masks.
+
+New masks (#6-18):
+> 3064 (known bad)      [3064/3162 midpt looks credible]
+> 3063 (credible Sloan position)
+> 2887 (known bad)
+> 2120   GOOD
+> 4459   GOOD
+> 6267   GOOD 
+> 6773   GOOD 
+> 6893   GOOD 
+> 7658   GOOD 
+> 8435   GOOD 
+> 9558   *** BAD   
+> 9621   GOOD
+> 9943   GOOD
+> 11070  GOOD
+> 11180 (known bad) (slightly off)
+> 11758  ****BAD
+
+Old masks (#1-5):
+> 1104  BAD (offset)
+> 1696  BAD (same offset as above)
+> 1719  BAD
+> 2120  GOOD
+> 2322  BAD (same offset as above)
+> 2887 (known bad)
+> 3064 (known bad)
+
+
+He has provided new coordinates for some stars below.  I suspect we need to
+redesign at least masks 6-9, and also 1-5, with either updated star
+coordinates or other alignment stars.  It looks like the original five
+masks are useless with their current alignment stars.  I will examine
+masks 10-18 to see if we have enough good stars to live with.
+
+
+New masks:
+> > 3064 12:36:03.963 62:11:41.02 
+> > 3063 12:37:19.783 62:20:50.48    3063/3581
+> > 2887 12:37:20.455 62:20:53.89  2887/3545/3127
+> > 2120   GOOD
+> > 4459   GOOD
+> > 6267   GOOD 
+> > 6773   GOOD 
+> > 6893   GOOD 
+> > 7658   GOOD 
+> > 8435   GOOD 
+> > 9558  12:36:33.755 62:08:07.51    9558/9851
+> > 9621   GOOD
+> > 9943   GOOD
+> > 11070  GOOD
+> > 11180 (known bad) (slightly off)
+> > 11758 12:36:52.983 62:07:26.69    12675/11758
+
+
+Old Masks:
+> > 1104  BAD (offset)
+> > 1696  BAD (same offset as above)
+> > 2322  BAD (same offset as above)
+> > 1719  BAD (offset position)
+> > 2120  GOOD
+> > 2887  12:37:20.455 62:20:53.89 
+> > 3064  12:36:03.963 62:11:41.02
+

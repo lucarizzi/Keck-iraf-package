@@ -1,0 +1,8 @@
+# Root task entry for the keck package help tree.  Defines `keck' as both a
+# task and a package in the keck help database.
+
+keck		men  = keck$keck.men,
+		hlp  = keck$keck.men,
+		sys  = keck$keck.hlp,
+		pkg  = keck$keck.hd,
+		src  = keck$keck.cl

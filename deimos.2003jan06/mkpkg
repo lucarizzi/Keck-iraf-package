@@ -1,0 +1,8 @@
+# Make the DEIMOS package.
+
+$call	relink
+$exit
+
+update:
+	$call	update@src
+	;

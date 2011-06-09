@@ -1,0 +1,32 @@
+# Help directory for the Keck packages
+
+$deimos		= "./deimos/"
+$lris		= "./lris/"
+$lws		= "./lws/"
+$nirspec	= "./nirspec/"
+
+# Define help files for the packages.
+
+deimos		men = deimos$deimos.men,
+		hlp = deimos$deimos.men,
+		sys = deimos$deimos.hlp,
+		pkg = deimos$deimos.hd,
+		src = deimos$deimos.cl
+
+lris		men = lris$lris.men,
+		hlp = lris$lris.men,
+		sys = lris$lris.hlp,
+		pkg = lris$lris.hd,
+		src = lris$lris.cl
+
+lws		men = lws$lws.men,
+		hlp = lws$lws.men,
+		sys = lws$lws.hlp,
+		pkg = lws$lws.hd,
+		src = lws$lws.cl
+
+nirspec		men = nirspec$nirspec.men,
+		hlp = nirspec$nirspec.men,
+		sys = nirspec$nirspec.hlp,
+		pkg = nirspec$nirspec.hd,
+		src = nirspec$nirspec.cl

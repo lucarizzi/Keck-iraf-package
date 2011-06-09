@@ -1,0 +1,26 @@
+LRED upgrade notes:
+
+New image format -- must update xbox (lrbox)
+TBD: new pointing origins.
+TBD: red/blue descriminator
+TBD: define various coord. systems for LRIS
+
+INSTRUME LRISBLUE "LRIS    "
+
+Need to define a common set of params that adequately describe mosaics.
+For DEIMOS, we assumed 2 amps, 4x2 array. This is obviously incorrect.
+Need to find a way to describe and accomodate various arrangements.
+
+Note that it's not good enough to simply locate the pixels. With multi-amp
+readout, alignment boxes can fall across amp boundaries and therefore must
+be corrected with typical bias/gain determined a prior.
+
+Work out coordinate systems. XIM,YIM corresponds closely to DEIMOS X,Y. As it
+turns out, LRIS is 180-deg off from this, ie, can still use X,Y just as in
+DEIMOS
+
+TBD: define POs in ICS; ccd_to_ics to translate coords for the rotation (or
+is this how it's done already??)
+
+Q. Why is DETSIZE 4102 in y?
+Q. Why is PANEID = 0 when PANE0 is not defined? Or is PANEID = 0 a code for PANE?

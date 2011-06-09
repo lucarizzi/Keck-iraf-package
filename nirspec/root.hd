@@ -1,0 +1,6 @@
+# Root help directory for the NIRSPEC packages.  This dummy package
+# is necessary in order to have `nirspec' appear as a module in some
+# package, so that the  user can type "help nirspec" (with the
+# `nirspec' given as a task). 
+
+_nirspec         pkg = nirspec$rootnirspec.hd

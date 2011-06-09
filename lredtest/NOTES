@@ -1,0 +1,52 @@
+The LRED package will grow with time. Notes are for cleaning up to make a
+more general spectragraph package.
+
+LBOX / XBOX:
+there are several defines that should go elsewhere.
+
+
+GMOS (DMOS):
+mosaic routines. Old based on DEIMOS code, which was before PANES were properly
+worked out. New should be general, based on PANES, DATASEC, and allowing up to
+four amps.
+
+SLA says AMPLOC is char, trailing blanks insignificant. However, suggests
+simply treating as INT for now, as only UCO is assigning them.
+
+SLA points out that changing read-out speed and binning will change gain/bias.
+
+Need to implement INSTRUME to determine red/blue side. We could for now
+simply translate AMPLOC based on INSTRUME to make gmos work.
+
+THERE APPEARS TO BE A BUG -- NCCD MUST BE 8 OR SEG VILOATION OCCURS
+DMOS.x has bug -- imaccf() is int, not bool
+
+
+
+REFL.X:
+ccd/ics conversion looks good except that CCD size is hardcoded!
+Also, there are some TEMP hardcodes in ident_ccd!!
+
+TRACE.X:
+ccd_geom: hardcoded; needs updating
+
+
+TBD:
+1. sign on rotation should be reversed
+2. sense of X is correct; sense of Y is reversed
+3. PO coords are extremely rough
+4. Not all POs defined
+5. POs should be in ICS to start with.
+6. DET_TO_ICS needs input chip number for two mosaics. This routine only used
+here -- eliminate.
+
+XBOX: plot should really not be centered on rotation axis; rather, min/max
+should be determined and plot scaled for that. Or, center of min/max should be
+used with CCDX,CCDY centered on that.
+
+ICS(0,0) should be the center of the cameras, or in practice the perceived
+center of the Dewar focal plane. (Some CCDs are offset from these locations).
+Units are pixels. Correct long-term? Perhaps mm is better.
+
+I believe we want to have a system wherein there is a ccd_geom (i, ccdi, n),
+where it varies with mosaic number.

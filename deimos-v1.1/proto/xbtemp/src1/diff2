@@ -1,0 +1,209 @@
+6,7d5
+< # TBD:  review angle calc
+< # TBD:	move fitting into separate routine; call initially and with 'f'
+9d6
+< 
+221d208
+< #			} else if (dely == 0.) {
+467c454
+< 						xsz, ysz, xfwhm, yfwhm, cx, cy)
+---
+> 					xsz, ysz, xfwhm, yfwhm, cx, cy, zip)
+477a465
+> int	zip			# "zip" mode (no interaction)
+572c560
+< 	while ( clgcur("coord", wx, wy, wcs, key, command, 32) != EOF ) {
+---
+> 	if (zip == NO) {
+573a562,563
+> 	  while ( clgcur("coord", wx, wy, wcs, key, command, 32) != EOF ) {
+> 
+668a659,661
+> 		case 'z':
+> 			zip = YES
+> 
+674a668
+> 	  }
+679a674,855
+> 
+> procedure	box_center (x, y, z, nx, ny, zx, zy, xsz, ysz, cx, cy)
+> 
+> real	x[nx], y[ny]		# position vectors
+> real	z[nx,ny]		# intensity array
+> int	nx, ny			# size of vectors/array
+> real	zx[nx], zy[ny]		# Work vectors for x,y cuts
+> real	xsz, ysz		# pixel sizes of boxes
+> real	cx, cy			# returned centers
+> real	grad			# new gradient, currently unused
+> 
+> int	i, j, i1, i2, j1, j2
+> 
+> real	saw_xcorr()
+> begin
+> 
+> # Get the initial profile
+> 	call amovkr (0., zx, nx)
+> 	call amovkr (0., zy, ny)
+> 	j1 = 0.5 * ny - 1
+> 	j2 = j1 + 4
+> 	do j = j1, j2 {
+> 		call aaddr (zx, z[1,j], zx, nx)
+> 	}
+> 	i1 = 0.5 * nx - 1
+> 	i2 = i1 + 4
+> 	do j = 1, ny {
+> 	    do i = i1, i2 {
+> 		zy[j] = zy[j] + z[i,j]
+> 	    }
+> 	}
+> 	call amulkr (zx, 1./real(j2-j1+1), zx, nx)
+> 	call amulkr (zy, 1./real(i2-i1+1), zy, ny)
+> 
+> 	cx = saw_xcorr (x, zx, nx, xsz, X_HWID, X_CRAD, grad)
+> 	if (cx ==INDEF) {
+> 		call eprintf ("Can't find box at %4.0f,%4.0f\n")
+> 			call pargr (x[nx/2])
+> 			call pargr (y[ny/2])
+> 	}
+> 	cy = saw_xcorr (y, zy, ny, ysz, Y_HWID, Y_CRAD, grad)
+> 	if (cy ==INDEF) {
+> 		call eprintf ("Can't find box at %4.0f,%4.0f -- check positions on image and prescan value!\n")
+> 			call pargr (x[nx/2])
+> 			call pargr (y[ny/2])
+> 	}
+> 
+> 	if (cx == INDEF || cy == INDEF)
+> 		return
+> 
+> # Get the final profile:
+> 	call amovkr (0., zx, nx)
+> 	call amovkr (0., zy, ny)
+> 	j1 = cy - y[1] + 1 - 0.5 * xsz + X_HWID
+> 	j2 = cy - y[1] + 1 + 0.5 * xsz - X_HWID + 0.5
+> 	do j = j1, j2 {
+> 		call aaddr (zx, z[1,j], zx, nx)
+> 	}
+> 	i1 = cx - x[1] + 1 - 0.5 * xsz + X_HWID
+> 	i2 = cx - x[1] + 1 + 0.5 * xsz - X_HWID + 0.5
+> 	do j = 1, ny {
+> 	    do i = i1, i2 {
+> 		zy[j] = zy[j] + z[i,j]
+> 	    }
+> 	}
+> 	call amulkr (zx, 1./real(j2-j1+1), zx, nx)
+> 	call amulkr (zy, 1./real(i2-i1+1), zy, ny)
+> 
+> 	cx = saw_xcorr (x, zx, nx, xsz, X_HWID, X_CRAD, grad)
+> 	if (cx ==INDEF)
+> 		call eprintf ("Got lost on recenter; check input positions")
+> 	cy = saw_xcorr (y, zy, ny, ysz, Y_HWID, Y_CRAD, grad)
+> 	if (cy ==INDEF)
+> 		call eprintf ("Got lost on recenter; check input positions")
+> 
+> 	if (cx == INDEF || cy == INDEF)
+> 		return
+> 
+> # Print out centers for debugging
+> # call eprintf ("cx,cy final = %6.2f %6.2f\n")
+> # call pargr (cx)
+> # call pargr (cy)
+> 
+> end
+> 
+> #
+> # SAW_XCORR: xcorr's a modified sawtooth with a vector to find centers
+> # This subroutine ALSO appears in MBOXFIND
+> #
+> # NOTE -- there can/will be an error if "sz-2*hwid" is larger than feature.
+> #
+> # Note -- as this stands, it is still not quite correct. If there are multiple
+> # crossings, the check on the slope SHOULD BE over the width of the feature;
+> # instead it is local only. This will probably produce the desired result in
+> # realistic cases.
+> 
+> real	procedure saw_xcorr (xgrid, z, nx, sz, hwid, noff, grad)
+> 
+> real	xgrid[nx], z[nx]		# position and intensity vectors
+> int	nx				# size of above
+> real	sz				# spacing of the peaks
+> real	hwid				# half-width of the peaks (pixels)
+> int	noff				# pixels to correlate across
+> real	grad				# returned gradient
+> 
+> int	nf, nc, xcen
+> int	ipos, ineg
+> int	i
+> real	xpeak, x, xdiff
+> real	maxderiv, cpos, cneg, fractpos
+> pointer	form, xcorr, deriv
+> 
+> real	adotr()
+> 
+> begin
+> # Create "form" vector; this is offset pos and neg. triangle functions
+> #          +
+> #         + +
+> #  +++++++   +++++++++   +++++++++.
+> #                     + +
+> #                      +
+> #
+> 	nf = nx + 2 * noff
+> 	nc = 1  + 2 * noff
+> 	call calloc (form, nf, TY_REAL)
+> 	call calloc (xcorr, nc, TY_REAL)
+> 	call calloc (deriv, nc, TY_REAL)
+> 
+> 	xcen = nf / 2 			# Center (to low ) of vectors
+> 	xpeak = 0.5 * sz
+> 	do i = 0, nf-1 {
+> #		x = i + 1 - (xcen + noff) + 1	# relative offset
+> 		x = nf - (i+1) - xcen		# relative offset
+> 		xdiff = abs (abs (x) - xpeak)
+> 		if (x > 0.)
+> 			Memr[form+i] =  max ((1. - xdiff / hwid), 0.)
+> 		else
+> 			Memr[form+i] = -max ((1. - xdiff / hwid), 0.)
+> 	}
+> 
+> # ready to x-corr; this is actually backwards, but since "form" is symmetric we
+> # may cheat and assign the negative value:
+> 
+> 	do i = 0, 2*noff
+> 		Memr[xcorr+i] = adotr (z, Memr[form+2*noff-i], nx)
+> 	do i = 0, 2*noff-1
+> 		Memr[deriv+i] = 0.5 * (Memr[xcorr+i+1] - Memr[xcorr+i-1])
+> 	Memr[deriv+2*noff] =  Memr[xcorr+2*noff] - Memr[xcorr+2*noff-1]
+> 	Memr[deriv]        =  Memr[xcorr+1]      - Memr[xcorr]
+> 
+> 	maxderiv = 0.
+> 	cneg = INDEF
+> 	do i = 0, 2*noff-1 {
+> 		if (Memr[xcorr+i] <= 0. && Memr[xcorr+i+1] > 0.) {
+> 			if (Memr[deriv+i] > maxderiv) {
+> 				ineg = noff - i
+> 				ipos = ineg - 1
+> 				cneg = Memr[xcorr+i]
+> 				cpos = Memr[xcorr+i+1]
+> 				maxderiv = Memr[deriv+i]
+> 			}
+> 		}
+> 	}
+> 	if (cneg == INDEF) {
+> 		x = INDEF
+> 		return (x)
+> 	}
+> 
+> 	fractpos = cpos / (cpos - cneg)
+> 	xcen = (nx+1) /2
+> 	x = fractpos * xgrid[xcen-ineg] + (1. - fractpos) * xgrid[xcen-ipos]
+> 
+> 	call mfree (deriv, TY_REAL)
+> 	call mfree (xcorr, TY_REAL)
+> 	call mfree (form, TY_REAL)
+> 
+> # TMP! (trial)
+> 	grad = maxderiv
+> 
+> 	return (x)	
+> end
+> 

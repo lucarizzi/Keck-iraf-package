@@ -1,0 +1,77 @@
+.help plotcuts 2001-Jan-05 wmkonspec.plotcuts
+.ih
+NAME
+plotcuts -- overplot cuts from multiple places along a spectrum
+.ih
+USAGE
+
+.sp
+.nf
+plotcuts image
+.fi
+.sp
+
+.ih
+PARAMETERS
+
+.le
+.ls image
+ Image(s) to plot
+.le
+.ls y1
+ First row to plot
+.le
+.ls y2
+ Last row to plot
+.le
+.ls nsum=5
+ Number of columns to coadd
+.le
+
+.ih
+DESCRIPTION
+This task will plot three column cuts along the specified
+image(s), showing only the regions between rows \fIy1\fR and
+\fIy2\fR.  The column cuts are taken at the center of the image
+and near the left and right edges.  The plot is scaled to the peak
+value occurring within the range of rows in the image.  Visual
+inspection of the resulting plot can reveal whether the removal of
+spatial distortions is adequate.
+.ih
+EXAMPLES
+.ls
+ Plot three cuts along the spectrum in image
+'24des0014y', extending from row 520 to 640 and
+including 5 columns in each sum:
+
+.sp
+.nf
+     plotcuts 24des0014y y1=520 y2=640 nsum=5
+.fi
+.sp
+
+The alignment of peaks in the resulting plot shows that the
+distortion removal across the spectrum is good.
+
+
+
+.le
+.ih
+SEE ALSO
+\fBspecplot\fR
+.br
+\fBThe cl script plotcuts.cl\fR
+.br
+\fBThe package wmkonspec\fR
+
+.ih
+AUTHOR
+Gregory D. Wirth\fR \fB(wirth@keck.hawaii.edu)\fR
+
+
+.ih
+LAST MODIFIED
+ Tue Apr 17 16:25:33 HST 2001
+
+.sp
+Converted from source help file plotcuts.html via html2lroff

@@ -1,0 +1,20 @@
+# Update DEIMOS distribution
+!cp -i ../src/dmos.x      /d/deimos/src/dmos.x
+#   !cp -i ../src/dsim.x      /d/deimos/src/dsim.x		# not just now
+!cp -i ../src/dsim2.x     /d/deimos/src/dsim2.x
+!cp -i ../src/dsim3.x     /d/deimos/src/dsim3.x
+!cp -i ../src/dsimgraph.x /d/deimos/src/dsimgraph.x
+!cp -i ../src/etc.x       /d/deimos/src/etc.x
+!cp -i ../src/qmodel.x    /d/deimos/src/qmodel.x
+!cp -i ../src/qtrmap.x    /d/deimos/src/qtrmap.x
+!cp -i ../src/refl.x      /d/deimos/src/refl.x
+!cp -i ../src/trace.x     /d/deimos/src/trace.x
+!cp -i ../src/xb2.x       /d/deimos/src/xb2.x
+!cp -i ../src/xbox.x      /d/deimos/src/xbox.x
+#
+!cp -i ../src/qtrmap.par  /d/deimos/src/qtrmap.par
+#
+!cp -i ../src/deimos.h    /d/deimos/src/deimos.h
+!cp -i ../src/keck.h      /d/deimos/src/keck.h	
+!cp -i ../src/fitsio.h    /d/deimos/src/fitsio.h
+!cp -i ../src/instrument.h /d/deimos/src/instrument.h

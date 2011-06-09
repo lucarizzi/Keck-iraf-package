@@ -1,0 +1,272 @@
+
+#
+# MAP_SORT: Sort the map info, separating the file by SLIT objects, REF objects
+# and the Guide Star.  This task could be a lot cleaner if we stored the
+# table as an array rather than individual vectors.
+#
+
+int	procedure map_sort (y, npt, x, yb, yt, ndx, pcode, guide_star)
+
+real	y[npt]					# y vector (to sort by)
+int	npt					# length
+real	x[npt]					# x vector (to sort by)
+real	yb[npt], yt[npt]			# y-limit info
+int	ndx[npt]				# index to ID
+int	pcode[npt]				# priority code
+bool	guide_star				# Is there a guide star?
+
+int	i, i2
+int	code
+int	ndx2
+int	nref					# number of reference objects
+int	nobj					# number of program targets
+
+begin
+# We start by separating the reference objects and guide star from the others:
+
+# if guide star present, adjust so it has space at end
+	if (guide_star) {
+		i2 = npt - 1
+	} else {
+		i2 = npt
+	}
+
+
+# now go through list backwards, switching reference,guide objects towards end
+	nref = 0
+	nobj = 0
+	ndx2 = i2
+	do i = i2, 1, -1 {
+		code = pcode[i]
+		if (code == CODE_GS) {		# If GS, switch to end; test new
+		    	call rndxswitch (y, ndx, npt, i, npt)
+			code = pcode[npt]
+		}
+		if (code == CODE_RF) {
+# if in last position, or next also ref, don't switch
+			if (i < ndx2)
+				call rndxswitch (y, ndx, npt, i, ndx2)
+			nref = nref + 1
+			ndx2 = ndx2 - 1
+		} else {
+			nobj = nobj + 1
+		}
+	}
+	ndx2 = ndx2 + 1				# first ref object
+
+
+# Now sort the slits
+	call ndxsortr (y, ndx, nobj)
+
+# ... and reference objects
+	if (nref > 1)
+		call ndxsortr (y[ndx2], ndx[ndx2], nref)
+
+	call re_orderr (ndx, x, x, npt, YES)
+	call re_orderr (ndx, yb, yb, npt, YES)
+	call re_orderr (ndx, yt, yt, npt, YES)
+	call re_orderi (ndx, pcode, pcode, npt, YES)
+
+# and return value of slits
+	return (nobj)
+end
+
+
+# SLIT_ADJUST: lengthen/shorten slits to use maximum space
+# Recall, these are based on delta values so we can treat the bar sensibly
+# Only objects which fall on mask included in list, and guide star is at end
+# At this point, all values in mm
+
+procedure	slit_adjust (y, ybot, ytop, y1, y2, pcode, n, sep_slit)
+
+real	y[n]				# y-object
+real	ybot[n], ytop[n]		# min. y length, bottom and top
+real	y1[n], y2[n]			# actual ymin, ymax
+int	pcode[n]			# priority/type code
+int	n				# length of object list
+real	sep_slit			# spacing between slits
+
+int	i
+int	imax
+real	ymax, del
+real	wt1, wt2, sum			# weights to distribute del
+
+begin
+	ymax = y[1]
+	imax = 1
+	do i = 2, n {
+		if (y[i] > ymax) {
+			ymax = y[i]
+			imax = i
+		}
+	}
+
+	if (pcode[1] != CODE_AS)
+		y2[1] = MIN_MY - MASK_Y0	# put at edge; ref'd to MASK_Y0
+	if (pcode[imax] != CODE_AS)
+		y1[imax] = MAX_MY - MASK_Y0
+
+	do i = 2, imax {
+		del = y2[i] - y1[i-1] - sep_slit
+
+# check for alignment stars (guide star should come at end)
+		if (pcode[i] == CODE_AS)
+			wt2 = 0.
+		else if (del < 0.)
+			wt2 = 0.5
+		else
+			wt2 = ytop[i]
+
+		if (pcode[i-1] == CODE_AS)
+			wt1 = 0.
+		else if (del < 0.)
+			wt1 = 0.5
+		else
+			wt1 = ybot[i-1]
+
+		sum = wt1 + wt2
+		if (sum == 0.)				# both AS, no changes
+			next
+
+		y2[i]   = y2[i]   - del * wt2 / sum	# Note sign!
+		y1[i-1] = y1[i-1] + del * wt1 / sum
+	}
+
+# Now adjust at the bar so that no slit crosses the mask center:
+	do i = 2, imax {
+		if (y[i] > 0. && y[i-1] < 0.) {
+		    if (pcode[i] != CODE_AS && pcode[i] != CODE_GS)
+			y2[i] = 0.
+		    if (pcode[i-1] != CODE_AS && pcode[i-1] != CODE_GS)
+			y1[i-1] = 0.
+		}
+	}
+end
+# Ideally, we should keep a buffer of "reserves" for each end, so that
+# we can adjust for a "min_length" condition, too.
+
+
+#
+# RE_ORDERR: reorder a real vector by index (input and output may be same)
+#
+procedure re_orderr (ndx, in, out, n, zero_index)
+
+int	ndx[n]				# index of positions
+real	in[n]				# input vector to be reordered
+real	out[n]				# output vector -- reodered by index
+int	n				# length of vectors
+bool	zero_index			# Is the vector zero-indexed?
+
+int	i
+int	ioff				# offset for zero indexing
+pointer	sp, buf				# pointer for stack, work vector
+
+begin
+# allocate stack memory for work vector:
+	call smark (sp)
+	call salloc (buf, n, TY_REAL)
+
+# do the reordering:
+	if (zero_index)
+		ioff = 1
+	else
+		ioff = 0
+
+	do i = 1, n
+		Memr[buf+i-1] = in[ndx[i]+ioff]
+
+# copy to output vector
+	call amovr (Memr[buf], out, n)
+
+	call sfree (sp)
+end
+
+#
+# RE_ORDERI: reorder an integer vector by index (input and output may be same)
+#
+procedure re_orderi (ndx, in, out, n, zero_index)
+
+int	ndx[n]				# index of positions
+int	in[n]				# input vector to be reordered
+int	out[n]				# output vector -- reodered by index
+int	n				# length of vectors
+bool	zero_index			# Is the vector zero-indexed?
+
+int	i
+int	ioff				# offset for zero indexing
+pointer	sp, buf				# pointer for stack, work vector
+
+begin
+# allocate stack memory for work vector:
+	call smark (sp)
+	call salloc (buf, n, TY_INT)
+
+# do the reordering:
+	if (zero_index)
+		ioff = 1
+	else
+		ioff = 0
+
+	do i = 1, n
+		Memi[buf+i-1] = in[ndx[i]+ioff]
+
+# copy to output vector
+	call amovi (Memi[buf], out, n)
+
+	call sfree (sp)
+end
+
+#
+# NDXSORTR: Sort a list of real values (low to high) and carry index
+# (see also re_orderX)
+
+procedure	ndxsortr (r, ndx, n)
+
+real	r[n]				# Real vector to sort
+int	ndx[n]				# index vector
+int	n				# number of points
+
+int	i, j
+real	h
+int	ih
+
+begin
+# Sort the list (low-to-high)
+	do i = 1, n-1 {
+	    do j = 1, n-i {
+		if (r[j] > r[j+1]) {
+			h = r[j+1]
+			r[j+1] = r[j]
+			r[j] = h
+
+			ih = ndx[j+1]
+			ndx[j+1] = ndx[j]
+			ndx[j] = ih
+		}
+	    }
+	}
+end
+#
+# RNDXSWITCH: Switch 2 lines of real items and index 
+#
+
+procedure	rndxswitch (r, ndx, n, i1, i2) 
+
+real	r[n]				# Real vector
+int	ndx[n]				# Index vector
+int	n				# number of points
+int	i1, i2				# indices of items to be switched
+
+real	h
+int	ih
+
+begin
+	h = r[i1]
+	r[i1] = r[i2]
+	r[i2] = h
+
+	ih = ndx[i1]
+	ndx[i1] = ndx[i2]
+	ndx[i2] = ih
+end
+

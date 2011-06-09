@@ -1,0 +1,171 @@
+#-----------------------------------------------------------------------
+procedure multi2simple( inimage, outimage)
+#-----------------------------------------------------------------------
+# Name:
+#	multi2simple
+# 
+# Purpose:
+#	Convert Multi-HDU FITS image to "old-style" simple image
+# 
+# Author:
+#	Gregory D. Wirth, W. M. Keck Observatory
+# 
+# Modification history:
+#	2009-May-29     GDW     original version
+#-----------------------------------------------------------------------
+string  inimage		{ prompt="Name of input LRIS Multi-HDU image" }
+string  outimage	{ prompt="Name of output LRIS simple image" }
+bool	overscan=no	{ prompt="Subtract overscan?" }
+bool	header=no	{ prompt="Copy image header?" }
+
+begin
+	string	iimage	   # internal copy of iimage
+	string	oimage	   # internal copy of oimage
+	#----
+	string	tmpprefix	# prefix for temp files
+	string	inlist		# file listing input sections
+	string	offsets		# file listing offsets
+	string	instrume	# name of instrument
+	string	detsec		# output detector section
+	string	datasec		# input (data) section
+	string	s1			# string buffer
+	string	isxn		# image section
+	string	biassec		# bias section
+	string	tempimage	# name of temp image
+	string	outtype="ushort"	# default output type
+	string	keywords	# file listing keywords
+	string	im			# name of input image...
+	int		i
+	int		nhdu		# number of HDUs
+	int		ix1,ix2
+	int		jx1,jx2
+	int		ibuf
+	int		xoffset
+	int		yoffset=0
+	int		nx
+	int		xbias1,xbias2
+
+	# prompt...
+	iimage = inimage
+	oimage = outimage
+	im = iimage
+
+	# allocate temp file names...
+	tmpprefix = "tmp$multi2simple"
+	inlist = mktemp( tmpprefix)
+	offsets = mktemp( tmpprefix)
+	keywords = mktemp( tmpprefix)
+	tempimage = mktemp( "multi2simple") // ".fits"
+
+	# verify input...
+	if ( ! imaccess( iimage))
+		error( 1, "requested input image "//iimage//" not found")
+
+	# verify non-existence of output image...
+	if ( imaccess( oimage))
+		error( 1, "operation would clobber existing output image "//oimage)
+
+	# count number of extensions...
+	count_hdu( iimage, verb+) | scan(nhdu)
+	if( nhdu < 1 )
+		error( 1, "no valid HDUs found!")
+
+	# loop for removing overscan...
+	if ( overscan ) {
+
+		# get datasec...
+		s1 = "[1]"
+		hselect( iimage//s1, "DATASEC", "yes") \
+			| translit( "STDIN", "[:,]", " ", del-, col-) \
+			| scan( ix1, ix2)
+
+		# get image size...
+		hselect( iimage//s1, "NAXIS1", "yes") | scan( xbias2)
+
+		# build overscan region...
+		xbias1 = ix2 + 1
+		biassec = "[" + xbias1 + ":" + xbias2 + "]"
+
+		# remove overscan...
+		ccdproc( iimage, output=tempimage, bpmasks="", ccdtype="", noproc=no,
+			xtalkcor=no, fixpix=no, overscan=yes, trim=no, zerocor=no,
+			darkcor=no, flatcor=no, sflatcor=no, split=no, merge=no,
+			xtalkfile="", fixfile="", saturation="INDEF", sgrow=0,
+			bleed="INDEF", btrail=20, bgrow=0, biassec=biassec,
+			trimsec="", zero="", dark="", flat="", sflat="",
+			minreplace=1., interactive=no, function="legendre", order=1,
+			sample="*", naverage=1, niterate=1, low_reject=3.,
+			high_reject=3., grow=0., fd="", fd2="")
+
+		# the debiased image is now the input image for the next step...
+		im = tempimage
+		outtype = "real"
+	}
+
+	
+	# build input list...
+	for ( i=1 ; i<=nhdu ; i+=1 ) {
+
+		# get datasec...
+		s1="["//i//"]"
+		hselect( im//s1, "DATASEC", "yes") \
+			| translit( "STDIN", "[:,]", " ", del-, col-) \
+			| scan( ix1, ix2)
+
+		# get detsec...
+		hselect( im//s1, "DETSEC", "yes") \
+			| translit( "STDIN", "[:,]", " ", del-, col-) \
+			| scan( jx1, jx2)
+
+		# measure output size...
+		nx=ix2 - ix1 + 1
+
+		# if detsec is flipped, then flip input section...
+		if ( jx1 > jx2 ) {
+			ibuf=ix1
+			ix1=ix2
+			ix2=ibuf
+			xoffset = jx2
+		} else {
+			xoffset = jx1
+		}
+
+		# define input section...
+		isxn = "[" + ix1 +":" + ix2 + ",*]"
+
+		# write input section...
+		print( im//s1//isxn, >>inlist)
+
+		# write offset...
+		print( xoffset, yoffset, >>offsets)
+	}
+
+	# create new image...
+	imcombine( input="@"//inlist, output=oimage, headers="",
+		bpmasks="", rejmasks="", nrejmasks="", expmasks="", sigmas="",
+		logfile="STDOUT", combine="average", reject="none", project=no,
+		outtype=outtype, outlimits="", offsets=offsets,
+		masktype="none", maskvalue=0., blank=0., scale="none",
+		zero="none", weight="none", statsec="", expname="",
+		lthreshold=INDEF, hthreshold=INDEF, nlow=1, nhigh=1, nkeep=1,
+		mclip=yes, lsigma=3., hsigma=3., rdnoise="0.", gain="1.",
+		snoise="0.", sigscale=0.1, pclip=-0.5, grow=0.)  
+
+	# remove DATASEC (otherwise, ds9 fails to display image properly...
+	hedit( oimage, "datasec", add-, delete+, ver-, show-, update+)
+
+	# copy header info...
+	if ( header ){
+		hselect( iimage//"[0]", "INSTRUME", "yes") | scan( instrume)
+		keywords = "lris$dat/lris_add_keywords." // instrume // ".dat"
+		print( "  Adding keywords listed in file ", keywords)
+		lris_add_keywords( iimage, oimage, keywords=keywords, verb-)
+	}
+
+	# clean up...
+	delete( inlist, ver-)
+	delete( offsets, ver-)
+	if ( im == tempimage )
+		imdel( tempimage, ver-)
+
+end

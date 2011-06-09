@@ -1,0 +1,47 @@
+# Make the LREDTEST package.
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$set	LIBS = "-lxtools -liminterp -lsurfit -lgsurfit -lcurfit -lslalib ../cfitsio/libcfitsio.a"
+## The following should work, but for some reason libtbtables gets overwritten
+##	$set	LIBS = "-lxtools -liminterp -lsurfit -lgsurfit -lcurfit -lslalib /Users/iraf/iraf/extern/tables/bin.macintel/libtbtables.a"
+
+	$update	libpkg.a
+	$omake	x_lredtest.x
+	$link	x_lredtest.o libpkg.a $(LIBS) -o xx_lredtest.e
+	;
+
+install:
+	$move	xx_lredtest.e lredtestbin$x_lredtest.e
+	;
+
+libpkg.a:
+	etc.x
+	keck_util.x	<math.h> "keck.h"
+#	fitsgen.x	<time.h> "ftab.h"
+	lredtest_util.x	<math.h> <math/gsurfit.h> "lredtest.h" "keck.h"
+#	dsim.x		<math.h> "deimos.h" "dsimulator.h" "inst_file.h"
+#	dsim2.x		<math.h> "deimos.h" "dsimulator.h" "chk_stat.lris" "inst_file.h"
+#	dsim3.x		<math.h> "keck.h" "dsimulator.h" "deimos.h" "fitsio.h" "inst_file.h"
+#	dsimgraph.x	<math.h> <gset.h> <gim.h> "dsimulator.h" "deimos.h" "inst_file.h"
+#	dswd.x		<time.h> <math.h> "deimos.h" "dsimulator.h" "ftab.h" "inst_file.h"
+#	dsplot.x	<math.h> "dsimulator.h" "inst_file.h"
+	refl.x		<math.h>
+	refr.x		<math.h>
+	trace.x		<math.h> <imhdr.h> "lredtest.h" "instrument.h"
+#	qtrmap.x	<math.h> "instrument.h" "deimos.h"
+	qmodel.x	<math.h> <math/gsurfit.h> "instrument.h"
+#	qrevmod.x	<math.h> <math/gsurfit.h> "instrument.h"
+	gmos.x		<imhdr.h> <error.h>
+	futil.x         "futil.h"
+	lbox.x		<math.h> <gset.h> "futil.h" "align.h" "instrument.h" "lredtest.h"
+	xb_util.x	<math.h> <gset.h> "futil.h"
+	xb2.x		"fitsio.h" "align.h" "instrument.h"
+	;

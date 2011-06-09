@@ -1,0 +1,165 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>xdistcor 2001-Jan-05 nirspec.xdistcor</title>
+  </head>
+  <body>
+    
+    <h1><a href="xdistcor.cl">xdistcor.cl</a></h1>
+    
+    <h2>Name</h2>
+    xdistcor -- remove 'x' (column) distortion from NIRSPEC low-d images
+    
+    <h3>Usage</h3>
+    <pre>xdistcor input output ref
+    </pre>
+    
+    <h3>Parameters</h3>
+    <dl>
+      
+      <dt> input
+      <dd> List of images to be corrected
+	
+      <dt> output
+      <dd> List of corresponding names for corrected output images
+
+      <dt> ref
+      <dd> Name of the reference image to use for defining the ends of 
+	the spectrum
+
+      <dt> verbose = yes
+      <dd> Print feedback on operations to the terminal?
+
+      <dt> useold = yes
+      <dd> If a solution for the reference image already exists, use
+	it rather than define a new one?
+	
+    </dl>
+    
+    <h3>Description</h3>
+
+    This procedure is used to remove the row distortion inherent in
+    NIRSPEC low-dispersion 2-D spectra, a correction that is required
+    for subsequent alignment of night sky lines via the <a
+    href="ydistcor.html">ydistcor</a> task.  Before running this
+    program, you should generate an image which can be used to define
+    the "trace" of the spectrum.  Here are two ways to do this:
+    
+    <ul>
+      <li> Create an image with strong spectra at several place
+	along the slit, perhaps by co-adding images of your
+	target (if it's bright) or of standard stars (assuming
+	the spectrograph was not moved in between your science
+	images and the calibration star images).
+	
+      <li> If you have a flat image taken with the same
+	instrumental setup as your science images, use the task
+	<a href="mktracer.html">mktracer</a> to generate a trace 
+	image from the flat; e.g. <pre>mktracer 24des0057 trace</pre>
+	
+    </ul>
+
+    The task will first check whether the database directory already
+    contains a transform solution for your trace image (specified as
+    parameter <em>ref</em>).  If so, you will be prompted whether to
+    use this existing solution to correct the images, or derive a new
+    solution.  If no transform solution is found, the program will
+    proceed with deriving a new one.
+
+    <p>
+      If a solution is to be derived, the program will first invoke
+      the <a
+      href="http://iraf.noao.edu/scripts/irafhelp?identify">identify</a>
+      task and allow the user to mark features to be traced.  Mark the
+      two (or more, if you used a stellar trace image) peaks by
+      placing the cursor on them, pressing the <kbd>m</kbd> key, and
+      pressing the <kbd>Enter</kbd> key when prompted for a wavelength
+      of the feature.  The resulting plot should look like <a
+      href="identify.gif">this</a>.
+
+    <p> 
+      Press <kbd>f</kbd> to perform a fit to the two points, then
+    <kbd>q</kbd> twice to quit this step.
+
+    <p>
+      <kbd>xdistcor</kbd> will now try to re-identify the
+      features you marked at other rows along the image.  If
+      you specified <kbd>verbose=yes</kbd> when you ran the
+      program, you will see the results of the fit.  Check
+      that all of your features were found in other rows.
+      
+
+    <p>
+      Next, the program will try to make a fit to the data in order to
+      derive the coordinate tranformation required to straighten the
+      image.  The program will prompt whether you want to perform a
+      fit interactively; answer <kbd>yes</kbd>.  It will show a plot
+      of fit residuals; press <kbd>x</kbd> to change the
+      <em>x</em>-axis plotting coordinate, then enter <kbd>y</kbd> to
+      plot residuals versus row number, and press <kbd>f</kbd> again
+      to redo the plot.  The <a href="fitcoords.gif">resulting
+      plot</a> may show some obvious outliers which you can delete
+      manually by placing the cursor on them, pressing <kbd>d</kbd>
+      and then <kbd>p</kbd> to nuke the offending point.  When
+      outliers have been excised, press <kbd>f</kbd> to redo the fit.
+      Delete additional outliers and re-do the fit as needed.  Press
+      <kbd>q</kbd> to quit the fitting, and press <kbd>Enter</kbd>
+      when prompted <pre>Write coordinate map to the database
+      (yes)?</pre> 
+
+    <p>
+      With the transformation now defined, the program will proceed to
+      remove the <em>x</em> distortion from all of your images.
+
+    <p>
+      If you included the reference image among those to be corrected,
+      you should inspect the resulting corrected reference image to
+      ensure that the spectra are now well aligned with the image
+      columns.
+
+    
+    <h3>Examples</h3>
+    
+    The user has already use the <a href="mktracer.html">mktracer</a> task
+    to create a reference image called <kbd>trace.fits</kbd>.  Given a 
+    list of the input images (<kbd>in.lst</kbd>) and output images
+    (<kbd>out.lst</kbd>), the following command will generate
+    corrected images:
+
+    <pre>xdistcor @in.lst @out.lst trace</pre>
+
+    The corrected version of the trace image will be <kbd>ctrace.fits</kbd>.
+    
+    <h3>Notes</h3>
+    
+    <UL>
+
+      <LI> User must have write access to the working directory.
+
+      <LI> Numerous temporary files will be generated in the working
+      director.  These are removed on successful completion.
+
+    </UL>
+    
+    <h3>Bugs</h3>
+    
+    <h3>See Also</h3>
+    <a href="http://iraf.noao.edu/scripts/irafhelp?identify">identify</a>
+    <a href="http://iraf.noao.edu/scripts/irafhelp?reidentify">reidentify</a>
+    <a href="http://iraf.noao.edu/scripts/irafhelp?fitcoords">fitcoords</a>
+    <a href="http://iraf.noao.edu/scripts/irafhelp?transform">transform</a>
+    <a href="mktracer.html">mktracer</a>
+    <a href="ydistcor.html">ydistcor</a>
+    <br>
+    <a href="xdistcor.cl">The cl script xdistcor.cl</a>
+    <br>
+    <a href="index.html">The package nirspec</a>
+    
+    <hr>
+    <address>Gregory D. Wirth</a> <a href="mailto:wirth@keck.hawaii.edu">&lt;wirth@keck.hawaii.edu&gt;</a></address>
+    <!-- Created: Fri Jan  5 09:05:27 HST 2001 -->
+    <!-- hhmts start -->
+Last modified: Tue Aug  6 17:09:49 HST 2002
+<!-- hhmts end -->
+  </body> 
+</html>

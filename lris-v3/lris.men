@@ -1,0 +1,9 @@
+         cdata - go to current LRIS data directory
+   check_boxes - create or modify LRIS slitmask box list on image display
+do_check_boxes - automatically run check_boxes on next or latest image
+       do_lbox - automatically run lbox on next or latest image
+    get_seeing - measure FWHM of stars in last alignment image
+   lrisdisplay - display multi-HDU LRIS image to image display
+    lspecfocus - measure LRIS spectral-mode focus based on arc image sequence
+    multi2flat - generate "flat" LRIS image from multi-HDU image
+

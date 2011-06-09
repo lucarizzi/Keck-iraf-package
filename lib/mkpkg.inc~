@@ -1,0 +1,13 @@
+# Global MKPKG definitions for the package.
+
+$set XFLAGS     = "$(XFLAGS) -p keck"
+$set XVFLAGS    = "$(XVFLAGS) -p keck"
+$set LFLAGS     = "$(LFLAGS) -p keck"
+
+$ifeq (MACH, ssun) then
+    $include "keck$lib/mkpkg.sf.SSUN"
+#$else $ifeq (MACH, redhat) then
+#    $include "keck$lib/mkpkg.sf.REDHAT"
+#$else $ifeq (MACH, sparc) then
+#    $include "keck$lib/mkpkg.sf.SUN4"
+$end

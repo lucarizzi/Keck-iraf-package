@@ -1,0 +1,2 @@
+FORMAT "%6d          %13.3h %12.2h  2000.0 1 1 1 %6.2f %5.2f %5.2f"
+LOOP id ra/15. dec slitpa bot top

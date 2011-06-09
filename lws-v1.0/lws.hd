@@ -1,0 +1,5 @@
+# Help directory for the WMKOLWS package.
+
+$doc             = "./doc/"
+
+lwscoadd	hlp=doc$lwscoadd.hlp, src=lwscoadd.hlp

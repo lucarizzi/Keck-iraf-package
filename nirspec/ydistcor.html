@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>ydistcor 2001-Jan-09 nirspec.ydistcor</title>
+  </head>
+  <body>
+    
+    <h1><a href="ydistcor.cl">ydistcor.cl</a></h1>
+    
+    <h2>Name</h2>
+    ydistcor -- align emission features with image rows
+    
+    <h3>Usage</h3>
+    <pre>
+ydistcor input output ref
+    </pre>
+    
+    <h3>Parameters</h3>
+    <dl>
+      
+      <dt> input
+      <dd> Names of input 2-D spectra to be corrected
+	
+      <dt> output
+      <dd> Names of output 2-D spectra to be created
+
+      <dt> ref
+      <dd> Name of reference image
+
+      <dt> x1
+      <dd> First column to extract
+
+      <dt> x2
+      <dd> Last column to extract
+
+      <dt> dy=0
+      <dd> Change in row (y) value for features as they move from
+	column x1 to column x2.  Note that if the features move toward 
+	lower row numbers (as generally done with NIRSPEC images), the 
+	value for dy should be negative.
+	
+    </dl>
+    
+    <h3>Description</h3>
+
+    Given an input image <em>input</em> plus a range of columns
+    <em>x1-x2</em>, this task shifts the columns as needed to align
+    emission features with the image rows and thus make reasonable sky
+    subtraction possible during the spectral extraction phase of data
+    reduction.  
+
+    <p>
+      For the selected range of columns, the
+      <em>longslit.identify</em> task is used non-interactively to
+      find <em>any</em> bright emission features in the image.  Next,
+      the <em>reidentify</em> task is used to find these same features
+      in other columns, co-adding data as needed in order to have not
+      more than a certain number of independent fits for a given
+      aperture.  The <em>fitcoords</em> task is used to find a
+      solution which fits the coordinates with a polynomial which is
+      third order in x and second order in y.  Then the
+      <em>transform</em> task will straighten the image.
+    
+    <h3>Examples</h3>
+    
+    <OL>
+      <LI> A set of NIRSPEC images taken with the same instrument
+	settings is to be corrected for <em>y</em> distortion.
+	Inspection of the first image (<kbd>24des0022.fits</kbd>)
+	shows that the illuminated region extends from column 600 to
+	column 800.  Inspection also reveals that a prominent emission 
+	line the middle of the image begins at row 550 on the left of
+	the slit and ends at row 525 on the right of the slit.
+	The task is run with the following parameters:
+
+	<pre>ydistcor *.fits *%.fits%y.fits% 24des0022 x1=600 x2=800 dy=-25</pre>
+	
+	The new images will be given the same name as the
+	corresponding input images, with a <kbd>y</kbd> appended to
+	the rootname.
+
+    </OL>
+    
+    <h3>Notes</h3>
+    
+    <UL>
+
+      <LI> The x distortion must already have been removed from the
+      input image.
+
+    </UL>
+    
+    <h3>Bugs</h3>
+    
+    <h3>See Also</h3>
+    <a href="http://iraf.noao.edu/scripts/irafhelp?identify">identify</a>
+    <a href="http://iraf.noao.edu/scripts/irafhelp?reidentify">reidentify</a>
+    <a href="http://iraf.noao.edu/scripts/irafhelp?fitcoords">fitcoords</a>
+    <a href="http://iraf.noao.edu/scripts/irafhelp?transform">transform</a>
+    <br>
+    <a href="ydistcor.cl">The cl script ydistcor.cl</a>
+    <br>
+    <a href="index.html">The package nirspec</a>
+    
+    <hr>
+    <address>Gregory D. Wirth</a> <a href="mailto:wirth@keck.hawaii.edu">&lt;wirth@keck.hawaii.edu&gt;</a></address>
+    <!-- Created: Fri Jan  5 09:05:27 HST 2001 -->
+    <!-- hhmts start -->
+Last modified: Tue Aug  6 17:10:23 HST 2002
+<!-- hhmts end -->
+  </body> 
+</html>

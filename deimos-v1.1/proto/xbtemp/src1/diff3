@@ -1,0 +1,442 @@
+8d7
+< #	-- flexure model, if any
+11,14c10,11
+< #	-- replace Y-weighting in xb_util.x (?)
+< #	-- should really use ICS coords, not mosaic coords [done]
+< #	-- add rotation offsets [done]
+< #	-- should modify to use INST commands for offsetting: [done]
+---
+> #	-- replace Y-weighting in xb_util.x
+> #	-- should really use ICS coords, not mosaic coords
+16,21d12
+< #	-- NB: MODE 3 only valid for DEIMOS PO ...
+< #	-- need to put in xform of TV to instrument coords.
+< #	-- need to work out the proper limits for plotting
+< #	-- choose offsets to apply
+< #	-- replace dcs input 
+< 
+25,26d15
+< include	"instrument.h"
+< include "align.h"
+32,35d20
+< define	XAMPL	0.		# X-flexure amplitude (px)
+< define	XPHI	30.		# X-flexure phase offset
+< define	YAMPL	-7.		# Y-flexure amplitude (px)
+< define	YPHI	30.		# Y-flexure phase offset
+37c22
+< # define	ID_CHSZ	9		# Character size of ID string
+---
+> define		ID_CHSZ	9		# Character size of ID string
+68d52
+< char	logfile[SZ_FNAME]		# (opt) log file for moves
+73c57
+< pointer	fda, fdb, fdl
+---
+> pointer	fda, fdb
+76,83c60
+< # XXX new for imodes
+< int	imode		# temporary, for testing various offset modes
+< real	xarcsec, yarcsec, xerr, yerr
+< real	xtv, ytv		# TV Pixel coords of guide star
+< real	delx, dely, phitv, tvdist
+< real	xadjtv, yadjtv
+< 
+< char	tchar
+---
+> char	tchar, idstr[ID_CHSZ]
+85c62
+< int	npt, ndx, i, j, k, n
+---
+> int	npt, ndx, i, j
+91,93c68
+< # int	nccd			# need to resolve the NCCD issue
+< real	ccd[NCCD,3]				# CCD geometry
+< double	sys[NPARAM]				# system parameters
+---
+> int	nccd
+95,99d69
+< # For auto-grep
+< char	guiname[SZ_GUINAM]
+< int	pos			# slmskpos value
+< pointer	bdat			# box data struct
+< 
+102d71
+< real	xflex, yflex
+104d72
+< real	theta
+127a96,97
+> int	zip_mode
+> 
+140a111
+> 	zip_mode = NO
+143d113
+< 	call clgstr ("logfile", logfile, SZ_FNAME)
+153d122
+< 	imode = clgeti ("imode")
+172c141
+< 	call mos_init (image, DEF_PROP_FILE, im0, mmap, n)
+---
+> 	call mos_init (image, DEF_PROP_FILE, im0, mmap, nccd)
+209d177
+< 
+213,226d180
+< ## Find flexure correction: #  (XXX NOT NEEDED if FCS is on):
+< 	    if (imaccf (im0, "ROTATVAL")) {
+< 		theta = imgetr (im0, "ROTATVAL")
+< 		xflex = XAMPL * sin (DEGTORAD(theta+XPHI))
+< 		yflex = YAMPL * sin (DEGTORAD(theta+YPHI))
+< call eprintf ("ROTATVAL = %4f -->  X,Y flex = %4f  %4f\n")
+< call pargr (theta)
+< call pargr (xflex)
+< call pargr (yflex)
+< 	    } else {
+< 		call eprintf ("ROTATVAL not found -- no flexure applied\n")
+< 	    }
+< 
+< ############### FOR TEXT INPUT #######################
+229,230c183
+< 	    if (strne (input, "")) {
+< 		fda = open (input, READ_ONLY, TEXT_FILE)
+---
+> 	    fda = open (input, READ_ONLY, TEXT_FILE)
+232,285d184
+< # Count entries in input file
+< 		npt = 0
+< 		while (fscan(fda) != EOF)
+< 			npt = npt + 1
+< 		call seek (fda, BOF)
+< 
+< # allocate the box struct
+< 		call box_alloc (bdat, npt)
+< 
+< ###
+< call eprintf ("DEBUG, SZ_ID=%d\n")
+< call pargi (SZ_ID)
+< 
+< # Get the input entries
+< 		ndx = 0
+< 		while (fscan (fda) != EOF) {
+< 			call gargwrd (tchar, 1)
+< 			if (tchar == '#' || nscan() == 0) {
+< 				next
+< 			}
+< 			call reset_scan()
+< 			call gargr (xs)
+< 			call gargr (ys)
+< 			if (nscan() < 2) {
+< 				call eprintf ("WARNING: input line skipped\n")
+< 				next
+< 			}
+< 			call gargwrd (OBJNAME(bdat,ndx), SZ_ID-1)
+< 			if (nscan() < 3)
+< 			    call strcpy ("(no ID)", OBJNAME(bdat,ndx), SZ_ID-1)
+< 
+< 			XPX(bdat,ndx) = xs
+< 			YPX(bdat,ndx) = ys
+< 			ndx = ndx + 1
+< 		}
+< 		npt = ndx	# npt reduced by bad pairs, comment lines
+< 
+< 	    } else {
+< 
+< # get slit position and read in the data dynamically
+< 		if (imaccf (im0, "SLMSKPOS")) {
+< 			pos = imgetr (im0, "SLMSKPOS")
+< 			call eprintf ("found SLMSKPOS = %d\n")
+< 				call pargi (pos)
+< 		} else {
+< 			call fatal (0, "SLMSKPOS missing -- must use input!")
+< 		}
+< 
+< 		if (pos < 2 || pos > 12)
+< 			call fatal (0, "Illegal SLMSKPOS --  aborting")
+< 		
+< 		call get_boxes (pos, bdat, npt, guiname)
+< 	    }
+< 
+293a193,198
+> # Count entries in input file
+> 	    npt = 0
+> 	    while (fscan(fda) != EOF)
+> 		npt = npt + 1
+> 	    call seek (fda, BOF)
+> 
+300,301d204
+< # Loop through expected box positions to measure actual box/star positions
+< 	do k = 0, npt-1 {
+302a206,220
+> # Get the input entries
+> 	    ndx = 0
+> 	    while (fscan (fda) != EOF) {
+> 		call gargwrd (tchar, 1)
+> 		if (tchar == '#' || nscan() == 0) {
+> 			next
+> 		}
+> 		call reset_scan()
+> 		call gargr (xs)
+> 		call gargr (ys)
+> 		if (nscan() < 2) {
+> 			call eprintf ("WARNING: input line skipped\n")
+> 			next
+> 		}
+> 
+304,305c222,223
+< 		xs = XPX(bdat,k) + xflex + xoff
+< 		ys = YPX(bdat,k) + yflex + yoff
+---
+> 		xs = xs + xoff
+> 		ys = ys + yoff
+306a225,228
+> 		call gargwrd (idstr, ID_CHSZ)
+> 		if (nscan() < 3)
+> 			call strcpy ("(no ID)", idstr, ID_CHSZ)
+> 
+325,330c247,252
+< # call eprintf ("(%d) %d-%d  %d-%d \n")
+< # call pargi (i)
+< # call pargi (x1)
+< # call pargi (x2)
+< # call pargi (y1)
+< # call pargi (y2)
+---
+> call eprintf ("(%d) %d-%d  %d-%d \n")
+> call pargi (i)
+> call pargi (x1)
+> call pargi (x2)
+> call pargi (y1)
+> call pargi (y2)
+359,361c281,282
+< 			Memr[bufzy], Memr[buftx], Memr[bufty], nx, ny,
+< 			OBJNAME(bdat,k), xb, yb, xsz, ysz, xfwhm, yfwhm,
+< 			xstar, ystar)
+---
+> 			Memr[bufzy], Memr[buftx], Memr[bufty], nx, ny, idstr,
+> 			xb, yb, xsz, ysz, xfwhm, yfwhm, xstar, ystar, zip_mode)
+365,368c286,297
+< 			Memr[xbuf1+k] = xstar
+< 			Memr[ybuf1+k] = ystar
+< 			Memr[xbuf2+k] = xb
+< 			Memr[ybuf2+k] = yb
+---
+> 			Memr[xbuf1+ndx] = xstar
+> 			Memr[ybuf1+ndx] = ystar
+> 			Memr[xbuf2+ndx] = xb
+> 			Memr[ybuf2+ndx] = yb
+> 			ndx = ndx + 1
+> ####### THIS SECTION FOR RAJA:
+> # i = det_chip (xstar, ystar)
+> # call printf ("RAJA: %1d  %7.2f %7.2f %-s\n")
+> # call pargi (i)
+> # call pargr (xstar - 2048.*(i-1))
+> # call pargr (ystar)
+> # call pargstr (idstr)
+370a300
+> 	    npt = ndx		# npt reduced by bad pairs, comment lines
+456,475d385
+< # DEIMOS: Adjust all coordinates into ICS, including the POs:
+< # define the geometry of the mosaic
+< 	call ccd_geom (ccd, sys, YES)
+< 
+< # convert the pointing origins to ICS
+< 	if (streq (poname, "DEIMOS")) {
+< 		xrot = 0.
+< 		yrot = yrot - 4096. - 8.
+< 	} else {
+< 		call get_ccdnum (xrot, yrot, n, xs, ys)
+< 		call ccd_to_ics (xs, ys, ccd, n, xrot, yrot)
+< 	}
+< # ... and convert the measurements
+< 	do i = 0, npt-1 {
+< 		call get_ccdnum (Memr[xbuf1+i], Memr[ybuf1+i], n, xs, ys)
+< 		call ccd_to_ics (xs, ys, ccd, n, Memr[xbuf1+i], Memr[ybuf1+i])
+< 		call get_ccdnum (Memr[xbuf2+i], Memr[ybuf2+i], n, xs, ys)
+< 		call ccd_to_ics (xs, ys, ccd, n, Memr[xbuf2+i], Memr[ybuf2+i])
+< 	}
+< 
+511,512d420
+< if (imode == 1) {
+< 
+515,516c423
+< #        ...        = 90 - (rotposn+90) (LRIS)
+< 
+---
+> #        ...        = 90 - (rotposn+90)
+553,559c460,462
+< } else if (imode == 2 || imode == 3) {
+< 	pdeg = RADTODEG(-atan2(coeff[1,2], coeff[1,1]))
+< 	perr = RADTODEG(asin(err[1]))
+< 	xarcsec = ASECPIX * coeff[1,3]
+< 	yarcsec = ASECPIX * coeff[2,3]
+< 	xerr = ASECPIX * err[2]
+< 	yerr = ASECPIX * err[3]
+---
+> ## Is this just a practice run?
+> 	if (no_op)
+> 		call fatal (0, "ignore error -- terminated because PRACTICE set")
+561,606d463
+< # PA offset is backwards from rotation:
+< 	call printf ("\n==========MODE 2====================================\n")
+< 	call printf ("\n*** MOVE TELESCOPE/ROTATOR by the following offsets:\n")
+< 	call printf ("\n Offset PA by %6.3f (%5.3f) degree\n")
+< 		call pargr (pdeg)
+< 		call pargr (perr)
+< 	call printf (" Offsets: %6.2f\" InstX (%4.2f)\t %6.2f\" InstY (%4.2f)\n\n")
+< 		call pargr (xarcsec)
+< 		call pargr (xerr)
+< 		call pargr (yarcsec)
+< 		call pargr (xerr)
+< 	call printf ("====================================================\n\n")
+< 	call flush (STDOUT)
+< 
+< }
+< if (imode == 3) {
+< ## Lots of hardcodes -- fix!!  NB -- GOOD FOR PO=DEIMOS only
+< ## NEED TO CONVERT TV pix into INST coordinates and work from there...
+< 
+< 	xtv = clgetr ("xtv")
+< 	ytv = clgetr ("ytv")
+< 	delx = (1000. - xtv) * 0.207
+< 	dely = (ytv - 131.) * 0.207	# XXX APPROX!! HARDCODE
+< 	phitv = atan2 (delx, dely)
+< 	tvdist = sqrt (delx*delx + dely*dely)
+< 	xadjtv = cos (phitv) * tvdist * DEGTORAD(pdeg)
+< 	yadjtv = sin (phitv) * tvdist * DEGTORAD(pdeg)
+< 
+< 	call printf ("For a guide star at TV (%4f,%4f):\n")
+< 		call pargr (xtv)
+< 		call pargr (ytv)
+< 	call printf (" Additional Offsets: %6.2f\" tvX \t %6.2f\" tvY \n\n")
+< 		call pargr (xadjtv)
+< 		call pargr (yadjtv)
+< 	xarcsec = xarcsec - xadjtv	## XXX add in here, adequate approx
+< 	yarcsec = yarcsec + yadjtv	## XXX add in here, adequate approx
+< 	call printf (" Offsets: %6.2f\" InstX (%4.2f)\t %6.2f\" InstY (%4.2f)\n\n")
+< 		call pargr (xarcsec)
+< 		call pargr (xerr)
+< 		call pargr (yarcsec)
+< 		call pargr (xerr)
+< 	call printf ("================MODE 3==============================\n\n")
+< 	call flush (STDOUT)
+< }
+< 
+< 
+608,610c465
+< 	if (no_op)
+< 		call printf ("PRACTICE set -- move will NOT be applied:\n")
+< 	while (get_valb ("[CONFIRM]  Send DCS commands?", true, dcs) != OK) ;
+---
+> 	dcs = clgetb ("dcs")
+616c471
+< 		while (get_valb ("[CONFIRM]  Send DCS commands?", false, dcs) != OK) ;
+---
+> 		dcspa = clgetb ("dcs_rot")
+620d474
+< 
+630,638c484,487
+< 
+< 		if (no_op) {
+< 			call eprintf ("(command NOT sent)\n")
+< 		} else {
+< 			stat = oscmd (cmdline)
+< 			if (stat != OK) {
+< 				call eprintf ("command failed!  (%d)\n")
+< 					call pargi (stat)
+< 			}
+---
+> 		stat = oscmd (cmdline)
+> 		if (stat != OK) {
+> 			call eprintf ("command failed!  (%d)\n")
+> 				call pargi (stat)
+647,655c496,499
+< 
+< 		if (no_op) {
+< 			call eprintf ("(command NOT sent)\n")
+< 		} else {
+< 			stat = oscmd (cmdline)
+< 			if (stat != OK) {
+< 				call eprintf ("command failed!  (%d)\n")
+< 					call pargi (stat)
+< 			}
+---
+> 		stat = oscmd (cmdline)
+> 		if (stat != OK) {
+> 			call eprintf ("command failed!  (%d)\n")
+> 				call pargi (stat)
+660d503
+< if (imode == 1) {
+667,675d509
+< } else {
+< 		call sprintf (cmdline, SZ_LINE,
+< 		  "rsh %s modify -s %s INSTXOFF=%.2f INSTYOFF=%.2f REL2CURR=1")
+< 			call pargstr (DCS_HOST)
+< 			call pargstr (DCS_SYS)
+< 			call pargr (xarcsec)
+< 			call pargr (yarcsec)
+< 
+< }
+678,686c512,515
+< 
+< 		if (no_op) {
+< 			call eprintf ("(command NOT sent)\n")
+< 		} else {
+< 			stat = oscmd (cmdline)
+< 			if (stat != OK) {
+< 				call eprintf ("command failed!  (%d)\n")
+< 					call pargi (stat)
+< 			}
+---
+> 		stat = oscmd (cmdline)
+> 		if (stat != OK) {
+> 			call eprintf ("command failed!  (%d)\n")
+> 				call pargi (stat)
+695,703c524,527
+< 
+< 		if (no_op) {
+< 			call eprintf ("(command NOT sent)\n")
+< 		} else {
+< 			stat = oscmd (cmdline)
+< 			if (stat != OK) {
+< 				call eprintf ("command failed!  (%d)\n")
+< 					call pargi (stat)
+< 			}
+---
+> 		stat = oscmd (cmdline)
+> 		if (stat != OK) {
+> 			call eprintf ("command failed!  (%d)\n")
+> 				call pargi (stat)
+709,743d532
+< # Write the log file entry
+< 	if (!no_op && strne (logfile, "")) {
+< 		fdl = open (logfile, APPEND, TEXT_FILE)
+< 		call seek (fdl, EOF)
+< 		if (dcspa == YES) {
+< 		    call fprintf (fdl,
+< "%-26s  %6.3fd (%5.3f)    %6.2f\"%1c (%4.2f) %6.2f\"%1c (%4.2f)\n")
+< 		} else if (dcs) {
+< 		    call fprintf (fdl,
+< "%-26s<<%6.3fd (%5.3f)>>  %6.2f\"%1c (%4.2f) %6.2f\"%1c (%4.2f)\n")
+< 		} else {
+< 		    call fprintf (fdl,
+< "%-26s<<%6.3fd (%5.3f)    %6.2f\"%1c (%4.2f) %6.2f\"%1c (%4.2f)>>\n")
+< 		}
+< 			call pargstr (image)
+< 			call pargr (pdeg)
+< 			call pargr (perr)
+< 		if (imode == 1) {
+< 			call pargr (earcsec)
+< 			call pargc ("E")
+< 			call pargr (eerr)
+< 			call pargr (narcsec)
+< 			call pargc ("N")
+< 			call pargr (nerr)
+< 		} else {
+< 			call pargr (xarcsec)
+< 			call pargc ("X")
+< 			call pargr (xerr)
+< 			call pargr (yarcsec)
+< 			call pargc ("Y")
+< 			call pargr (yerr)
+< 		}
+< 		call close (fdl)
+< 	}
+< 

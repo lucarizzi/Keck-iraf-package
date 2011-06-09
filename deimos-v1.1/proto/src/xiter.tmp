@@ -1,0 +1,46 @@
+
+procedure	xiter_mu (xmm, ymm, wave, xtarg, niter, param, fdz, cd)
+
+real	xmm, ymm, wave
+real	xtarg
+int	niter
+real	param[NPARAMS]			# extraction/position params
+pointer	fdz, cd
+
+int	i
+real	relscale
+real	xpx, ypx
+real	delmu
+
+real	zx, zy
+begin
+
+	if (ORDER(param) != 0) {
+		relscale = 1. / GRLINES(param) * ORDER(param) *
+				(cos (alpha) + cos (beta))
+#		relscale = RADTODEG (1. / relscale)
+# convert relscale to pixels (ie radian/pix)
+		relscale = 1. / relscale * WAVINC(param)
+	} else {
+# determine relscale
+		relscale = 0.5 * (0.024 / 312.)		## NB HARDCODE
+	}
+
+	do i = 1, niter {
+		call pt_xfm (xmm, ymm, zx, zy, xpx, ypx, 1, fdz,
+							cd, param, wave, NO)
+############
+		call pt_xfm (xmm[i], ymm[i], wave[j], e1, a2, a3, a4, ccd, sys, xpix, ypix, n)
+		call ics_to_ccd (xpix, ypix, ccd, n, xpix, ypix)
+############
+		delmu = (xpx - xtarg) * relscale
+		MU(param) = MU(param) + delmu
+	}
+
+	call printf (
+	    "\n Mu indicated for %5.0f at xpix %4f: %7.4f (last del=%6.3f)\n")
+		call pargr (wave)
+		call pargr (xtarg)
+		call pargr (RADTODEG(MU(param)))
+		call pargr (RADTODEG(delmu))
+end

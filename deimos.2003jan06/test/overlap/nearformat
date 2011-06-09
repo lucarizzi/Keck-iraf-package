@@ -1,0 +1,24 @@
+ind1	int	%3d	# index (not used)
+xm1	real	%8.3f	# x-location, SMCS (mm)
+ym1	real	%7.3f	# y-location, SMCS (mm)
+wav1	real	%8.1f	# input wavelength (A)
+xpx1	real	%8.1f	# x-pixel location
+ypx1	real	%7.1f	# y-pixel location
+ind2	int	%3d	# index (not used)
+xm2	real	%8.3f	# x-location, SMCS (mm)
+ym2	real	%7.3f	# y-location, SMCS (mm)
+wav2	real	%8.1f	# input wavelength (A)
+xpx2	real	%8.1f	# x-pixel location
+ypx2	real	%7.1f	# y-pixel location
+ind3	int	%3d	# index (not used)
+xm3	real	%8.3f	# x-location, SMCS (mm)
+ym3	real	%7.3f	# y-location, SMCS (mm)
+wav3	real	%8.1f	# input wavelength (A)
+xpx3	real	%8.1f	# x-pixel location
+ypx3	real	%7.1f	# y-pixel location
+ind4	int	%3d	# index (not used)
+xm4	real	%8.3f	# x-location, SMCS (mm)
+ym4	real	%7.3f	# y-location, SMCS (mm)
+wav4	real	%8.1f	# input wavelength (A)
+xpx4	real	%8.1f	# x-pixel location
+ypx4	real	%7.1f	# y-pixel location

@@ -1,0 +1,9 @@
+input,f,a,,,,"input (mapmask) file"
+output,f,a,,,,"output file"
+title,s,h,"",,,"title"
+width_page,r,h,10.557,,,"width of plotting dev. (in)"
+height_page,r,h,7.943,,,"height of plotting dev. (in)"
+slit_width,r,h,1.05,,,"width of slit in mm"
+true_scale,b,h,yes,,,"plot at true scale?"
+label,b,h,yes,,,"label the slits?"
+mode,s,h,"ql",,,

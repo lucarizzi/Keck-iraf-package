@@ -1,0 +1,9 @@
+Check with De re: obs comments in DEIMOS DB (comment+author to go with a frame)
+
+
+Commissioning:
+	TV astrometry frame (verify?)
+
+
+Focus: how about 2 blade during readout?  There's a conmflict with the
+dither versus coadded guider image.

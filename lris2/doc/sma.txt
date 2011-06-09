@@ -1,0 +1,115 @@
+Here's a cookbook for the latest method using the ucsclris software with
+pre-selected guide star and the pickoff mirror:
+
+AFTERNOON:
+
+1. Create the Box Coordinate Files:
+    Write a text file for each mask, containing (one line per star):
+	x  y  (Optional ID)
+Take the x,y CCD coordinates from the "map" file created by mapmask.
+
+2. Confirm the Coordinates:
+    Take an image through each slitmask (you may use internal illumination,
+eg, Ne lamp and V filter, 2s each; or the dome).  Run xbox to make sure
+that all boxes are found (it doesn't matter where it finds a "star").
+Note the delta values for each box: if they're constant and larger than
+about 3--4 pixels, you may want to epar "xoff,yoff" in mboxfind.
+(You may enter "I" when the residual plot is displayed to interrupt the 
+program.)
+
+3. Set up the STARLIST for the OA:
+    Write a "starlist" file containing the Guide Star RA,Dec for each mask.
+Note that the line contained in the header of the map file is close to
+the correct format:  strip off the first 4 characters and replace the :'s
+in the coordinates with spaces.  This starlist file is sent to the OA.
+
+Also, note the PA's for each mask (slightly updated for precession), and the
+TV pixel coordinates for the guide star.
+
+
+
+FOR EACH MASK:
+
+1a.  Give the OA the Guide Star Coordinates as identified in the starlist.
+NB: Tell the OA these go at the PICKOFF Pointing Origin!  Tell the OA the
+PA on the sky (updated for precession, see #4 above).
+
+1b.  Insert the slitmask and move to the imaging mirror.  The OA should switch
+to the slit-viewing camera.
+
+2.  Identify the Guide Star in the slit-viewing camera.  Tell the OA to
+place the star at the TV pixel coordinates in the "map" file (see 4 above).
+
+3.  Take a direct image through the mask (30s is typically good).  Stars
+should be seen in the boxes. (* if not, see Note_1 below)
+Analyze the image:
+
+	uc> xbox lris0023 box_coord_file
+
+(if problems, see Note_2 below)  You should be able to type "q" at each plot.
+Confirm the offsets; if less than about 0.03 degree in PA and 0.1" in RA/Dec,
+don't bother --- you're there.  (Also, see Note_3)
+
+4.  Repeat the last step as needed.  When aligned, switch back to grating and
+go!
+
+
+TROUBLESHOOTING:
+
+NOTE_1:  If stars are not seen in the boxes, something is wrong.  Immediately
+pull out the mask and take a direct image.  Display the direct image and
+the mask image. Identify an alignment star and the box it should fall in,
+and use "mshift" to move it there:
+
+	uc> mshift (xstar) (ystar) xref=(xbox) yref=(ybox) pa=(PA)
+
+(You should also "blink" the two images to make sure that the PA is close.)
+Then re-insert the mask and return to step 3.  NOTE: if the PA error is
+too large (one star will be in a box, but the others won't) see Note_4 below.
+
+NOTE_2:  Things to watch for...
+"Cannot find box" and crash!  Oh oh, this shouldn't happen any more if you've
+followed the procedure above.  Here's what to do.  Display the image and
+measure the coordinates of a couple of boxes.  If there's a constant offset
+between the boxes and what's listed in the "box coordinate file", then epar
+mboxfind to change the offsets (don't forget to return them to zero when
+appropriate).  Note that _some_ offset may already be applied, as listed by
+xbox -- be sure to _exclude_ this when changing xoff,yoff.
+If only one box is failing, you can measure its coordinates in the image
+AND SUBTRACT the offsets listed by xbox; incorporate these new coordinates
+in the box coordinate file.  If the one box that fails is non-crucial,
+you can simply comment it out (#) in the box file. Then rerun xbox.
+
+There is no box (only noise) seen in the profiles.  This is the same case as
+above, but the program doesn't crash.  Same options as above.
+
+The vertical line marking the star center isn't where you think the star 
+center should be:  place the x-cursor where you want it and type "f".
+
+The sky isn't set right: place the y-cursor where you want it and type
+"<space>".  The centering is not very sensitive to this.
+
+
+
+NOTE_3:  If the stars are off at the very edge of the box, you may want to
+have the OA apply the translation without the PA change; then take another 
+image.  This is particularly true for crowded fields, where misidentifications
+can really lead you astray.  In any event, the PA offset may not be very
+reliable if the stars are mostly occulted.
+
+
+
+NOTE_4:  The PA error is so large that even though one star is in the box,
+other ones aren't.  This is a serious problem, and one that should not happen!
+If it does, though, here is the fix:
+1. remove the mask and take a direct image.
+2. measure the locations of two stars (one at top, one at bottom of image).
+3. measure the locations of the corresponding boxes.
+4. write a text file ("pairs file") that lists (one star per line):
+	xbox ybox xstar ystar
+5. run xbox:
+	xbox lris0027  pairs=pairs_file
+6. Since you've hit serious problems, take another direct image and
+blink it against the previous mask image to confirm the stars will be
+in the boxes.
+7. reinsert mask and continue at Step 3.

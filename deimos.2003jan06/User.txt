@@ -1,0 +1,272 @@
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+The DEIMOS mask-design tool is currently called "dsimulator".  It takes an
+input file with format below, and produces a FITS file containing a number
+of FITS ASCII tables (this will likely change to binary tables before shipping,
+and the table-writing routines replaced by canned routines).
+
+
+--------------------------------------------------------------
+To INSTALL (on a Solaris machine):
+--------------------------------------------------------------
+
+> mkdir deimos
+> cd deimos
+> tar -xvf tarfile
+
+Then in loginuser.cl:
+
+set deimos=".../deimos/"
+task deimos=deimos$deimos.cl
+
+--------------------------------------------------------------
+To RUN:
+--------------------------------------------------------------
+
+> cl			# start up IRAF
+
+cl> deimos		# load DEIMOS package
+
+de> dsim input output	# run dsimulator
+
+
+--------------------------------------------------------------
+To USE (with xgterm):
+--------------------------------------------------------------
+Parameters:
+      objfile = "obj.srt"       file of primary objects
+          mdf = "test2.fits"    Mask Design File (FITS)
+         (ra0 = 14.283333333333) Initial RA of field
+        (dec0 = 52.4)           Initial Dec of field
+         (PA0 = 40.)            Initial PA of field
+     (equinox = 2000.)          Equinox of coordinates		[ignore for now]
+      (output = "")             output list (mapmask input)	[ignore for now]
+         (ha0 = 0.)             Initial Hour Angle
+    (min_slit = 8.)             Minimum slit length (arcsec)
+  (lambda_cen = 5000.)          wavelength for refraction
+    (sep_slit = 0.35)           Separation between slits (arcsec)
+        (temp = 0.)             Air temp (C)			[ignore for now]
+    (pressure = 485.)           Air pressure (mm Hg)		[ignore for now]
+  (slit_width = 1.)             Width of slit (arcsec)
+      (box_sz = 4.)             Alignment box size (arcsec)
+       (coord = "")             graphics cursor input
+        (mode = "ql")           
+
+Keystrokes:
+
+       hjkl      translate mask (1" x factor) in the usual ways
+       p/n       rotate mask (1 deg x factor) in a Pos/Neg sense
+        .        cycle through speeds (10, 1, 0.1) for pnhjkl keys
+        c        move field Center to cursor position
+        s        Select workable set of primary objects
+        a        Add a target
+        d        Delete a target
+        r        Redraw
+        i        Clear (initialize) the list of selected objects
+        x        *experimental*  generate slits to go over targets.
+        ?        print this list
+        q        quit
+        I        interrupt task immediately
+
+
+1. When graph is displayed, use "hjkl" to move around, vi convention (actually,
+it appears you are moving the targets around).  Adjust PA by "p/n".  Use "." to
+cycle through speeds (fast/medium/slow, factor of 10 change). The mask
+outline in shown in yellow; coordinate units are arcsec on sky wrt field center.
+
+Selected objects show up white, special objects (eg alignment stars) magenta,
+primary list objects green, secondary etc objects blue.  If an object is not
+in a usable area (in DEIMOS, that could be CCD mosaic gaps, or the camera-
+occulted region at top center) the targets are shown red.  Each target is
+represented as a slit of requested length tilted at the requested PA, if
+specified.
+
+2. You can use "s" to select a workable set of targets.  We assume no
+overlapping slits.
+
+3. Use "a" and "d" to add/delete targets, "r" to replot.
+
+4. To draw slits over the selected objects, type "x".  Note that interactive
+slit editing is currently not implemented, but will be soon.
+
+
+--------------------------------------------------------------
+Structure of the Slitmask Design tool:
+--------------------------------------------------------------
+
+INPUT FILE (see example below):
+
+ID	-- whitespace delimited identifier
+RA	-- RA (hh:mm:ss.ss)
+Dec	-- dd:mm:ss.s
+Equinox	-- years
+Pcode	-- currently numeric (-2=alignment, -1=guide, 1-9999=science targets)
+		[eventually will be AS, GS, O, possibly PS=pseudo-object]
+Sample	-- ranking number of list (eg 0=preslected, 1=primary, 2=secondary, etc)
+Selcode	-- select code (currently 1=selected, 2=not selected)
+opt:
+PA	-- position anlgle on sky (degree, N through E)
+len1	-- minumum length (arcsec) on one side [exact definition TBD]
+len2	-- minumum length (arcsec) on other side [exact definition TBD]
+
+
+
+
+3. Automatic selection:
+
+The "rules" for automatic prioritizing are yet TBD, and in fact may be user
+selectable in the end.  However, general rules apply:
+
+A. All preselected objects must be included.  ****
+B. All primary-list objects that do not conflict with previously-selected
+targets are considered first.
+C. After all primary-list targets have been considered, space can then be
+used to accomodate as many secondary-list targets as possible, and so on,
+until all space and/or lists are exhausted.
+
+========================================================
+REQUIRED EXTENSIONS (these must and will be implemented):
+========================================================
+
+** Binding:
+It is sometimes desireable to place 2 or more objects in a single slit --
+we refer to this as "binding" targets together.
+
+"Binding" objects:  must be able to select object(s) to go into same slit
+as another.  Rules:
+Since more than two objects can go into a slit, binding should be selected
+by _area_, eg:
+
+<place cursor at one corner>
+"again"
+<place cursor at other corner>
+"select one object as principle target (or type `c' to cancel)"
+(... repeated as needed until a valid principle target is selected)
+"N objects bound"
+
+Only (pre)selected objects will be included.  The principle target (PT) may have
+its parameters (PA, len1, len2, priority) changed to reflect the binding.
+The PA will be done with least-squares fitting (do the coords of the PT
+change?).  The other(s)
+must go into another list (special number) to indicate they are bound. We may
+need another list/vector to point to the appropriate PT index.
+
+The alternative is to create a new pseudo object (PS) and bind all the objects
+to this new entity.
+
+
+(a). Unbinding objects -- done on PT or PS; needs confirmation; old parameters
+must be input by rescanning the input data if needed (PT implementation).
+
+(b). Other rules: one object cannot be bound to more than one other.
+Binding should show up in another color to indicate special status.
+
+
+(x). An alternative approach again -- first select targets.  Assign a slit
+to each target.  Then, while resolving slit conflicts, allow objects to
+be "bound".  In this way, the numerical assignment of objects to slits is
+easily handled.  However, it means slit info must be carried around at all
+intermediate stages, including input.
+
+
+** Many additional features not yet coded, such as:
+* Additional keystroke options:
+	-- binding (see above)
+	-- change field size (zoom in/out; pan;  NB this can be done currently
+		by the plot buffer commands ZP,HJKL, but some kind a real
+		zoom/pan would be desirable)
+	-- label targets
+	-- change target properties interactively (eg length of slit, PA)
+	-- change Hour Angle
+	-- proper initialize (current has some faults)
+	-- change auto-selection criteria (?)
+	-- option to display slits over image
+	-- slit conflict marking/resolution (ie when slits would overlap,
+		there is a conflict and the slits must be shortened.  This
+		should be done automatically (rules TBD), but should be
+		reviewed and edited interactively.)
+	-- others I am not thinking of right now
+
+
+* Supporting graphical/text info:
+-- Keck-II Telescope elevation limits
+-- Compass Rose (partially implemented, but needs PA of instrument added)
+-- Parallactic Angle
+	+ estimate of differential slit losses
+	+ suggested filter for aligning/guiding (and est. errors for others)
+
+* precession (trivial)
+* Refraction corrections (trivial)
+* proper motion correction (? probably and trivial to calculate, but not high
+on list of priorities.  Values probably will be input keyword style in input
+file.)
+
+
+* Intermediate Output:
+
+-- all selected objects would be output as "preselected", so the output file
+could be input again, ad nauseum.  Bound objects must be indicated so they get
+carried along. The output (text) file has the same format as the input file.
+
+-- it is also desirable to output the list of targets which were _NOT_ selected
+as these are frequently wanted to go into the design of the next mask.
+
+
+* There is also a desire to show the spectra in the detector plane, that is,
+for each object, what its spectral trace will be plus starting and ending
+wavelengths ON THE DETECTOR.  If redshift is known, the location of spectral
+features such as strong emission lines could also be shown.  In addition, this
+view would also show known CCD defects.  This would probably be a keystroke
+option to switch into this mode.  The optical layout of the CCD mosaic,
+camera distortion, etc, etc, as well as defects lists, must be known to
+implement this mode.
+
+
+** Miscellaneous:
+-- resize xgterm graphics window to fit mask form-factor better.
+-- make colors user-selectable at some level for possible color-blindness.
+
+
+
+=================================================================
+Example of input file format (see deimos$test/obj.srt for full file):
+=================================================================
+# ID                RA            Dec     Eqnx.  pc samp sel  PA
+313_4559        14:15:11.851  52:01:20.48 2000.  800  2  0  
+313_4845        14:15:10.345  52:01:20.73 2000.  800  2  0  
+313_4473        14:15:13.378  52:01:23.03 2000.  800  2  0  
+304_4028        14:15:17.787  52:01:23.63 2000.  800  2  0  
+304_6632        14:15:20.560  52:01:25.06 2000.  800  2  0   70.50
+313_5920        14:15:07.444  52:01:25.69 2000.  800  3  0  
+313_5844        14:15:10.028  52:01:30.63 2000.  800  2  0  
+313_6332        14:15:08.663  52:01:32.95 2000.  800  2  0  
+304_1608        14:15:14.854  52:01:37.73 2000.  800  2  0  
+294_2078        14:15:23.216  52:01:41.56 2000.  800  2  0   11.70
+303_0429        14:15:16.020  52:01:45.00 2000.  800  2  0  
+313_7545        14:15:09.713  52:01:46.44 2000.  800  1 0  -115.5
+313_7453        14:15:10.531  52:01:47.90 2000.  800  2  0  
+303_1224        14:15:15.370  52:01:51.91 2000.  800  2  0   10.50
+313_7763        14:15:11.555  52:01:52.74 2000.  800  2  0  
+294_3367        14:15:24.267  52:01:54.58 2000.  800  2  0   10.50
+294_2062        14:15:22.792  52:01:56.88 2000.  800  2  0  
+
+
+==================================================================
+Adopting to other telescopes/instruments
+==================================================================
+
+(1) The telescope focal surface is assumed spherical.  The radius of curvature
+and the functional form of the telescope's radial-distortion must be
+known and input into an include file.  Also the telescope focal length (to
+give plate scale).
+
+(2) The slitmask is assumed cylindrical (could be flat) in shape and tilted.
+Its geometry (radius of curvature, and tilt, offset and intercept wrt telescope
+axis) must be inserted in an include file.
+
+(3a) Slitmask/detector limits must be coded analytically in the subroutine
+chk_stat().
+
+(3b) The outline of the slitmask and other features (eg mosaic gaps, guide
+camera FOV) must be specified in a text file read at execution.
+
+(4) The output routines must be customized.

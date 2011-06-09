@@ -1,0 +1,99 @@
+.help spec_s2n 2001-Jan-05 wmkonspec.spec_s2n
+.ih
+NAME
+spec_s2n -- estimate the S/N for multispec-format spectra
+.ih
+USAGE
+
+.sp
+.nf
+spec_s2n input
+.fi
+.sp
+
+.ih
+PARAMETERS
+
+.le
+.ls input
+ Name(s) of multispec-format image(s) to process.
+.le
+
+.ih
+DESCRIPTION
+This task will compute and print an empirical estimate of the
+signal-to-noise ratio in each aperture of a multispec-format
+image.  Each multispec-format spectrum contains a signal band
+(assumed to be band 1) and a noise band (band 4) which is an
+estimate based on read noise and poisson statistics.  The task
+simply computes the estimated S/N in each pixel by taking the
+ratio of these two bands, then computes the median of all the S/N
+values in the spectrum to derive a median S/N for the spectrum.
+The operation is repeated for each aperture in the image.
+
+
+If multiple images or apertures are specified, the quadrature sum
+of the S/N values for all spectra is printed.
+.ih
+EXAMPLES
+.ls
+ Compute the median S/N in spectrum '24des0073cy.ms.fits':
+
+.sp
+.nf
+wm> spec_s2n 24des0073cy.ms.fits
+Image: 24des0073cy.ms.fits  S/N: 3.6 per pixel (median)
+.fi
+.sp
+	
+.le
+.ls
+ Compute the median S/N of all spectra in a dataset:
+
+.sp
+.nf
+wm> spec_s2n *.ms.fits
+Image: 24des0073cy.ms.fits  S/N: 3.6 per pixel (median)
+Image: 24des0074cy.ms.fits  S/N: 3.1 per pixel (median)
+Image: 24des0075cy.ms.fits  S/N: 3.6 per pixel (median)
+Image: 24des0076cy.ms.fits  S/N: 4.4 per pixel (median)
+Image: 24des0077cy.ms.fits  S/N: 7.7 per pixel (median)
+Image: 24des0078cy.ms.fits  S/N: 6.9 per pixel (median)
+Image: 24des0079cy.ms.fits  S/N: 8.0 per pixel (median)
+Image: 24des0080cy.ms.fits  S/N: 9.1 per pixel (median)
+Image: 24des0081cy.ms.fits  S/N: 9.8 per pixel (median)
+Image: 24des0082cy.ms.fits  S/N: 6.8 per pixel (median)
+Image: 24des0083cy.ms.fits  S/N: 10.0 per pixel (median)
+Image: 24des0084cy.ms.fits  S/N: 10.6 per pixel (median)
+Image: 24des0085cy.ms.fits  S/N: 10.2 per pixel (median)
+Image: 24des0086cy.ms.fits  S/N: 9.3 per pixel (median)
+Image: 24des0087cy.ms.fits  S/N: 9.3 per pixel (median)
+Image: 24des0088cy.ms.fits  S/N: 9.9 per pixel (median)
+Image: 24des0089cy.ms.fits  S/N: 7.7 per pixel (median)
+Image: 24des0090cy.ms.fits  S/N: 8.0 per pixel (median)
+Image: 24des0091cy.ms.fits  S/N: 7.7 per pixel (median)
+Quadrature sum: 34.9 per pixel
+.fi
+.sp
+
+.le
+.ih
+SEE ALSO
+\fBimarith\fR
+\fBimstat\fR
+.br
+\fBThe cl script spec_s2n.cl\fR
+.br
+\fBThe package wmkonspec\fR
+
+.ih
+AUTHOR
+Gregory D. Wirth\fR \fB(wirth@keck.hawaii.edu)\fR
+
+
+.ih
+LAST MODIFIED
+ Tue Apr 17 16:25:12 HST 2001
+
+.sp
+Converted from source help file spec_s2n.html via html2lroff

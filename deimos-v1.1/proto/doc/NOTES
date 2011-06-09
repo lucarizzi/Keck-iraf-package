@@ -1,0 +1,41 @@
+Simulator:
+Objects must be specified by
+ID RA DEC equinox pcode mag size pa [epoch mua mud] [also pband,type,z]
+
+OBJECT  RA_OBJ DEC_OBJ RADECSYS EQUINOX MJD_OBS mag pBand RadVel MajAxis
+ObjClass MajAxPA MinAxis PM_RA PM_Dec Parallax
+
+
+
+
+Slits will need
+	center, pa, lower, upper, width, type
+dSlitId DesId slitRA slitDec slitTyp slitLen slitLPA  slitWid slitWPA
+
+
+
+Steps:
+1. convert RA,dec --> correct for equinox, epoch, parallax, refraction, etc.
+  ==> new RA, DEC
+
+2. Convert to x,y using a scaled Mercator projection (or perhaps better,
+a tangent projection into standard coordinates)
+
+3. Now, a fundamental question -- do we define by selecting targets _OR_ by
+defining slitlets?
+
+Go ahead via object selection -- it's how people think.
+
+3. We can presumably select objects based on non-overlap in the slit direction
+(ie mask PA).  This _may_ introduce overlap on the metal, but who cares? as it
+shouldn't overlap in the _image_ where it counts.
+
+
+4. Note in slit cutting, we may wish to change the corners of the ||gram in
+order to line up with the dispersion direction.  We may also need to vary
+slit width, _BUT_ do not vary within a given slit (worry about mill stage
+step size).
+
+
+
+The current version of mapmask is to develop the FITSIO routines.

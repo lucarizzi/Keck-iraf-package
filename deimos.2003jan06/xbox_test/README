@@ -1,0 +1,9 @@
+Temporary directory to test xbox.
+
+Test image: /net/polo/dsk/iraid1/kics/2002may30/d0530_0003.fits
+
+xbox /net/polo/dsk/iraid1/kics/2002may30/d0530_0003.fits box03
+Also:
+xbox /net/polo/dsk/iraid1/kics/2002may31/d0531_0001.fits box03
+xbox /net/polo/dsk/iraid1/kics/2002may31/d0531_0002.fits box03
+

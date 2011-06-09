@@ -1,0 +1,394 @@
+#############################################################################
+
+
+define	TFMTLEN		7
+define	TTYPLEN		12
+define	TUNILEN		12
+
+define	KDATLEN		9
+define	TFIELD		Memi[$1]
+define	TWUSED		Memi[$1+1]
+define	CHARCNT		Memi[$1+2]
+define	TBCOLPT		Memi[$1+3]
+define	TFORMPT		Memi[$1+4]
+define	TTYPEPT		Memi[$1+5]
+define	TUNITPT		Memi[$1+6]
+define	TROWPT		Memi[$1+7]
+define	THDROK		Memi[$1+8]
+define	TBCOL		Memi[TBCOLPT($1)+$2]
+define	TTYPE		Memc[TTYPEPT($1)+$2*TTYPLEN]
+define	TUNIT		Memc[TUNITPT($1)+$2*TUNILEN]
+define	TFORM		Memc[TFORMPT($1)+$2*TFMTLEN]
+define	BUFROW		Memc[TROWPT($1)]
+
+#############################################################################
+
+# FITSTEST:  look for ways to write fits tables
+# Path: create struct to handle format, etc?  compose a format string
+# do an sprintf to write spp string
+# pass string to write routine, which uses chrpak and write OR simply
+#      use fprintf.  Keep count of chars; will need to pad on exit.
+# 
+
+procedure t_fitstest ()
+
+pointer	fd
+char	output[SZ_FNAME]			# output fits file
+
+char	fmtstr[SZ_LINE]				# format for writing table row
+int	fmtstrlen
+int	n
+pointer	kdat
+
+int	i
+
+pointer	open()
+begin
+
+# Read in parameters:
+
+	call clgstr ("output", output, SZ_FNAME)
+	fd = open (output, NEW_FILE, TEXT_FILE)
+
+	fmtstrlen = SZ_LINE
+	n = 33
+
+	call ftab_init (kdat, 3, fmtstr)
+
+	call ftcol_def (kdat, "index", "I6",      "",  6, fmtstr, fmtstrlen)
+	call ftcol_def (kdat, "xslit", "F12.7", "mm", 12, fmtstr, fmtstrlen)
+	call ftcol_def (kdat, "yslit", "F12.7", "mm", 12, fmtstr, fmtstrlen)
+	call ftcol_def (kdat, "id",    "A10",     "", 10, fmtstr, fmtstrlen)
+
+	call ftab_whead (fd, kdat, n)
+
+	do i = 1, n {
+		call sprintf (BUFROW(kdat), TWUSED(kdat), fmtstr)
+			call pargi (i)
+			call pargr (3.14159)
+			call pargr (99.99)
+			call parstr ("ID_NAME")
+		call ftab_wrow (fd, kdat)
+	}
+
+	call ftab_close (fd, kdat)
+
+end
+
+#############################################################################
+# 
+#	ftab_init (kdat, ncol, fmtstr)
+#
+#	ftcol_def (kdat, type, form, unit, wid, fmtstr, fmtstrlen)
+#
+#	ftab_whead (fd, kdat, nline)
+#
+#	ftab_wrow (fd, kdat)
+#
+#	ftab_close (fd, kdat)
+#
+#	pkwi   (fd, kdat, name, val, comment)
+#	pkwr   (fd, kdat, name, val, comment)
+#	pkwstr (fd, kdat, name, val, comment)
+#	pkwspec (fd, kdat, val)
+#
+
+# FTAB_INIT: initialize fits acsii table
+# 
+procedure	ftab_init (kdat, ncol, fmtstr)
+
+pointer	kdat
+int	ncol
+char	fmtstr[ARB]
+
+begin
+	call malloc (kdat, KDATLEN, TY_STRUCT)
+	call malloc (TBCOLPT(kdat), ncol, TY_INT)
+	call malloc (TFORMPT(kdat), ncol*TFMTLEN, TY_CHAR)
+	call malloc (TTYPEPT(kdat), ncol*TTYPLEN, TY_CHAR)
+	call malloc (TUNITPT(kdat), ncol*TUNILEN, TY_CHAR)
+
+	TFIELD(kdat) = 0
+	TWUSED(kdat) = 0
+	CHARCNT(kdat) = 0
+	THDROK(kdat) = NO
+	call strcpy ("", fmtstr, 1)
+end
+
+
+# FTCOL_DEF: define ascii table column, return update format string
+
+procedure ftcol_def (kdat, type, form, unit, wid, fmtstr, fmtstrlen)
+
+pointer	kdat				# pointer to struct
+char	type[ARB]			# field name
+char	form[ARB]			# format string for column
+char	unit[ARB]			# field units
+int	wid				# width of field (TMP?)
+
+char	fmtstr[ARB]
+int	fmtstrlen
+
+char	sppfmt[16]
+int	ndx
+
+int	strlen()
+begin
+	ndx = TFIELD(kdat)
+
+	if (strlen (form) >= TFMTLEN)
+		call fatal (0, "ftcol_def: format string too long")
+	if (strlen (type) >= TTYPLEN)
+		call fatal (0, "ftcol_def: type string too long")
+	if (strlen (unit) >= TUNILEN)
+		call fatal (0, "ftcol_def: unit string too long")
+
+	TFIELD(kdat) = TFIELD(kdat) + 1
+	TBCOL(kdat,ndx) = TWUSED(kdat) + 1
+	TWUSED(kdat) = TWUSED(kdat) + wid
+	call strcpy (form, TFORM(kdat,ndx), TFMTLEN-1)
+	call strcpy (type, TTYPE(kdat,ndx), TTYPLEN-1)
+	call strcpy (unit, TUNIT(kdat,ndx), TUNILEN-1)
+
+# translate format string
+	if (form[1] == 'A' || form[1] == 'a') {
+		call sprintf (sppfmt, 16, "%%%ss")
+			call pargstr (form[2])
+	} else if (form[1] == 'I' || form[1] == 'i') {
+		call sprintf (sppfmt, 16, "%%%sd")
+			call pargstr (form[2])
+	} else if (form[1] == 'F' || form[1] == 'f') {
+		call sprintf (sppfmt, 16, "%%%sf")
+			call pargstr (form[2])
+	} else {
+		call fatal (0, "ftcol_def:  no translation for format type")
+	}
+
+
+	if (strlen (fmtstr) + strlen (sppfmt) > fmtstrlen) {
+		call fatal (0, "requested format string too long!")
+	}
+
+	call strcat (sppfmt, fmtstr, fmtstrlen)
+
+end
+
+# FTAB_WHEAD:  Write header including column defns (currently ends also)
+# Note: header is left open; first data write closes it
+
+procedure	ftab_whead (fd, kdat, nline)
+
+pointer	fd				# opened file
+pointer	kdat				# tab KW struct
+int	nline				# number of lines to write
+
+char	kwd[8]				# string variable for enumerated keyword
+int	n
+
+begin
+	call pkwstr (fd, kdat, "XTENSION", "TABLE   ", "ASCII table extension")
+	call pkwi   (fd, kdat, "BITPIX", 8, "number of bits per data pixel")
+	call pkwi   (fd, kdat, "NAXIS", 2, "always 2 for a FITS table")
+	call pkwi   (fd, kdat, "NAXIS1", TWUSED(kdat), "cols -- chars needed to describe fields")
+	call pkwi   (fd, kdat, "NAXIS2", nline, "rows")
+	call pkwi   (fd, kdat, "PCOUNT", 0, "required FITS extension keyword")
+	call pkwi   (fd, kdat, "GCOUNT", 1, "required FITS extension keyword")
+	call pkwi   (fd, kdat, "TFIELDS", TFIELD(kdat), "Number of columns in the table")
+
+
+	do n = 0, TFIELD(kdat)-1 {
+		call sprintf (kwd, 8, "TBCOL%-3d")
+			call pargi (n+1)
+		call pkwi (fd, kdat, kwd, TBCOL(kdat,n), "")
+
+		call sprintf (kwd, 8, "TFORM%-3d")
+			call pargi (n+1)
+		call pkwstr (fd, kdat, kwd, TFORM(kdat,n), "")
+
+		call sprintf (kwd, 8, "TTYPE%-3d")
+			call pargi (n+1)
+		call pkwstr (fd, kdat, kwd, TTYPE(kdat,n), "")
+
+		call sprintf (kwd, 8, "TUNIT%-3d")
+			call pargi (n+1)
+		call pkwstr (fd, kdat, kwd, TUNIT(kdat,n), "")
+	}
+
+# Finally, create the data (row) buffer
+		call malloc (BUFROW(kdat), TWUSED(kdat), TY_CHAR)
+
+end	
+
+
+
+# FTAB_WROW: write row, update count
+
+procedure	ftab_wrow (fd, kdat)
+pointer	fd
+pointer	kdat
+
+int	cnt, n
+
+begin
+	if (THDROK(kdat) == NO) {
+		call pkwspec (fd, kdat, "END")
+
+		cnt = (2880 - CHARCNT(kdat)) / 80
+		if (cnt > 0) {
+			do n = 1, cnt
+				call pkwspec (fd, kdat, "")
+		}
+
+# and reset counter ?
+		if (CHARCNT(kdat) != 0) {
+			call eprintf ("Error on CHAR_CNT: %d\n")
+				call pargi (CHARCNT(kdat))
+			CHARCNT(kdat) = 0
+		}
+
+		THDROK(kdat) = YES
+	}
+	call fprintf (fd, "%s")
+		call pargstr (BUFROW(kdat))
+	CHARCNT(kdat) = CHARCNT(kdat) + TWUSED(kdat)	# actually char-cnt
+	if (CHARCNT(kdat) > 2880)
+		CHARCNT(kdat) = CHARCNT(kdat) - 2880
+end
+
+
+
+# FTAB_CLOSE: pad and close file, release memory
+
+procedure	ftab_close (fd, kdat)
+
+pointer	fd
+pointer	kdat
+
+int	i
+
+begin
+# First, pad and close the fits table  (REVIEW -- v. inefficient)
+	if (CHARCNT(kdat) < 2880) {
+		do i = CHARCNT(kdat), 2880
+			call fprintf (fd, " ")
+	}
+	
+# Close the file
+	call close (fd)
+	
+# Free memory
+	call mfree (BUFROW(kdat), TY_CHAR)
+	call mfree (TUNIT(kdat), TY_CHAR)
+	call mfree (TTYPE(kdat), TY_CHAR)
+	call mfree (TFORM(kdat), TY_CHAR)
+	call mfree (TBCOL(kdat), TY_INT)
+	call mfree (kdat, TY_STRUCT)
+end
+
+procedure pkwi (fd, kdat, name, val, comment)
+
+pointer	fd
+pointer	kdat
+char	name[ARB]
+int	val
+char	comment[ARB]
+
+char	card[80]
+
+begin
+	call sprintf (card, 80, "%-8s= %20d / %s")
+		call pargstr (name)
+		call pargi (val)
+		call pargstr (comment)
+
+	call fprintf (fd, "%-80s")
+		call pargstr (card)
+
+	CHARCNT(kdat) = CHARCNT(kdat) + 80
+	if (CHARCNT(kdat) >= 2880)
+		CHARCNT(kdat) = CHARCNT(kdat) - 2880
+end
+
+	
+procedure pkwr (fd, kdat, name, val, comment)
+
+pointer	fd
+pointer	kdat
+char	name[ARB]
+real	val
+char	comment[ARB]
+
+char	card[80]
+
+begin
+	call sprintf (card, 80, "%-8s= %20f / %s")
+		call pargstr (name)
+		call pargr (val)
+		call pargstr (comment)
+
+	call fprintf (fd, "%-80s")
+		call pargstr (card)
+
+	CHARCNT(kdat) = CHARCNT(kdat) + 80
+	if (CHARCNT(kdat) >= 2880)
+		CHARCNT(kdat) = CHARCNT(kdat) - 2880
+end
+
+	
+procedure pkwstr (fd, kdat, name, val, comment)
+
+pointer	fd
+pointer	kdat
+char	name[ARB]
+char	val[ARB]
+char	comment[ARB]
+
+char	card[80]
+char	tval[70]
+
+int	strlen()
+begin
+	call sprintf (tval, 69, "'%s")
+		call pargstr (val)
+	call strcat ("'", tval, 70)
+
+	if (strlen (val) > 68)
+		call eprintf ("WARNING: fits string value truncated!\n")
+
+	if (strlen (tval) < 20)		# pad for appearance
+		call strcat ("                    ", tval, 20)
+
+	call sprintf (card, 80, "%-8s= %s / %s")
+		call pargstr (name)
+		call pargstr (tval)
+		call pargstr (comment)
+
+	call fprintf (fd, "%-80s")
+		call pargstr (card)
+
+	CHARCNT(kdat) = CHARCNT(kdat) + 80
+	if (CHARCNT(kdat) >= 2880)
+		CHARCNT(kdat) = CHARCNT(kdat) - 2880
+end
+
+
+procedure pkwspec (fd, kdat, val)
+
+pointer	fd
+pointer	kdat
+char	val[ARB]
+
+char	card[80]
+
+begin
+	call sprintf (card, 80, "%-s")
+		call pargstr (val)
+
+	call fprintf (fd, "%-80s")
+		call pargstr (card)
+
+	CHARCNT(kdat) = CHARCNT(kdat) + 80
+	if (CHARCNT(kdat) >= 2880)
+		CHARCNT(kdat) = CHARCNT(kdat) - 2880
+end
+

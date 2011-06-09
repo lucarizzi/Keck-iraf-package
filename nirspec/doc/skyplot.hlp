@@ -1,0 +1,139 @@
+.help skyplot 2001-Jan-09 wmkonspec.skyplot
+.ih
+NAME
+skyplot -- create simlulated sky spectrum and corresponding line list
+.ih
+USAGE
+
+.sp
+.nf
+skyplot inlines outlines outimage
+.fi
+.sp
+
+.ih
+PARAMETERS
+
+.le
+.ls inlines = "wmkonspec$lowd_ir_ohlines.dat"
+ File listing sky emission features (units of
+&Aring;ngstroms) and intensities (in arbitrary units). 
+The default input list is a set of OH sky lines from about 0.8
+to 2.3 &micro;m which is suitable for most low-dispersions spectra
+taken with NIRSPEC.
+.le
+.ls outlines
+ Output list of sky emission lines.  If none is specified, no
+list is produced.
+.le
+.ls outimage
+ Name of image in which to create simulated night sky
+spectrum.  If none is specified, no image is produced.
+.le
+.ls wavelength = 10000.
+ Central wavelength [Angstroms] for the wavelength interval
+over which to produce the simulated spectrum and line list.
+.le
+.ls dispersion = 2.077
+ Dispersion [Angstroms/px] of the resulting spectrum.  The
+default was appropriate for a test observation, and should be
+changed to suit your data.
+.le
+.ls fwhm = 5.
+ Width of sky lines [px].  This controls the FWHM of the
+emission lines in the simulated spectrum.  For purposes of
+comparing the simulated spectrum to the lines in your data it
+is best to input the FWHM of skylines in your sky spectra.
+.le
+.ls ncols = 1024
+ Number of pixels in spectrum.  Generally this should be the 
+same as the number of pixels in your NIRSPEC data.
+.le
+.ls identify = yes
+ Determine whether or not to label the emission lines in
+the resultant spectrum with their wavelengths.
+.le
+.ls nlines = 50
+ Number of lines to identify.  The \fInlines\fR strongest 
+emission lines in the spectrum will be labeled.
+.le
+.ls graphics = "stdgraph"
+ Graphics outimage device for plot of night sky emission
+lines. 
+.le
+
+.ih
+DESCRIPTION
+Given a list of sky emission features and their relative
+intensities, this task will generate a spectrum of these lines
+over the specified wavelength interval.  Optionally, the task will
+create an image and generate a list of the strongest lines in the
+spectrum.
+
+
+The task will generate a simulated sky spectrum, centered on the
+specified central wavelength, based on the input line list
+\fIinlines\fR.  The spectrum has the number of columns
+specified by parameter \fIncols\fR and the specified
+\fIdispersion\fR.  A plot of the spectrum is sent to the
+graphics device specified by the \fIgraphics\fR parameter.
+If the \fIidentify\fR parameter is set true, then the
+\fInlines\fR strongest features in the spectrum will be
+labeled with their wavelengths.
+
+
+If the \fIoutlines\fR parameter is defined, the task will
+create a list of the \fInlines\fR strongest features in the
+spectrum and save them to a file.  This file can then by used as 
+input to the 
+\fBidentify\fR
+task to obtain a wavelength solution based on the night sky
+lines.
+
+
+If the \fIoutimage\fR parameter is defined, the task will
+store the simulated sky spectrum in the specified image.
+.ih
+EXAMPLES
+.ls
+ Generate a list and a corresponding hardcopy plot of the 50
+strongest OH night sky lines between 1.0 and 1.25 &micro;m,
+putting the linelist into a file 'lines1.coo':
+
+.sp
+.nf
+skyplot wmkonspec$lowd_ir_ohlines.dat lines1.coo \
+wavelength=11250. dispersion=2.44 fwhm=5 ncols=1024 \
+ident+ nlines=50 graphics=stdplot
+.fi
+.sp
+
+Here is the resulting \fBplot\fR.
+.le
+.ih
+NOTES
+.ls (1)
+ The default linelist is a modified version of that
+published by \fBRousselot et al., 2000, A&amp;A, 354, 1134\fR.   This version of the linelist has been modified
+to (a) exclude all lines with intensity less than 10
+and (b) combine all P1/P2 pairs of unresolved lines.
+.le
+.ih
+SEE ALSO
+\fBidentify\fR
+.br
+\fBThe cl script skyplot.cl\fR
+.br
+\fBThe package wmkonspec\fR
+
+.ih
+AUTHOR
+Gregory D. Wirth\fR \fB(wirth@keck.hawaii.edu)\fR
+
+
+.ih
+LAST MODIFIED
+ Tue Apr 17 23:13:31 HST 2001
+
+.sp
+Converted from source help file skyplot.html via html2lroff

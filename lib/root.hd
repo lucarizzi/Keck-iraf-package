@@ -1,0 +1,5 @@
+# Root help directory for the KECK packages.  This dummy package is necessary
+# in order to have `keck' appear as a module in some package, so that the user
+# can type "help keck" (with the `keck' given as a task).
+
+_keck		pkg = keck$lib/rootkeck.hd

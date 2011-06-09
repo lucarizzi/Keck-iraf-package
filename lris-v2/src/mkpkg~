@@ -1,0 +1,36 @@
+# Make the LRIS package.
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$set	LIBS = "-lxtools -liminterp -lsurfit -lgsurfit -lcurfit"
+	$update	libpkg.a
+	$omake	x_lris.x
+	$link	x_lris.o libpkg.a $(LIBS) -o xx_lris.e
+	;
+
+install:
+	$move xx_lris.e keckbin$x_lris.e
+	;
+
+libpkg.a:
+	etc.x
+	yesno.x
+	futil.x		"futil.h"
+	lris_util.x	<math.h> "lris.h"
+	maskalign.x	<math.h> <gset.h> "futil.h"
+	xbox.x		<math.h> <gset.h> "futil.h"
+	xboxb.x		<math.h> <gset.h> "futil.h"
+	mboxfind.x	<imhdr.h> <gset.h>
+	simulator.x	<math.h> <gset.h> "lris.h"
+	gen_igi.x	<math.h>
+	mshift.x	<math.h> "lris.h"
+	mshiftb.x	<math.h> "lris.h"
+	l2process.x	<imhdr.h> <error.h>
+	;

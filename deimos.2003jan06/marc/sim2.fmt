@@ -1,0 +1,3 @@
+FORMAT "%6d          %13.3h %12.2h  2000.0 1 1 1 %6.2f %5.2f %5.2f"
+LOOP id ra/15. dec slitpa min(0.5,bot) min(0.5,top)
+## LOOP id ra/15. dec slitpa min(max(1.8**(23.-magr),0.5),bot) min(max(1.8**(23.-magr),0.5),top)

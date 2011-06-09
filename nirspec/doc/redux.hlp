@@ -1,0 +1,883 @@
+.help IRAF Reduction of NIRSPEC Low-D Spectra
+
+
+
+
+
+
+
+NIRSPEC
+.br
+Reduction of
+Low-Dispersion Spectra in IRAF
+
+
+
+
+
+
+
+
+.ih
+BACKGROUND
+NIRSPEC images taken in low-dispersion spectroscopy mode present
+certain headaches in the data reduction process owing to the
+skewed position of the spectrum relative to detector columns and
+rows.  This document describes a procedure for removing these
+distortions and extracting spectra from NIRSPEC low-dispersion
+images.
+
+
+
+.ih
+PROCEDURE (LONG VERSION)
+.ls
+ Filter cosmic rays.
+If desired, use a routine such as \fBcosmicrays\fR
+to remove bad pixels from your set of images.
+
+
+.le
+.ls
+ Flatten images.
+If desired, use flatfield images to flatten your data.  But
+first, think carefully about whether you want to take this
+step.  If your flatfield image shows numerous streaks along
+the slit, it's probably due to "junk" on the dewar window as
+seen through the slit.  Unless your data were taken in
+stationary tracking mode (unlikely), the pattern of junk may
+differ on your flats and science images.  Hence, using the
+flat to correct your science data could do more harm than
+good to your data.
+
+
+.le
+.ls
+ Modify image headers.
+IRAF will eventually need to know which direction is the
+dispersion direction on these images, so you'd might as well
+tell it now.  Use this command to add the required
+header parameter to all of your images:
+
+.sp
+.nf
+hedit *.fits dispaxis 2 add+ verify- update+
+.fi
+.sp
+
+
+
+.le
+.ls
+ Create trace image.
+Although the curvature of the spectrum in the \fIx\fR
+(column) direction is not in itself a problem, it prevents
+proper removal of the \fIy\fR (row) distortions in the
+image which complicate sky subtraction.  In order to map and 
+remove this distortion, you need an appropriate "trace" image.  You
+can generate one in two ways:
+.ls (1)
+ Create an image with strong spectra at several place
+along the slit, perhaps by co-adding images of your
+target (if it's bright) or of standard stars (assuming
+the spectrograph was not moved in between your science
+images and the calibration star images).
+.le
+.ls (2)
+ If you have a flat image taken with the same
+instrumental setup as your science images, use the task
+\fBmktracer\fR to generate a trace 
+image from the flat; e.g. 
+.sp
+.nf
+mktracer 24des0057 trace
+.fi
+.sp
+
+.le
+Here are a sample \fBflat image\fR and \fBtrace image\fR generated with the \fBmktracer\fR task.
+
+
+.le
+.ls
+ Remove x distortion.  In this step, you'll shift
+all rows of the images to align with the middle row, so that 
+the spectra will parallel to image columns.
+.ls (1)
+ Start up the \fBxdistcor\fR
+program.  The syntax is:
+
+.sp
+.nf
+xdistcor \fIinput output ref\fR
+.fi
+.sp
+
+where:
+.ls (1)
+ 'input' is a list of your input
+science images to be corrected
+.le
+.ls (2)
+ 'output' is a list of the
+corresponding names to give the corrected images
+.le
+.ls (3)
+ 'ref' is the trace image you created
+in the previous step
+.le
+You should include the reference image among your list
+of input images to be transformed in order to check the 
+goodness of the correction later.
+.le
+.ls (2)
+ The program will plot a cut across the reference
+(trace) image.  Mark the two (or more, if you used a
+stellar trace image) peaks by placing the cursor on them,
+pressing the 'm' key, and pressing the
+'Enter' key when prompted for a wavelength of the
+feature.  The resulting plot should look like \fBthis\fR.
+.le
+.ls (3)
+ Press 'f' to perform a fit to the two
+points, then 'q' twice to quit this step.
+.le
+.ls (4)
+ 'xdistcor' will now try to re-identify the
+features you marked at other rows along the image.  If
+you specified 'verbose=yes' when you ran the
+program, you will see the results of the fit.  Check
+that all of your features were found in other rows.
+.le
+.ls (5)
+ Next the program will try to make a fit to the data
+in order to derive the coordinate transformation required
+to straighten the image.  The program will prompt whether
+you want to perform a fit interactively; answer
+'yes'.  It will show a plot of fit residuals;
+press 'x' to change the \fIx\fR-axis plotting
+coordinate, then enter 'y' to plot residuals
+versus row number, and press 'f' again to redo
+the plot.  The \fBresulting plot\fR
+may show some obvious outliers which you can delete
+manually by placing the cursor on them, pressing
+'d' and then 'p' to nuke the offending
+point.  When outliers have been excised, press
+'f' to redo the fit.  Delete additional outliers
+and re-do the fit as needed.  Press 'q' to quit
+the fitting, and press 'Enter' when prompted
+
+.sp
+.nf
+Write coordinate map to the database (yes)?
+.fi
+.sp
+
+After this, the program will remove the \fIx\fR
+distortion from all of your images.
+.le
+.ls (6)
+ Check the goodness of the correction by overplotting
+several cuts along your transformed trace image.  Use
+the 'implot' task to do this:
+
+.sp
+.nf
+implot \fIoutref\fR
+.fi
+.sp
+
+where \fIoutref\fR is the name of your corrected
+trace image.  You'll get a plot of the middle row of
+your image.  Zoom in on the region occupied by your
+features by placing the cursor to the lower left of your 
+leftmost feature, pressing 'e' to define an
+expansion box, then moving to the upper right of your
+rightmost feature and pressing 'e' again.  Now
+overplot a row near the bottom using the following
+commands:
+
+.sp
+.nf
+:o
+:l10
+.fi
+.sp
+
+Finally, overplot a line near the top:
+
+.sp
+.nf
+:o
+:l1010
+.fi
+.sp
+
+The \fBresulting plot\fR should show
+nicely aligned features.  If so, your images are fine
+and you can proceed to remove \fIy\fR distortions.
+If not, you'll need to go back and check why things may
+have failed.
+.le
+
+
+.le
+.ls
+ Remove y distortion.
+Next, you need to align the night sky lines with the image
+rows to ensure adequate night sky line subtraction.  For
+this you'll use the task \fBydistcor\fR.
+.ls (1)
+  Run \fBydistcor\fR.
+The syntax is:
+
+.sp
+.nf
+ydistcor \fIinput output ref\fR
+.fi
+.sp
+
+where:
+.ls (1)
+ \fIinput\fR is the list of \fIx\fR-corrected images from
+the previous step
+.le
+.ls (2)
+ \fIoutput\fR is the list of \fIy\fR-corrected
+images to produce
+.le
+.ls (3)
+ \fIref\fR is an emission-line image to use as a
+reference for tracing this image.  If the spectra in your 
+science images are faint, choose one of them; otherwise, 
+use an arc lamp exposure if available.
+.le
+The program should complete without any need for user
+input. 
+.le
+.ls (2)
+ Verify the goodness of the rectification by checking
+alignment of night sky lines on your science images.
+First, display a corrected image and locate a range of
+about 100 rows which have nice emission features.  Then
+use the \fBplotcuts\fR task to
+plot a cut from a middle column and one near each end of 
+the slit:
+
+.sp
+.nf
+plotcuts y1=\fIfirst\fR y2=\fIlast\fR
+.fi
+.sp
+
+where \fIfirst\fR and \fIlast\fR are the starting
+and ending rows of the region to plot.  If the magic
+works, the \fBresulting plot\fR
+should show that the night sky lines are perfectly
+aligned.
+.le
+
+
+.le
+.ls
+ Extract Spectra.
+With the image now carefully rectified, you can proceed to
+extract spectra.  Use the \fB
+noao.twodspec.apextract.apall\fR task to perform the
+extractions.  Refer to Section 3.3.2 of the \fBUser's
+Guide to Reducing Slit Spectra with IRAF\fR.
+.ls
+ \fISetup.\fR
+Set the parameters as shown below:
+
+.sp
+.nf
+        input = "*ms.fits"       List of input images
+nfind = 1               Number of apertures to be found automatically
+(output = "")             List of output spectra
+(apertures = "")             Apertures
+(format = "multispec")    Extracted spectra format
+(references = "")             List of aperture reference images
+(profiles = "")             List of aperture profile images\n
+(interactive = yes)            Run task interactively?
+(find = yes)            Find apertures?
+(recenter = no)             Recenter apertures?
+(resize = no)             Resize apertures?
+(edit = yes)            Edit apertures?
+(trace = yes)            Trace apertures?
+(fittrace = yes)            Fit the traced points interactively?
+(extract = yes)            Extract spectra?
+(extras = yes)            Extract sky, sigma, etc.?
+(review = no)             Review extractions?\n
+(line = INDEF)          Dispersion line
+(nsum = -25)            Number of dispersion lines to sum or median\n\n
+(lower = -10.)           Lower aperture limit relative to center
+(upper = 10.)            Upper aperture limit relative to center
+(apidtable = "")             Aperture ID table (optional)\n\n# DEFAULT BACKG
+(b_function = "chebyshev")    Background function
+(b_order = 1)              Background function order
+(b_sample = "-30:-6,6:30")  Background sample regions
+(b_naverage = -100)           Background average or median
+(b_niterate = 0)              Background rejection iterations
+(b_low_reject = 3.)             Background lower rejection sigma
+(b_high_rejec = 3.)             Background upper rejection sigma
+(b_grow = 0.)             Background rejection growing radius\n\n# APERTU
+(width = 5.)             Profile centering width
+(radius = 10.)            Profile centering radius
+(threshold = 0.)             Detection threshold for profile centering\n\n# 
+(minsep = 5.)             Minimum separation between spectra
+(maxsep = 1000.)          Maximum separation between spectra
+(order = "increasing")   Order of apertures\n\n# RECENTERING PARAMETERS\n
+(aprecenter = "")             Apertures for recentering calculation
+(npeaks = INDEF)          Select brightest peaks
+(shift = yes)            Use average shift instead of recentering?\n\n# 
+(llimit = INDEF)          Lower aperture limit relative to center
+(ulimit = INDEF)          Upper aperture limit relative to center
+(ylevel = 0.1)            Fraction of peak or intensity for automatic wid
+(peak = yes)            Is ylevel a fraction of the peak?
+(bkg = yes)            Subtract background in automatic width?
+(r_grow = 0.)             Grow limits by this factor
+(avglimits = no)             Average limits over all apertures?\n\n# TRACING
+(t_nsum = 25)             Number of dispersion lines to sum
+(t_step = 25)             Tracing step
+(t_nlost = 100)            Number of consecutive times profile is lost bef
+(t_function = "chebyshev")    Trace fitting function
+(t_order = 2)              Trace fitting function order
+(t_sample = "*")            Trace sample regions
+(t_naverage = 1)              Trace average or median
+(t_niterate = 10)             Trace rejection iterations
+(t_low_reject = 3.)             Trace lower rejection sigma
+(t_high_rejec = 3.)             Trace upper rejection sigma
+(t_grow = 0.)             Trace rejection growing radius\n\n# EXTRACTION 
+(background = "fit")          Background to subtract
+(skybox = 1)              Box car smoothing length for sky
+(weights = "variance")     Extraction weights (none|variance)
+(pfit = "fit1d")        Profile fitting type (fit1d|fit2d)
+(clean = yes)            Detect and replace bad pixels?
+(saturation = INDEF)          Saturation level
+(readnoise = "30")           Read out noise sigma (photons)
+(gain = "5")            Photon gain (photons/data number)
+(lsigma = 4.)             Lower rejection threshold
+(usigma = 4.)             Upper rejection threshold
+(nsubaps = 1)              Number of subapertures per aperture
+.fi
+.sp
+
+.le
+.ls
+ \fIInspection.\fR
+For each spectrum in your image, note whether the target
+is easily visible near the middle row (512).  For the
+ones that aren't, try to determine a column number where
+they appear prominent, due either to a lack of night sky
+emission lines, or the presence of an emission line in
+the object.  Note this column number for use in the next
+step.
+.le
+.ls
+ \fIDefine apertures.\fR
+Run \fBapall\fR,
+answer 'yes' to the query 'Find
+apertures?', and 'yes' to the question
+'Edit apertures?'.  The program will plot a cut
+across the spectrum and mark the suggested aperture.  If
+desired, remove it by pressing 'd' and use the
+'m' key to mark the center positions of your target(s).
+
+
+A bracket should appear above the location of each
+object.  The width of the bracket indicates the region
+that will be extracted to define your spectrum.
+Obviously, you want this to obtain as much of the light
+from the target as possible without including too much
+of the night sky background light.  Use the 'u'
+and 'l' keys to adjust the upper and lower
+limits of the aperture to an appropriate size for your
+object.  If in doubt, be a little generous with the size
+- the ``optimal extraction'' algorithm employed by
+'apall' will weight each pixel appropriately
+based on the amount of light.
+
+
+If an object is not visible, use the command ':line
+N' to move to the column where the spectrum was
+determined to be the most visible, then use 'm'
+to mark that spectrum and adjust the size as needed.
+.le
+.ls
+ \fIDefine background.\fR
+For each aperture you've defined, review the
+corresponding background aperture to verify that it is
+positioned appropriately for good sky estimation.
+Select an aperture by moving the cursor to it and
+pressing the period key.  Use the 'b' key to
+enter the background editor.  If the background must be
+changed, use the 'd' key to delete the existing
+sample regions.  Then, define one background region on
+either side of your spectrum using the 's' key
+to indicate the starting and ending points with the
+cursor.  Or, explicitly type in the range of rows to be
+used with the command ':samp -15:-10 10:15',
+for example.  If your object is so close to the edge of
+the slit that you can't get a good sky region on one
+side, then use only the other side to define your sky.
+Press 'f' to fit the background data, and
+'q' to quit the background editor.  Repeat this
+step for each object. 
+.le
+.ls
+\fITrace spectrum.\fR
+After defining the object and background apertures for
+each object, you have told IRAF where to find the object
+at one particular place on the chip.  Now use \fBapall\fR
+to track the spectrum across all of the columns in the
+``trace'' step.  Answer ``yes'' to the queries
+'Trace spectra?', 'Fit traced spectra
+interactively?', and 'Trace spectrum 1
+interactively?'.  If your object is bright, this
+step will be a piece of cake and IRAF will show you a
+plot of the trace versus column number, which will be
+well fit by a line (i.e., second-order Chebyshev
+polynomial in IRAF-land).  If IRAF reports that it lost
+the trace, try increasing the 'nsum' parameter
+(e.g., ':nsum 50').  The resulting fit should
+be essentially constant and have an RMS of under 0.2
+pixels.  Delete outlying points as needed with the
+'d' key.  When a suitable fit is achieved, type
+'q' to quit and proceed to the next spectrum.
+.le
+.ls
+\fIExtract spectrum.\fR
+Once your spectra have been traced, then
+go ahead and extract them - have a look at your masterwork!
+.le
+
+
+.le
+.ls
+ Estimate S/N. So just how good are your spectra?
+This is relatively easy to determine.  Measure the signal-to-noise
+(S/N) ratio per pixel in one of two ways:
+.ls
+ Run the \fBsplot\fR
+program to review your spectra stick to band 1).  Select
+three representative regions of the spectrum, each about 100
+pixels wide.  Use the 'm' key to measure
+S/N within each region.  Note that \fBsplot\fR
+knows nothing bout the gain and readnoise of the detector - it
+simply assumes that the bumps and wiggles in the spectrum
+represent the noise, and compares the size of the ``noise''
+to the level of signal in the continuum.
+.le
+.ls
+ Compute S/N manually.  By running \fBsplot\fR
+in multispec mode, you've saved some useful information.
+For each aperture, there are 4 bands in the final
+spectrum.  Band 1 is the extracted spectrum (signal).
+Band 3 is the square root of the pixel variance or, in
+other words, the noise.  So to compute S/N at
+each pixel, just divide the signal spectrum by the noise
+spectrum:
+
+.sp
+.nf
+imarith myspec[*,N,1] / myspec[*,N,4] snr
+.fi
+.sp
+
+where N is the aperture number.  If you
+inspect this spectrum with \fB
+splot\fR or \fBimplot\fR,
+you'll see that the values vary widely due to the
+generally small size of the signal and the wildly varying
+intensity of the background.  Determine the typical
+S/N per pixel by using 
+.sp
+.nf
+imstat snr
+field="midpt"
+.fi
+.sp
+ to compute the median.  The \fBspec_s2n\fR task will do this for
+you!
+.le
+
+
+.le
+.ls
+ Combine spectra. Unless you moved the cross
+disperser in the middle of your image set, your images are
+likely to be very well aligned in wavelength.  In this case,
+you can combine them before doing the wavelength solution.
+.ls (1)
+ Check alignment by using the \fBsplot\fR
+task to plot your first spectrum, and press '#'
+and enter '3' to plot the sky band.  Zoom in on
+an emission line (use 'w' to enter window mode
+and press 'e' at two locations to define a zoom
+window), press 'o' to overplot, press
+'g' to get a new image, enter the name of the
+image to overplot and enter '3' for the band
+number.  If the \fBresulting plot\fR
+shows no wavelength shift, continue combining spectra.  If
+a shift is apparent, you'll need to independently obtain
+wavelength solutions for each spectrum and then combine
+them afterwards.
+.le
+.ls (2)
+ To combine the spectra, use the \fBonedspec.scombine\fR task.  Here are the parameters:
+
+.sp
+.nf
+        input = "*ms.fits"      List of input spectra
+output = "set1_avsigclip" List of output spectra
+(noutput = "")             List of output number combined spectra
+(logfile = "STDOUT")       Log file\n
+(apertures = "")             Apertures to combine
+(group = "apertures")    Grouping option
+(combine = "average")      Type of combine operation
+(reject = "avsigclip")    Type of rejection\n
+(first = no)             Use first spectrum for dispersion?
+(w1 = INDEF)          Starting wavelength of output spectra
+(w2 = INDEF)          Ending wavelength of output spectra
+(dw = INDEF)          Wavelength increment of output spectra
+(nw = INDEF)          Length of output spectra
+(log = no)             Logarithmic increments?\n
+(scale = "median")       Image scaling
+(zero = "none")         Image zero point offset
+(weight = "median")       Image weights
+(sample = "")             Wavelength sample regions for statistics\n
+(lthreshold = INDEF)          Lower threshold
+(hthreshold = INDEF)          Upper threshold
+(nlow = 1)              minmax: Number of low pixels to reject
+(nhigh = 1)              minmax: Number of high pixels to reject
+(nkeep = 1)              Minimum to keep (pos) or maximum to reject (neg
+(mclip = yes)            Use median in sigma clipping algorithms?
+(lsigma = 3.)             Lower sigma clipping factor
+(hsigma = 3.)             Upper sigma clipping factor
+(rdnoise = "25")           ccdclip: CCD readout noise (electrons)
+(gain = "5")            ccdclip: CCD gain (electrons/DN)
+(snoise = "0.")           ccdclip: Sensitivity noise (fraction)
+(sigscale = 0.1)            Tolerance for sigma clipping scaling correction
+(pclip = -0.5)           pclip: Percentile clipping parameter
+(grow = 0)              Radius (pixels) for 1D neighbor rejection
+(blank = 0.)             Value if there are no pixels
+.fi
+.sp
+
+These parameters will give you a resultant image in
+which discrepant pixels have been rejected.  Note that
+the 'avsigclip' rejection algorithm used here
+relies on knowledge of the detector gain and readnoise,
+so be cure to set the corresponding task parameters
+'gain' and 'rdnoise' appropriately.
+.le
+
+
+.le
+.ls
+ Derive wavelength solution. Next, you need to map
+pixels onto wavelengths.  Review Section 3.4.1 of the \fBUser's Guide
+to Reducing Slit Spectra with IRAF\fR in preparation for this
+step.  Customarily, one obtains a solution for the wavelengths
+based on exposures of a source of emission lines, as provided
+in many cases by a Neon/Argon arc lamp.  If you wish to do so,
+linelists for the \fBneon\fR and \fBargon\fR lamps are included with this
+package.  However, your science spectra are likely to be
+dominated by emission lines from the night sky, thus providing
+you with a built-in wavelength calibration.  Follow these
+steps to calibrate your spectrum using the night sky emission
+lines:
+.ls (1)
+ Create an separate sky spectrum by extracting the sky
+information band from one of your science
+images:
+
+.sp
+.nf
+imcopy \fImyspec\fR[*,1,3] sky
+.fi
+.sp
+
+where \fImyspec\fR is the name of your image.
+.le
+.ls (2)
+ Generate a plot of the sky lines by using the \fBsplot\fR task:
+
+.sp
+.nf
+splot sky
+.fi
+.sp
+
+Print out a paper copy by moving the cursor into the
+plot and hitting the '=' key.
+.le
+.ls (3)
+ Generate a simulated sky plot for the same wavelength
+range as your spectra with the \fBskyplot\fR task.  Here are the
+parameters:
+
+.sp
+.nf
+      inlines = "\fBwmkonspec$lowd_ir_ohlines.dat\fR" File listing sky lines
+outlines = "oh_lines"      Output line list [optional]
+outimage = "oh_image"      Name of image to create [optional]
+(wavelength = 15904.)         Central wavelength [Angstroms]
+(dispersion = 2.901)          Dispersion [Angstroms/px]
+(fwhm = 5.)             Width of sky lines [px]
+(ncols = 1024)           number of pixels in spectrum
+(identify = yes)            Identify lines?
+(nlines = 30)             Number of lines to identify
+(graphics = "stdgraph")     Graphics outimage device
+.fi
+.sp
+
+Edit the parameters for the task using the \fIepar\fR
+command and change the values of the parameters
+\fIwavelength\fR, \fIdispersion\fR, and
+\fIfwhm\fR as appropriate for your data.  Run the
+task and inspect the resulting plot to verify that
+covers the same wavelength regime as your sky spectrum.
+Change parameters and re-run if necessary until all of
+the lines in your sky spectrum are represented in the
+simulated spectrum.  The task creates a list of the
+\fInlines\fR strongest OH emission features and
+stores it in the file \fIoutlines\fR.  Create a
+hardcopy of the plot using the '=' key.
+.le
+.ls (4)
+ Edit the parameters for the \fBonedspec.identify\fR 
+task.  Here are the task parameters:
+
+.sp
+.nf
+       images = "sky"          Images containing features to be identified
+crval =                 Approximate coordinate (at reference pixel)
+cdelt =                 Approximate dispersion
+(section = "middle col")   Section to apply to two dimensional images
+(database = "database")     Database in which to record feature data
+(coordlist = "oh_lines.dat") User coordinate list
+(units = "Angstroms")    Coordinate units
+(nsum = "10")           Number of lines/columns/bands to sum in 2D imag
+(match = -3.)            Coordinate list matching limit
+(maxfeatures = 30)             Maximum number of features for automatic identi
+(zwidth = 100.)           Zoom graph width in user units
+(ftype = "emission")     Feature type
+(fwidth = 5.)             Feature width in pixels
+(cradius = 10.)            Centering radius in pixels
+(threshold = 30000.)         Feature threshold for centering
+(minsep = 5.)             Minimum pixel separation
+(function = "spline3")      Coordinate function
+(order = 1)              Order of coordinate function
+(sample = "*")            Coordinate sample regions
+(niterate = 1)              Rejection iterations
+(low_reject = 4.)             Lower rejection sigma
+(high_reject = 4.)             Upper rejection sigma
+(grow = 0.)             Rejection growing radius
+(autowrite = no)             Automatically write to database
+(graphics = "stdgraph")     Graphics output device
+(cursor = "")             Graphics cursor input
+(aidpars = "")             Automatic identification algorithm parameters
+.fi
+.sp
+
+Set the parameter \fIcoordlist\fR to the name of the
+file you generated with \fBskyplot\fR.  Set
+\fImaxfeatures\fR to at least the number of features
+listed in that file.  Set the threshold to a reasonable
+minimum value for bright features based on an inspection 
+of your science spectrum (this helps avoid
+misidentification of lines. 
+.le
+.ls (5)
+ Run the \fBonedspec.identify\fR
+task to locate the sky lines in your spectrum.  Move your
+cursor onto the plot, position it over a prominent sky
+lines, and press the 'm' key to mark the line.
+Verify that it found the right feature by checking for a 
+vertical mark over the intended line.  If okay, enter
+the wavelength as written on your hardcopy of the
+simulated sky spectrum.  Identify two more prominent
+features in the spectrum, one near the right end and one 
+near the left.  Then press the 'f' key to fit a 
+solution.  Press 'q' to return to the spectrum, 
+and press 'l' to automatically mark additional
+lines.  Press 'f' again to repeat the fit and
+press 'l' to view the non-linear component of
+the fit.  Delete obvious outliers using the 'd' 
+key and re-do the fit by pressing 'f'.  You
+should end up with a plot like \fBthis\fR.
+Then press 'q' twice to quit the task, and
+answer 'yes' to the prompt:
+
+.sp
+.nf
+Write feature data to the database?
+.fi
+.sp
+
+.le
+.ls (6)
+ Assign the sky spectrum to be the wavelength
+reference for your image by using the  \fBhedit\fR task:
+
+.sp
+.nf
+hedit set1_avsigclip refspec1 sky add+ update+
+.fi
+.sp
+
+.le
+.ls (7)
+ Apply the wavelength solution via the \fBonedspec.dispcor\fR task.  The parameters are:
+
+.sp
+.nf
+        input = "set1_avsigclip" List of input spectra
+output = "set1_dispcor"  List of output spectra
+(linearize = no)             Linearize (interpolate) spectra?
+(database = "database")     Dispersion solution database
+(table = "")             Wavelength table for apertures
+(w1 = INDEF)          Starting wavelength
+(w2 = INDEF)          Ending wavelength
+(dw = INDEF)          Wavelength interval per pixel
+(nw = INDEF)          Number of output pixels
+(log = no)             Logarithmic wavelength scale?
+(flux = yes)            Conserve flux?
+(samedisp = no)             Same dispersion in all apertures?
+(global = no)             Apply global defaults?
+(ignoreaps = no)             Ignore apertures?
+(confirm = no)             Confirm dispersion coordinates?
+(listonly = no)             List the dispersion coordinates only?
+(verbose = yes)            Print linear dispersion assignments?
+(logfile = "")             Log file
+.fi
+.sp
+
+The parameters listed will apply the solution without
+rebinning the spectrum.
+.le
+
+
+.le
+.ls
+Excise bad regions. When your target is faint
+relative to the night sky, your data are likely to show the
+effects of imperfect background subtraction, as in \fBthis example\fR.  If desired, interpolate
+over these messy regions to improve the appearance of your
+spectrum using the \fBskyinterp\fR
+task:
+.ls (1)
+ Use \fBsplot\fR
+to inspect your sky image.  Inspect the plot to derive an
+estimated lower flux level for major night sky lines.  Note
+this number.
+.le
+.ls (2)
+ Run the \fBskyinterp\fR task
+to interpolate across pixels affected by strong
+background emission:
+
+.sp
+.nf
+      inimage = "set1_dispcor"  input image(s)
+outimage = "set1_pretty"   output image(s)
+skyimage = "sky"           image containing sky spectrum
+(thresh = 10000.)         sky value above which to excise
+(verbose = no)             print operations?
+.fi
+.sp
+
+Set the \fIthresh\fR parameter to the value for onset 
+of strong night sky emission as determined in the
+previous step.
+.le
+.ls (3)
+ Inspect the result to determine whether the spectrum
+has been "cleaned" to your satisfaction, and re-run the
+task with a new threshold value as needed.
+.le
+.le
+
+
+
+.ih
+PROCEDURE (SHORT VERSION)
+Having gone through the long procedure above, you may wish to
+take a few shortcuts by using the task \fBdonspec\fR to do the bookkeeping for you.
+It will perform the following steps to your data:
+.ls (1)
+ Generate trace image from image specified in parameter
+\fIxref\fR
+.le
+.ls (2)
+ Remove \fIx\fR distortions using \fBxdistcor\fR 
+.le
+.ls (3)
+ Allow optional checking of \fIx\fR alignment
+.le
+.ls (4)
+ Remove \fIy\fR distortions using \fBydistcor\fR 
+.le
+.ls (5)
+ Allow optional checking of \fIy\fR alignment
+.le
+.ls (6)
+ Extract spectra interactively using \fIapall\fR
+.le
+.ls (7)
+ Measure median S/N using \fBspec_s2n\fR
+.le
+.ls (8)
+ Average spectra together using \fIscombine\fR
+.le
+.ls (9)
+ Extract sky band from first image
+.le
+.ls (10)
+ Derive wavelength solution using \fIidentify\fR
+.le
+.ls (11)
+ Apply wavelength solution using \fIdispcor\fR
+.le
+.ls (12)
+ Interactively obtain sky flux threshold
+.le
+.ls (13)
+ Remove regions affected by bright night sky lines using \fBskyinterp\fR
+.le
+The script will \fInot\fR do the following:
+.ls (1)
+ Cleaning of cosmic rays and bad pixels
+.le
+.ls (2)
+ Flatfielding
+.le
+.ls (3)
+ Flux calibration
+.le
+Because some task parameters are hardwired, this approach is
+useful only for data meeting the following criteria:
+.ls (1)
+ Target is a point source
+.le
+.ls (2)
+ Calibration can be done from night sky lines
+.le
+Prior to running this script, you should run the \fBskyplot\fR task to generate your input
+\fIcoordlist\fR listing relevant night sky emission features
+over the wavelength range of interest.
+
+.ih
+AUTHOR
+Gregory D. Wirth \fB(wirth@keck.hawaii.edu)\fR
+
+
+.ih
+LAST MODIFIED
+ Tue Apr 17 22:02:05 HST 2001
+
+
+.sp
+Converted from source help file redux.html via html2lroff

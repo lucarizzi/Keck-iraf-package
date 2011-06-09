@@ -1,0 +1,5 @@
+input,f,a,,,,"input bintable"
+output,f,a,,,,"output image"
+ndim,i,a,1,1,2,"dimensions"
+extn,i,h,1,1,,"extn number to decode"
+mode,s,h,"ql",,,

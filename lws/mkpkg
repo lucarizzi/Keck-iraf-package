@@ -1,0 +1,24 @@
+# WMKOLWS package.
+
+$call   relink
+$exit
+
+update:
+	$call relink
+	$call install
+	;
+
+relink:
+	$set   LIBS = ""
+	$update libpkg.a
+	$omake	x_lws.x
+	$link	x_lws.o libpkg.a $(LIBS) -lxtools -o xx_lws.e
+	;
+
+install:
+	$move xx_lws.e ../bin$(arch)/x_lws.e
+	;
+
+libpkg.a:
+	lwscoadd.x	<imhdr.h>
+	;

@@ -1,0 +1,195 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>donspec 2001-Jan-10 nirspec.donspec</title>
+  </head>
+  <body>
+    
+    <h1><a href="donspec.cl">donspec.cl</a></h1>
+    
+    <h2>Name</h2>
+    donspec -- rectify, extract, and calibrate NIRSPEC low-d spectra
+    
+    <h3>Usage</h3>
+    <pre>donspec input root</pre>
+    
+    <h3>Parameters</h3>
+    <dl>
+      
+      <dt> input
+      <dd> List of input images to process.  These should be cleaned,
+	2-D NIRSPEC images taken in low-dispersion spectroscopy mode
+	for a single target and instrument setting.
+	
+      <dt> root
+      <dd> Rootname for output spectra.
+
+      <dt> xref
+      <dd> Name of flat image to use for xdistcor.  This image will be 
+	used to generate the trace image for use in removing
+	<em>x</em> distortions.
+
+      <dt> yref
+      <dd> Name of line image to use for ydistcor.  If blank, the
+	first input image will be used.
+
+      <dt> coordlist
+      <dd> Name of file listing emission lines to be identified in sky 
+	spectrum.
+
+      <dt> x1
+      <dd> First illuminated column to extract, as measured in the middle line
+	of the input images.
+	
+      <dt> x2
+      <dd> Last illuminated column to extract, as measured in the middle line
+	of the input images.
+
+      <dt> dy=0
+      <dd> Change in row (y) value for features as they move from
+	column x1 to column x2.  Note that if the features move toward 
+	lower row numbers (as generally done with NIRSPEC images), the 
+	value for dy should be negative.
+
+      <dt> gain=5
+      <dd> (Inverse) detector gain [electrons/DN].  This is used to set
+      noise parameters for extraction and image combining
+	
+      <dt> rdnoise=30
+      <dd> Detector read noise [electrons/px].  This is used to set
+      noise parameters for extraction and image combining.
+
+      <dt> thresh=-1
+      <dd> Threshold value which defines the flux level in the sky
+	image which defines "bad" pixels to be removed via
+	interpolation.  The default value of -1 allows this to be
+	defined interactively by the user on a plot of the sky image.
+
+      <dt> logfile="logfile"
+      <dd> File into which to write results of the S/N measurements
+	and image summing operation.
+
+      <dt> verbose=yes
+      <dd> Give feedback on operations while running?
+
+    </dl>
+    
+    <h3>Description</h3>
+
+    This script coordinates the reduction of NIRSPEC low-dispersion
+    spectral data.  The following tasks are accomplished:
+    <ul>
+      <li> Generate trace image from image specified in parameter
+	<em>xref</em>
+      <li> Remove <em>x</em> distortions using <a
+	  href="xdistcor.html">xdistcor</a> 
+      <li> Allow optional checking of <em>x</em> alignment
+      <li> Remove <em>y</em> distortions using <a
+	  href="ydistcor.html">ydistcor</a> 
+      <li> Allow optional checking of <em>y</em> alignment
+      <li> Extract spectra interactively using <em>apall</em>
+      <li> Measure median S/N using <a
+	  href="spec_s2n.html">spec_s2n</a>
+      <li> Average spectra together using <em>scombine</em>
+      <li> Extract sky band from first image
+      <li> Derive wavelength solution using <em>identify</em>
+      <li> Apply wavelength solution using <em>dispcor</em>
+      <li> Interactively obtain sky flux threshold
+      <li> Remove regions affected by bright night sky lines using <a href="skyinterp.html">skyinterp</a>
+    </ul>
+
+    The script will <em>not</em> do the following:
+
+    <ul>
+      <li> Cleaning of cosmic rays and bad pixels
+      <li> Flatfielding
+      <li> Flux calibration
+    </ul>
+
+    The script will create the following files:
+    <dl>
+      <dt> <b>*y.fits</b>
+      <dd> Fully rectified spectra
+
+      <dt> <b>*y.ms.fits</b>
+      <dd> Extracted spectra
+
+      <dt> <b><em>root</em>_trace</b>
+      <dd> Trace image used for <a href="xdistcor.html">xdistcor</a>
+
+      <dt> <b><em>root</em>_sky</b>
+      <dd> Sky band extracted from first image
+
+      <dt> <b><em>root</em>_avsigclip</b>
+      <dd> Average of extracted spectra with sigma clipping and median 
+	weighting enabled
+
+      <dt> <b><em>root</em>_dispcor</b>
+      <dd> Wavelength-corrected spectrum
+
+      <dt> <b><em>root</em>_skyinterp</b>
+      <dd> Spectrum with regions near strong background emission
+	features removed
+    </dl>
+
+    
+    <h3>Example</h3>
+
+    The current directory contains cleaned images named
+    <kbd>*c.fits</kbd> and a flat called <kbd>flat.fits</kbd>.  The
+    target name for the observations is <kbd>foo</kbd>.  Inspection of
+    a science image shows that in the middle line, the illuminated
+    columns run from 500 to 700 and night sky lines change position by
+    -25 rows from one end to the other.  Determination of a flux
+    threshold for bright night sky lines is to be done
+    interactively. To rectify and extract spectra, type:
+
+    <pre>  donspec *c.fits foo xref=flat x1=500 x2=700 dy=-25 thresh=-1</pre>
+    
+    <h3>Notes</h3>
+    
+    This script requires the following:
+
+    <ul>
+      <li> Target is a point source
+      <li> Wavelength calibration can be done from night sky lines
+      <li> Flat image must be available for generating trace image
+      <li> Night sky emission line list must be available (see <a
+	  href="skyplot.html">skyplot</a>) 
+      <li> Starting and ending columns for extraction and the shift in 
+	row shift in night sky features must have been measured and
+	entered in the corresponding task parameters (<em>x1</em>,
+	<em>x2</em>, and <em>dy</em>)
+    </ul>
+    
+    <h3>Bugs</h3>
+
+    <ul>
+
+      <li> The script will try to delete any files or images which
+      would conflict with its built-in naming scheme.  When no such
+	files exist, the program will generate spurious warning
+	messages about images which cannot be found.
+
+    </ul>
+    
+    <h3>See Also</h3>
+    <a href="mktracer.html">mktracer</a>
+    <a href="xdistcor.html">xdistcor</a>
+    <a href="ydistcor.html">ydistcor</a>
+    <a href="skyinterp.html">skyinterp</a>
+    <a href="skyplot.html">skyplot</a>
+    <a href="spec_s2n.html">spec_s2n</a>
+    <br>
+    <a href="donspec.cl">The cl script donspec.cl</a>
+    <br>
+    <a href="index.html">The package nirspec</a>
+    
+    <hr>
+    <address>Gregory D. Wirth</a> <a href="mailto:wirth@keck.hawaii.edu">&lt;wirth@keck.hawaii.edu&gt;</a></address>
+    <!-- Created: Fri Jan  5 09:05:27 HST 2001 -->
+    <!-- hhmts start -->
+Last modified: Tue Aug  6 17:03:05 HST 2002
+<!-- hhmts end -->
+  </body> 
+</html>

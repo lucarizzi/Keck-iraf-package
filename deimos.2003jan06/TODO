@@ -1,0 +1,88 @@
+1. Review Slitmask design code; recall how to add params (eg, delta-refract)
+2. Put in the slalib routines for refraction, precession, etc.
+3. Get the sense of the slitmask layout right.
+4. Get the TV mirror in the right place.
+5. Put in switch for milling direction.
+6. Document how to do things (like 1, 4)
+7. Incorporate switch for engineering (no refract, precession; no slit lengthen)
+
+7. Must figure out the right curve for Marc, assuming typical line curvature;
+note that line on slitmask must be converted then to line on sky.  A sky to
+detector mapping would probably be useful.  Alternatively, simply say
+distortion is small (true), and figure out the line curvature as a cos
+function; convert with anamorphic factor to sky (NB curve gets larger).
+Then can test.
+
+8. Need to write mapping routines, and to convert to some polynomial mapping
+that MD can use.
+
+
+
+
+Wednesday -- do fringing; need sky-subtraction in qextr
+
+Tuesday:
+- redo solutions? For calgrid, limit ghost holes but add wavelengths
+- do solutions to 1200 B,C positions
+- do full solution to 1200 A-C plus calmask; resolve the mosaic spacings
+- extract ghost spectra
+- extract fringe spectra
+
+- ideal curve for Marc
+- location of TV mirror
+- FCS spectra
+- Zn,Cd spectra
+
+## NB - frame 1932 shows a "ghost" in the red!  What is this???
+
+
+CHANGE GRLINES to be lines/micron throughout.
+MOVE CERTAIN CONSTANTS to instrument.h; add PIXSZ
+ADD COL_DST to solution.
+ADD radial correction to gamma/beta to account for vignetting (this is a
+high-order term to the distortion that can come from ZEMAX).
+Task to create alpha,gamma and beta,gamma maps (or r1,r2 maps)
+Task to match maps and provide grating effects.
+
+
+
+Change grat_to_ccd/ccd_to_grat to work in image CS (defined by camera axis??)
+Then write a routine that transforms pixels to/from CCD pixels, and converts
+to the large packaged image (hardcode for now).
+
+l8process.
+
+Quick spectral extraction code
+
+Alignment Solution.  We can assume that camera angle, distortion are well-known
+for now.  The tent mirror errors may be degenerate with the collimator. Needs
+to solve for --
+  all chips (3 params);
+  X,Y,rotation (defined wrt chip 3);
+  coll. tip/tilt;
+  grating angle, roll, yaw.
+  fl
+
+pt_xfm is now written, although setup will need to be called also in most cases.
+
+OK, into debug phase:
+* We are not using chip info properly;  numderiv can cross chip
+	boundaries (very bad!!): NEED TO FIX
+ Resolve the sign-sense of X !  (Done; take xmm from FITS file, negate)
+ It helps to get input data right ...
+
+
+* Need to clean up. 
+* Need to resolve the CCD_geom vs XY_OPT issue -- this is very important, and
+probably has to do with the partials in that changes to MOS_ROT, X_OPT and
+Y_OPT affect the corrections coming out of the CN_nERR adjustments.
+
+* We may want to put the collimator distance in
+* We may want to put an overall mosaic tilt and phi in.
+*   ... as part of this, document how to insert new variables.
+
+
+* make cal-grid mask
+* analyse differential distortion in rotation data
+* analyse ghosts in 900gmm rotation data
+

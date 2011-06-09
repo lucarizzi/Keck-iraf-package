@@ -1,0 +1,14 @@
+        cdata - set current directory to DEIMOS data directory
+  check_boxes - display predicted location of alignment boxes on image
+  dmosdisplay - display a DEIMOS mosaic image
+      do_xbox - wait for next image to read out, then run xbox
+   dsimulator - DEIMOS slitmask design program
+    dss_chart - quick script to convert DSS image to DEIMOS guider image
+    get_boxes - generate a file listing predicted locations of alignment boxes
+   get_seeing - measure median FWHM of stars in slitmask alignment image
+    lastimage - return full disk name of the most recently acquired image
+     plotmask - plot DSIMULATOR output MONGO file
+       qmodel - DEIMOS optical model
+  tune_qmodel - adjust optical model to match predicted,actual box locations
+          wfi - wait for new DEIMOS image to be written to disk
+         xbox - compute telescope offsets required to align DEIMOS slitmask

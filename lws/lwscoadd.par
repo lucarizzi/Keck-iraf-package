@@ -1,0 +1,3 @@
+input,f,ql,,,,"Name of input image(s)"
+output,f,ql,,,,"Name of output image(s)"
+verbose,b,h,y,,,"Print results?"

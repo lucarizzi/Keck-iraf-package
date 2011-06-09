@@ -1,0 +1,15 @@
+refl  0.98 0.56   t3=12. p3=90 wmin=.68 wmax=.93 gmm=1200 >> d1200.dat
+refl  0.84 0.56   t3=12. p3=90 wmin=.68 wmax=.93 gmm=1200 >> d1200.dat
+refl  0.70 0.56   t3=12. p3=90 wmin=.68 wmax=.93 gmm=1200 >> d1200.dat
+refl  0.56 0.56   t3=12. p3=90 wmin=.68 wmax=.93 gmm=1200 >> d1200.dat
+refl  0.42 0.56   t3=12. p3=90 wmin=.68 wmax=.93 gmm=1200 >> d1200.dat
+refl  0.28 0.56   t3=12. p3=90 wmin=.68 wmax=.93 gmm=1200 >> d1200.dat
+refl  0.14 0.56   t3=12. p3=90 wmin=.68 wmax=.93 gmm=1200 >> d1200.dat
+refl  0.0  0.56   t3=12. p3=90 wmin=.68 wmax=.93 gmm=1200 >> d1200.dat
+refl -0.14 0.56   t3=12. p3=90 wmin=.68 wmax=.93 gmm=1200 >> d1200.dat
+refl -0.28 0.56   t3=12. p3=90 wmin=.68 wmax=.93 gmm=1200 >> d1200.dat
+refl -0.42 0.56   t3=12. p3=90 wmin=.68 wmax=.93 gmm=1200 >> d1200.dat
+refl -0.56 0.56   t3=12. p3=90 wmin=.68 wmax=.93 gmm=1200 >> d1200.dat
+refl -0.70 0.56   t3=12. p3=90 wmin=.68 wmax=.93 gmm=1200 >> d1200.dat
+refl -0.84 0.56   t3=12. p3=90 wmin=.68 wmax=.93 gmm=1200 >> d1200.dat
+refl -0.98 0.56   t3=12. p3=90 wmin=.68 wmax=.93 gmm=1200 >> d1200.dat

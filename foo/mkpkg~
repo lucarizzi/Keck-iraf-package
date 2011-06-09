@@ -1,0 +1,6 @@
+$call   update
+$exit
+
+update:
+        $call update@src
+        ;

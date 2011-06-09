@@ -1,0 +1,103 @@
+	    Installation Instructions for the KECK Package
+
+The KECK package contains a hodge-podge of IRAF tasks for use by the
+various instruments of the W. M. Keck Observatory.  The current
+maintainer of the package is Gregory Wirth (wirth@keck.hawaii.edu)
+
+These instructions describe how to install KECK either as a user
+package or as a layered (external) package to IRAF.  A user package
+can be installed by any user, and is only available to users if their
+"loginuser.cl" files contain the necessary additions.  A layered
+package is layered on as part of IRAF and is available to all IRAF
+users without any changes to their "loginuser.cl" file.  A layered
+package can only be installed by the IRAF user.  Documentation on
+layered software is found in the Site Manager's Guide that accompanied
+your IRAF distribution.
+
+[1] The package is distributed as GNU compressed tar file.  Retrieve
+the file from this URL:
+
+  ftp://ftp.keck.hawaii.edu/outgoing/ObservingTools/iraf/keck.tar.gz
+
+[2] Create a directory to contain the KECK external package files.  This
+    directory should be outside the IRAF directory tree.  If KECK is being
+    installed as a layered package, then the directory must be owned
+    by the IRAF account.  In the following examples, this root directory
+    is named /local/keck/ (UNIX).  Make the appropriate file name
+    substitutions for your site.
+
+[3] If KECK is being installed as a user package, then this step can be
+    skipped.  If KECK is being installed as a layered package, then the
+    IRAF system must be made aware of its existence by adding it to the list
+    of external packages.  Log in as IRAF and edit the extern.pkg file in the
+    hlib directory to define the package to the CL.  From the IRAF account,
+    outside the CL, you can move to this directory with the commands:
+
+	% cd $hlib
+
+    Define the environment variable keck to be the pathname to the keck
+    root directory.  UNIX pathnames must be terminated with a '/'.
+    Edit extern.pkg to include:
+
+	reset keck     = /local/keck/
+
+	task  $keck.pkg = keck$keck.cl
+
+[4] Unpack the archive file.  From the shell, change directories to
+    the KECK root directory created above and use 'gtar' if available:
+
+	gtar xvzf keck.tar.gz
+
+    of do this as separate steps via:
+
+	gunzip keck.tar.gz
+	tar xvf keck.tar
+	
+    The archive file can be deleted once the package has been
+    successfully installed.
+
+[5] The compiled parts of the KECK package will only build properly
+    under Solaris.  The compilation and linking of the KECK package is
+    done using the following command:
+
+	cl> mkpkg update >& spool &
+
+    NOTE: On systems that concurrently support different architectures
+    (e.g., Suns, Convex), you must configure the system for the desired
+    architecture before issuing the above command.  SUN/IRAF sites must
+    execute a pair of 'mkpkg' commands for each supported architecture type.
+    The Unix environment variable IRAFARCH must be set as well before
+    compiling.  For example:
+
+	# Assuming IRAFARCH is set to sparc
+	cl> mkpkg sparc
+	cl> mkpkg -p noao update >& keck.sparc &
+	cl> mkpkg f68881
+	# Now reset IRAFARCH to f68881 before continuing
+	cl> mkpkg -p noao update >& keck.f68881 &
+
+    The spool file(s) should be reviewed upon completion to make sure there
+    were no errors.  
+
+    NOTE FOR USER PACKAGE: If someone other than the IRAF account is compiling
+    the package (i.e., if KECK is being installed as a user package) then
+    certain enviroment variables must be set.  In Unix, before entering CL,
+    type the following:
+
+	# Substitute the appropriate path to the IRAF root directory below
+	% setenv iraf /local/iraf/
+	% source $iraf/unix/hlib/irafuser.csh
+
+    On a Sun, the architecture must also be specified.
+
+	# Substitute f68881 or ffpa for sparc below if necessary
+   	%setenv IRAFARCH sparc
+
+[6] If KECK was installed as a layered package then this step can be skipped.
+    If it was installed as a users package, then each user wanting access to
+    the package needs to put the following lines into his/her "loginuser.cl"
+    file, somewhere before the "keep" command.
+
+	reset	keck		= /local/keck/
+	task	keck.pkg	= keck$keck.cl
+	reset	helpdb		= (envget("helpdb") //",keck$lib/helpdb.mip")

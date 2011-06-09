@@ -1,0 +1,9 @@
+There seems to be a problem with sprintf, in that if overflows to fields occur,
+the count gets lost or some such.
+
+Note that double INDEFs are different than INDEFs  -- best to use INDEFR, INDEFD
+
+===================================================
+
+Need to define NULLS in ftcol_def; if null or units is blank, don't write out
+card

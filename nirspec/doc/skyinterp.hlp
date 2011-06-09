@@ -1,0 +1,107 @@
+.help skyinterp 2000-Dec-28 wmkonspec.skyinterp
+.ih
+NAME
+skyinterp -- interpolate over regions where background is strong
+.ih
+USAGE
+
+.sp
+.nf
+skyinterp inimage outimage skyimage
+.fi
+.sp
+
+.ih
+PARAMETERS
+
+.le
+.ls inimage
+ Names of existing images to be cleaned
+.le
+.ls outimage
+ Names of cleaned images to produce
+.le
+.ls skyimage
+ Name of reference sky spectrum
+.le
+.ls thresh
+ Threshold sky value.  Pixels in the input images which
+correspond to pixels in the skyimage having sky values above
+the threshold value will be interpolated over.
+.le
+
+.ih
+DESCRIPTION
+This task can be used to effectively clean extracted spectra of
+regions which are degraded to to imperfect background subtraction
+in the vicinity of strong emission features.  Such regions
+commonly occur when spectra of faint objects are reduced.
+
+
+First, inspect a plot of the reference sky spectrum.  Determine
+the flux level which defines, in your judgement, a "strong"
+emission line which is likely to cause trouble in subtraction.
+Set the \fIthresh\fR parameter for this task to that value.
+
+
+For each input image, this task will perform the following
+operations:
+.ls (1)
+ Create a temporary image by passing a 29-point median
+filter across the image to smooth on long scales.
+.le
+.ls (2)
+ Create a temporary image whose pixels consist of data from
+the science image (for regions of low sky background), or data 
+from the median-smoothed image (for regions where the sky flux 
+in the reference image exceeds the threshold).
+.le
+.ls (3)
+ Pass a 9-point median filter over this image to generate an 
+image smoothed on smaller scales.
+.le
+.ls (4)
+ Create the output image, consisting of pixels from the
+input image in areas of low sky background (sky value (
+threshold) and pixels from the smoothed image created in the
+previous step in those regions where the sky exceeds the
+threshold.
+.le
+.ih
+EXAMPLES
+.ls
+ Replace sky-dominated pixels in the image
+'foo.fits' based on sky values from the file
+'sky.fits', creating the output image 'clean.fits': 
+
+.sp
+.nf
+    donspec foo.fits clean.fits sky.fits thresh=15000
+.fi
+.sp
+
+The plot below shows NIRSPEC data before (white) and after
+(red) cleaning via this task.
+
+
+
+.le
+.ih
+SEE ALSO
+\fBimexpr\fR
+.br
+\fBThe cl script skyinterp.cl\fR
+.br
+\fBThe package wmkonspec\fR
+
+.ih
+AUTHOR
+Gregory D. Wirth\fR \fB(wirth@keck.hawaii.edu)\fR
+
+
+.ih
+LAST MODIFIED
+ Tue Apr 17 23:32:00 HST 2001
+
+.sp
+Converted from source help file skyinterp.html via html2lroff

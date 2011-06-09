@@ -1,0 +1,32 @@
+XTENSION= 'BINTABLE'           /Binary table written by MWRFITS
+BITPIX  =                    8 /Required value
+NAXIS   =                    2 /Required value
+NAXIS1  =                   26 /Number of bytes per row
+NAXIS2  =                 9600 /Number of rows
+PCOUNT  =                    0 /Normally 0 (no varying arrays)
+GCOUNT  =                    1 /Required value
+TFIELDS =                    7 /Number of columns in table
+COMMENT
+COMMENT  *** Column formats ***
+COMMENT
+TFORM1  = 'E       '           /
+TFORM2  = 'E       '           /
+TFORM3  = 'E       '           /
+TFORM4  = 'E       '           /
+TFORM5  = 'I       '           /
+TFORM6  = 'E       '           /
+TFORM7  = 'E       '           /
+COMMENT
+COMMENT  *** Column Names ***
+COMMENT
+TTYPE1  = 'MASKX   '           /
+TTYPE2  = 'MASKY   '           /
+TTYPE3  = 'RA      '           /
+TTYPE4  = 'DEC     '           /
+TTYPE5  = 'NSLITS  '           /
+TTYPE6  = 'SKYR    '           /
+TTYPE7  = 'SKYI    '           /
+COMMENT
+COMMENT  *** End of required fields ***
+COMMENT
+END

@@ -1,0 +1,85 @@
+OK, the current version of the DSIM S/W includes the upgraded plate scale, and
+the latest revisions for formatting and data types. It also has the slit-width
+feature implemented (to be checked!!)
+
+
+NEED TO FIX: space after PA= on CENTER line causes a failure ...
+NEED TO ADD: precession (see targ_init, dsim2)
+
+DSIM versions different in different places:
+dsim2.x:        call strcpy ("Dsimulator: Ver 0.0b", DESCREAT(indat), SZ_LINE)
+dsim2.x:        call strcpy ("DSIMULATOR -- June2000", creatask, 35)
+dswd.x: call strcpy ("DSIMULATOR -- 02Jul25", creatask, 35)
+
+
+junk0.fits -- old plate scale
+junk1.fits -- new plate scale
+junk2.fits -- more instrument-spec. moved to dsimulator.h; DESCREA updated 
+
+
+==================================================================
+FOR NEW INSTRUMENTS:
+edit chk_stat
+edit metal_check
+edit "dsimlator.h (end)"
+	Note that SIM_ZSENSE, FLIP_RHS and FLD2TEL_PA are all related -- fix!
+edit "deimos.h"
+edit all ds*.x for include file names
+routine to translate mill coords
+
+!rm deimos.h foc_plane.dat
+!ln -s deimos.dmos deimos.h
+!ln -s foc_plane.dmos foc_plane.dat
+
+!rm deimos.h foc_plane.dat
+!ln -s deimos.lris deimos.h
+!ln -s foc_plane.lris foc_plane.dat
+
+!vi dsim2.x		# include file
+!vi dsimulator.h	# params at end
+
+===================================================================
+del test4.sim,junk4.fits
+dsim mask1.sim test4.sim junk4.fits gui=TEST obs="foo<foo@ucolick.org>"
+===================================================================
+REVISIONS:
+NB DO NOT CHANGE FLIP!! this should be set to -1 and left there, unless the
+sense of N-->E is changed! 
+
+PROBLEM: I suspect that 'h', 'l' need FLIP added also for consistent behavior
+PROBLEM: 'z' skips -- bad!
+POTENTIAL PROBLEM: make sure sky orientation matches PA
+TBD: will need to xlate masks coords to actual mill coords at end.
+TBD: fix above ...
+PROBLEM: if gen_slit not run, can hang on ' ' (info)
+
+
+TBD!! Fix tel2radec now ...
+TBD!! remove redundant (wrong) calc in mask_coords
+TBD!! figure out convention for slit lengths -- currently flipped from former?
+TBD!! review LRIS metal limits
+TBD!! review MM_ARCS -- looks like this is the real scale for system!!
+NB!! The current value of MM_ARCS in keck.h is for LRIS, NOT DEIMOS!! nevermind,
+not used in current slitmask S/W
+
+Also, for LRIS:
+1. Get correct info for deimos.h
+	ZPT_YM		OK (except need to resolve if truly in SMCS) set at 7.0'
+	MASK_HT0	OK (modulo above)
+	FL_TEL	149600.4
+	PPLDIST	19968.9 from ZMAX
+	M_ANGLE	8.06
+	M_RCURV 2192.1
+
+(See /net/deep2/raid/phillips/celeste/iraf/newlris/src/lris.h)
+
+2. Need flag for pickoff mirror in chk_stat (metal_check not a problem)
+2a. Need flag to specify pickoff mirror or not!
+
+
+find low-z object; failures
+M Cooper: 400/3400 d50; 600/7500 (ghosting) 300/5000 (better) on red
+Could go deeper on 2_1 with 300/5000, or 2_2 (repeat), or start 2_3 (prob. best)
+
+
+

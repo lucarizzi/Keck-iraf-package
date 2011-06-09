@@ -1,0 +1,34 @@
+# SLITMASK and MILLING:
+
+Jeff says: champhored end of mask (which is +X DEIMOS) is -X in mill coords.;
+plus he confirms that we are milling from the FRONT of the mask currently.
+
+Currently (aug01) it appears the orientation is correct for producing MILL
+COORD, _but_ the slitmask code is _not_ producing DEIMOS slitmask coords
+properly.  I believe that I've removed this in trace, etc, by negating the
+coords. -- YES, VERIFIED.
+
+## Keck parameters
+define	FL_TEL	150100.4D0	# Foc Len of KII WITH 3" PULLBACK (T8_im.zmx)
+
+ZEMAX/T8_im.zmx:
+
+R(primary) -1376.929 in = 34974.00 mm     f1 = 17487.0 mm
+R(secndry)  -186.5368 in = 4738.035 mm     f2 = 2369.02 mm
+
+"thickness(primary)" 606.0611 in = 15393.95 mm
+
+2ndry-to-focus = 707.3132 in = 17965.76 mm (including an adjustment for window)
+
+m = s2' / s2 = 17965.76 / (17487.0 - 15393.95) = 8.5835
+
+Thus fl(eff) = f1*m =  150100.4 mm
+
+beta = 0.14707
+PPLDIST = 20018.84
+
+COLLIMATOR:
+The collimator is an oblate ellipsoid (K=-0.75) not a paraboloid (K=-1)
+
+NB: Is the telescope focal surface 83.65 or 83.5in?  Do we care?  Must resolve
+this where R_CURV is used!

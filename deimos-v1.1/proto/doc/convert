@@ -1,0 +1,52 @@
+Instructions on converting packages to modern structure:
+
+1. Get a copy of pkgshell (all directories)
+set deimos=/net/savitri/d/deimos/
+cd deimos$
+!tar -xvf /d/phillips/tar_pkgshell
+
+2. Move old package into src/
+src should contain mkpkg, *.x, *.cl, *.h *.par
+
+3. movefile src/*.keys lib/keys/
+## (movefile src/doc/* doc/  ; !rmdir src/doc)
+
+4. 
+edit pkgxxxx.* mkpkg lib/mkpkg.inc lib/root*.hd lib/zzsetenv.def src/mkpkgxxxx
+:1,$s/pkgxxxx/deimos/g
+:1,$s/PKGXXXX/DEIMOS/g
+
+
+5. 
+!mv pkgxxxx.cl  deimos.cl
+!mv pkgxxxx.hd  deimos.hd
+!mv pkgxxxx.men deimos.men
+!mv pkgxxxx.par deimos.par
+!mv lib/rootpkgxxxx.hd lib/rootdeimos.hd
+
+
+
+6.
+edit deimos.cl
+... to add task definitions
+... virtually like original .cl, except for $src/, and zzsetenv, package lines
+edit deimos.hd
+... to add hlp, src info for each task
+edit deimos.men
+... to add one-line description of each task
+edit deimos.par
+... to edit date.
+
+
+7. resolve mkpkg/mkpkgxxxx in src/
+
+8.  do the mkpkg thing:
+del src/libpkg.a,src/deimos.cl,src/x_deimos.o 
+mkpkg arch
+mkpkg sparc   ## ( mkpkg ssun   mkpkg alpha )
+mkpkg -p deimos
+
+
+## eg:
+##  :1,$s/DEIMOS/DEIMOS/g
+##  :1,$s/deimos/deimos/g

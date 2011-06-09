@@ -1,0 +1,11 @@
+# DEIMOS package parameter file.
+amf2map,f,h,"proto$mappings/amf2map",,,"a fmap, slider2"
+bmf2map,f,h,"proto$mappings/bmf2map",,,"b fmap, slider2"
+bmr2map,f,h,"proto$mappings/bmr2map",,,"b rmap, slider2"
+amf3map,f,h,"proto$mappings/amf3map",,,"a fmap, slider3"
+bmf3map,f,h,"proto$mappings/bmf3map",,,"b fmap, slider3"
+bmr3map,f,h,"proto$mappings/bmr3map",,,"b rmap, slider3"
+amf4map,f,h,"proto$mappings/amf4map",,,"a fmap, slider4"
+bmf4map,f,h,"proto$mappings/bmf4map",,,"b fmap, slider4"
+bmr4map,f,h,"proto$mappings/bmr4map",,,"b rmap, slider4"
+version,s,h,"2004aug15"

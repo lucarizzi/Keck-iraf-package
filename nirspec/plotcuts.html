@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>plotcuts 2001-Jan-05 nirspec.plotcuts</title>
+  </head>
+  <body>
+    
+    <h1><a href="plotcuts.cl">plotcuts.cl</a></h1>
+    
+    <h2>Name</h2>
+    plotcuts -- overplot cuts from multiple places along a spectrum
+    
+    <h3>Usage</h3>
+    <pre>plotcuts image</pre>
+    
+    <h3>Parameters</h3>
+    <dl>
+      
+      <dt> image
+      <dd> Image(s) to plot
+	
+      <dt> y1
+      <dd> First row to plot
+	
+      <dt> y2
+      <dd> Last row to plot
+	
+      <dt> nsum=5
+      <dd> Number of columns to coadd
+	
+    </dl>
+    
+    <h3>Description</h3>
+
+    This task will plot three column cuts along the specified
+    image(s), showing only the regions between rows <em>y1</em> and
+    <em>y2</em>.  The column cuts are taken at the center of the image
+    and near the left and right edges.  The plot is scaled to the peak
+    value occurring within the range of rows in the image.  Visual
+    inspection of the resulting plot can reveal whether the removal of
+    spatial distortions is adequate.
+    
+    <h3>Examples</h3>
+    
+    <OL>
+      <LI> Plot three cuts along the spectrum in image
+	<kbd>24des0014y</kbd>, extending from row 520 to 640 and
+	including 5 columns in each sum:
+
+	<pre>     plotcuts 24des0014y y1=520 y2=640 nsum=5</pre>
+
+	The alignment of peaks in the resulting plot shows that the
+	distortion removal across the spectrum is good.
+	<p>
+	<img alt="Plot of graphics window" src="plotcuts.gif">
+    </OL>
+    
+    <h3>See Also</h3>
+    <a href="http://iraf.noao.edu/scripts/irafhelp?specplot">specplot</a>
+    <br>
+    <a href="plotcuts.cl">The cl script plotcuts.cl</a>
+    <br>
+    <a href="index.html">The package nirspec</a>
+    
+    <hr>
+    <address>Gregory D. Wirth</a> <a href="mailto:wirth@keck.hawaii.edu">&lt;wirth@keck.hawaii.edu&gt;</a></address>
+    <!-- Created: Fri Jan  5 09:05:27 HST 2001 -->
+    <!-- hhmts start -->
+Last modified: Tue Aug  6 17:06:50 HST 2002
+<!-- hhmts end -->
+  </body> 
+</html>

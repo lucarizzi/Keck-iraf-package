@@ -1,0 +1,63 @@
+#
+# DATE_DECODE: decode use_date
+#
+define	SZ_DATE_STR	10
+
+int	procedure date_decode (date_str, epoch)
+
+char	date_str[ARB]		# date-string
+real	epoch
+
+char	tchar
+char	wkstr[SZ_DATE_STR]
+int	i, io, n
+int	yyyy, mm, dd
+
+int	stridx(), strlen(), sscan(), nscan()
+begin
+	tchar = ' '
+	call amovkc (tchar, wkstr, SZ_DATE_STR)
+
+	tchar = '-'
+	i = 1
+	io = 1
+	n = stridx (tchar, date_str[i]) - 1
+call eprintf ("DEBUG1 %d\n"); call pargi(n)
+	if (n < 1)
+		return (ERR)
+	call amovc (date_str[i], wkstr[io], n)
+
+	i = i + n + 1
+	io = io + n + 1
+	tchar = '-'
+	n = stridx (tchar, date_str[i]) - 1
+call eprintf ("DEBUG2 %d\n"); call pargi(n)
+	if (n < 1)
+		return (ERR)
+	call amovc (date_str[i], wkstr[io], n)
+
+	tchar = 'T'
+	n = stridx (tchar, date_str[i]) - 1
+	if (n < 1) {
+		n = strlen (date_str[i])
+call eprintf ("DEBUG3 %d\n"); call pargi(n)
+		if (n < 1) 
+			return (ERR)
+	}
+	call amovc (date_str[i], wkstr[io], n)
+
+	io = io + n
+	wkstr[io] = EOS
+
+	i = sscan (wkstr)
+		call gargi (yyyy)
+		call gargi (mm)
+		call gargi (dd)
+	if (nscan() < 3) {
+		epoch = INDEF
+		return (ERR)
+	} else {
+		epoch = yyyy + mm/12. + dd/365.		#  Approx; XXX
+		return (OK)
+	}
+end

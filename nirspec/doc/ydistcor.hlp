@@ -1,0 +1,112 @@
+.help ydistcor 2001-Jan-09 wmkonspec.ydistcor
+.ih
+NAME
+ydistcor -- align emission features with image rows
+.ih
+USAGE
+
+.sp
+.nf
+
+ydistcor input output ref
+
+.fi
+.sp
+
+.ih
+PARAMETERS
+
+.le
+.ls input
+ Names of input 2-D spectra to be corrected
+.le
+.ls output
+ Names of output 2-D spectra to be created
+.le
+.ls ref
+ Name of reference image
+.le
+.ls x1
+ First column to extract
+.le
+.ls x2
+ Last column to extract
+.le
+.ls dy=0
+ Change in row (y) value for features as they move from
+column x1 to column x2.  Note that if the features move toward 
+lower row numbers (as generally done with NIRSPEC images), the 
+value for dy should be negative.
+.le
+
+.ih
+DESCRIPTION
+Given an input image \fIinput\fR plus a range of columns
+\fIx1-x2\fR, this task shifts the columns as needed to align
+emission features with the image rows and thus make reasonable sky
+subtraction possible during the spectral extraction phase of data
+reduction.  
+
+
+For the selected range of columns, the
+\fIlongslit.identify\fR task is used non-interactively to
+find \fIany\fR bright emission features in the image.  Next,
+the \fIreidentify\fR task is used to find these same features
+in other columns, co-adding data as needed in order to have not
+more than a certain number of independent fits for a given
+aperture.  The \fIfitcoords\fR task is used to find a
+solution which fits the coordinates with a polynomial which is
+third order in x and second order in y.  Then the
+\fItransform\fR task will straighten the image.
+.ih
+EXAMPLES
+.ls
+ A set of NIRSPEC images taken with the same instrument
+settings is to be corrected for \fIy\fR distortion.
+Inspection of the first image ('24des0022.fits')
+shows that the illuminated region extends from column 600 to
+column 800.  Inspection also reveals that a prominent emission 
+line the middle of the image begins at row 550 on the left of
+the slit and ends at row 525 on the right of the slit.
+The task is run with the following parameters:
+
+.sp
+.nf
+ydistcor *.fits *%.fits%y.fits% 24des0022 x1=600 x2=800 dy=-25
+.fi
+.sp
+
+The new images will be given the same name as the
+corresponding input images, with a 'y' appended to
+the rootname.
+.le
+.ih
+NOTES
+.ls (1)
+ The x distortion must already have been removed from the
+input image.
+.le
+.ih
+BUGS
+.ih
+SEE ALSO
+\fBidentify\fR
+\fBreidentify\fR
+\fBfitcoords\fR
+\fBtransform\fR
+.br
+\fBThe cl script ydistcor.cl\fR
+.br
+\fBThe package wmkonspec\fR
+
+.ih
+AUTHOR
+Gregory D. Wirth\fR \fB(wirth@keck.hawaii.edu)\fR
+
+
+.ih
+LAST MODIFIED
+ Thu Jan 11 13:39:58 HST 2001
+
+.sp
+Converted from source help file ydistcor.html via html2lroff

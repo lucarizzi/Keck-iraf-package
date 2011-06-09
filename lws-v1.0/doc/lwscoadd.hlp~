@@ -1,0 +1,106 @@
+.help lwscoadd 30Jun99 wmkolws
+.ih
+NAME
+lwscoadd -- Convert raw 6-dimensional LWS image to 2-D frame
+.ih
+USAGE
+lwscoadd input output
+.ih
+PARAMETERS
+.ls input
+List of input images to process.  These must be 6-dimensional raw LWS
+images.  Wildcards may be used to select multiple files.  An "@"-file
+may also be used.
+.le
+.ls output
+List of output co-added images to create.  This may be either a list
+of files (in which case the number of input and output images must
+match), a directory name (in which case the output images will have
+the same names as the input images), or a blank string (in which case
+the output images will replace the input images).
+.le
+.ls verbose = yes
+Flag which determines whether or not to echo the actions being taken.
+.le 
+.ih
+DESCRIPTION
+
+The \fBlwscoadd\fR task takes as input a raw image produced by the Long
+Wavelength Spectrometer (LWS) at the W. M. Keck Observatory (WMKO) and
+outputs an image which properly combines the various layers of the
+input.  The raw LWS images have the following dimensions:
+.ls (1) detector columns
+Index of detector column or "x" coordinate, from 1 to 128.
+.le
+.ls (2) detector rows
+Index of detector row or "y" coordinate, from 1 to 128.
+.le
+.ls (3) chpbeams
+Index of chop beam, 1 for on-source and 2 for off-source.
+.le
+.ls (4) savesets
+Index of the save set; i.e., number of disk writes during a nod set.
+.le
+.ls (5) nodbeams
+Index of nod beam, 1 for on-source and 2 for off-source.
+.le
+.ls (6) nodsets
+Index of the nod set; i.e., number of nods during the exposure.
+.le
+.ih
+EXAMPLES
+
+1. To convert a single raw LWS image into an output image in the same directory:
+
+.nf
+	cl> lwscoadd lws00001.fits coadd00001.fits
+.fi
+
+2. To convert a single raw LWS image into an output image of the same
+name in a subdirectory named "coadd/":
+
+.nf
+	cl> lwscoadd lws00001.fits coadd/
+.fi
+
+3. To replace all LWS images in the current directory with their
+co-added versions:
+
+.nf
+	cl> lwscoadd *.fits
+.fi
+
+.ih
+TIME REQUIREMENTS
+To process a 32MB raw LWS image on a lightly-loaded UltraSPARC 10
+requires less than 4 seconds, which is much faster than equivalent IDL 
+routines.
+.ih
+ALGORITHM
+The algorithm can be described as follows:
+
+.nf
+    for( each line in the input image){
+	set default sense to "positive";
+	negate the sense if this layer represents the CHOP OFF beam;
+	negate the sense if this layer represents the NOD OFF beam;
+	add this line into the final array;
+    }
+.fi
+.ih
+AUTHOR
+Gregory D. Wirth, W. M. Keck Observatory
+.ih
+SUPPORT
+Send questions to lws@keck.hawaii.edu
+.ih
+REVISIONS
+.ls lwscoadd v1.0 1999-Oct-26
+Original public release.
+.le
+.ls lwscoadd v0.0 1999-Jun-30
+Original internal release.
+.le
+.ih
+SEE ALSO
+.endhelp

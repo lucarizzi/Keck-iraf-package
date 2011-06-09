@@ -1,0 +1,16 @@
+Check on TNULLn -- is it always text?
+
+Isn't "" a legitimate null for text?  Can we fake by making it " "?
+
+We need to incorporate the changes of ftcol_def in the programs.
+-- probably also need to specify input type so that NULLs get appropriately
+treated.  This means identifying the data type.  Could do by character,
+by definition (TY_REAL, etc) or by defining different subroutines
+(ftcol_defi, ftcol_defr, etc).
+
+-- what about if NULL isn't present for numerics? (use INDEF? INDEFI? INDEFR?
+etc -- this would require separate subroutine calls, so the proper INDEF could
+be matched ...)
+
+DEBUG:  look at actual null values in whead ...
+

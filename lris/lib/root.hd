@@ -1,0 +1,6 @@
+# Root help directory for the LRIS packages.  This dummy package
+# is necessary in order to have `lris' appear as a module in some
+# package, so that the  user can type "help lris" (with the
+# `lris' given as a task). 
+
+_lris		pkg = lris$lib/rootlris.hd

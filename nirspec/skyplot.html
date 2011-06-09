@@ -1,0 +1,137 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>skyplot 2001-Jan-09 nirspec.skyplot</title>
+  </head>
+  <body>
+    
+    <h1><a href="skyplot.cl">skyplot.cl</a></h1>
+    
+    <h2>Name</h2>
+    skyplot -- create simlulated sky spectrum and corresponding line list
+    
+    <h3>Usage</h3>
+    <pre>skyplot inlines outlines outimage</pre>
+    
+    <h3>Parameters</h3>
+    <dl>
+      
+      <dt> inlines = "nirspec$lowd_ir_ohlines.dat"
+      <dd> File listing sky emission features (units of
+	&Aring;ngstroms) and intensities (in arbitrary units). 
+	The default input list is a set of OH sky lines from about 0.8
+	to 2.3 &micro;m which is suitable for most low-dispersions spectra
+	taken with NIRSPEC.
+	
+      <dt> outlines
+      <dd> Output list of sky emission lines.  If none is specified, no
+	list is produced.
+
+      <dt> outimage
+      <dd> Name of image in which to create simulated night sky
+	spectrum.  If none is specified, no image is produced.
+    
+      <dt> wavelength = 10000.
+      <dd> Central wavelength [Angstroms] for the wavelength interval
+	over which to produce the simulated spectrum and line list.
+
+      <dt> dispersion = 2.077
+      <dd> Dispersion [Angstroms/px] of the resulting spectrum.  The
+	default was appropriate for a test observation, and should be
+	changed to suit your data.
+
+      <dt> fwhm = 5.
+      <dd> Width of sky lines [px].  This controls the FWHM of the
+	emission lines in the simulated spectrum.  For purposes of
+	comparing the simulated spectrum to the lines in your data it
+	is best to input the FWHM of skylines in your sky spectra.
+
+      <dt> ncols = 1024
+      <dd> Number of pixels in spectrum.  Generally this should be the 
+	same as the number of pixels in your NIRSPEC data.
+
+      <dt> identify = yes
+      <dd> Determine whether or not to label the emission lines in
+	the resultant spectrum with their wavelengths.
+
+      <dt> nlines = 50
+      <dd> Number of lines to identify.  The <em>nlines</em> strongest 
+	emission lines in the spectrum will be labeled.
+
+      <dt> graphics = "stdgraph"
+      <dd> Graphics outimage device for plot of night sky emission
+	lines. 
+
+    </dl>
+    <h3>Description</h3>
+
+    Given a list of sky emission features and their relative
+    intensities, this task will generate a spectrum of these lines
+    over the specified wavelength interval.  Optionally, the task will
+    create an image and generate a list of the strongest lines in the
+    spectrum.
+
+    <p>
+      The task will generate a simulated sky spectrum, centered on the
+      specified central wavelength, based on the input line list
+      <em>inlines</em>.  The spectrum has the number of columns
+      specified by parameter <em>ncols</em> and the specified
+      <em>dispersion</em>.  A plot of the spectrum is sent to the
+      graphics device specified by the <em>graphics</em> parameter.
+      If the <em>identify</em> parameter is set true, then the
+      <em>nlines</em> strongest features in the spectrum will be
+      labeled with their wavelengths.
+
+    <p>
+      If the <em>outlines</em> parameter is defined, the task will
+      create a list of the <em>nlines</em> strongest features in the
+      spectrum and save them to a file.  This file can then by used as 
+      input to the 
+      <a href="http://iraf.noao.edu/scripts/irafhelp?identify">identify</a>
+      task to obtain a wavelength solution based on the night sky
+      lines.
+
+    <p>
+      If the <em>outimage</em> parameter is defined, the task will
+      store the simulated sky spectrum in the specified image.
+
+    <h3>Examples</h3>
+    
+    <OL>
+
+      <LI> Generate a list and a corresponding hardcopy plot of the 50
+      strongest OH night sky lines between 1.0 and 1.25 &micro;m,
+      putting the linelist into a file <kbd>lines1.coo</kbd>:
+
+	<pre>skyplot nirspec$lowd_ir_ohlines.dat lines1.coo \
+wavelength=11250. dispersion=2.44 fwhm=5 ncols=1024 \
+ident+ nlines=50 graphics=stdplot</pre>
+
+	Here is the resulting <a href="skyplot.eps">plot</a>.
+    </OL>
+    
+    <h3>Notes</h3>
+    
+    <UL>
+      <LI> The default linelist is a modified version of that
+	published by <a
+	  href="http://adsabs.harvard.edu/cgi-bin/nph-bib_query?bibcode=2000A%26A...354.1134R&db_key=AST&high=3adcfd905702391">Rousselot et al., 2000, A&amp;A, 354, 1134</a>.   This version of the linelist has been modified
+	to (a) exclude all lines with intensity less than 10
+	and (b) combine all P1/P2 pairs of unresolved lines.
+    </UL>
+    
+    <h3>See Also</h3>
+    <a href="http://iraf.noao.edu/scripts/irafhelp?identify">identify</a>
+    <br>
+    <a href="skyplot.cl">The cl script skyplot.cl</a>
+    <br>
+    <a href="index.html">The package nirspec</a>
+    
+    <hr>
+    <address>Gregory D. Wirth</a> <a href="mailto:wirth@keck.hawaii.edu">&lt;wirth@keck.hawaii.edu&gt;</a></address>
+    <!-- Created: Fri Jan  5 09:05:27 HST 2001 -->
+    <!-- hhmts start -->
+Last modified: Tue Aug  6 17:08:59 HST 2002
+<!-- hhmts end -->
+  </body> 
+</html>

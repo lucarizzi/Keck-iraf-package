@@ -1,0 +1,199 @@
+# Make the LREDTEST package.
+#
+# If you have not installed this package as an official IRAF external
+# package (in hlib$extern.pkg), you must first execute the following
+# unix command:
+#
+#    % setenv lredtest 'directory'
+#
+# before entering IRAF to do a `mkpkg -p examples', and also before
+# executing mkpkg at the host level.  The specified directory should
+# be an absolute unix pathname, e.g., '/u2/seaman/examples/'.  The
+# trailing slash (/) is required.  The unix environment definition
+# can be added to your .login or .cshrc file for future convenience.
+
+
+$call	update
+$exit
+
+update:
+	$call update@src
+	;
+
+
+# SUMMARY -- [UNIX] mkpkg summary: output a summary of the spooled mkpkg
+# output, omitting most of the mundane chatter.  Used to scan large spool
+# files for errors.
+
+summary:
+	$ifeq (HOSTID, unix)
+	    $ifndef (spool)
+		$set spool = spool
+	    $endif
+	    $verbose off
+	    ! grep -v ':$$' $(spool) | grep -v '^xc' | \
+		grep -v '^ar' | grep -v '^check file'
+	$else
+	    $echo "mkpkg summary only available on a UNIX system"
+	$endif
+	;
+
+
+
+
+# UNIX/IRAF stuff (multiple architecture support).
+# ---------------------------------------------------
+
+arch:
+showfloat:				# show current float option
+	$verbose off
+	!$(hlib)/mkfloat.csh
+	;
+generic:				# make architecture indep. (no bins)
+	$verbose off
+	!$(hlib)/mkfloat.csh generic
+	!(cd $iraf/unix; setenv MACH generic; sh -x setarch.sh)
+	;
+f68881:					# install f68881 binaries
+	$verbose off
+	!$(hlib)/mkfloat.csh f68881
+	!(cd $iraf/unix; setenv MACH mc68020; sh -x setarch.sh)
+	;
+ffpa:					# install ffpa binaries
+	$verbose off
+	!$(hlib)/mkfloat.csh ffpa
+	!(cd $iraf/unix; setenv MACH mc68020; sh -x setarch.sh)
+	;
+fswitch:				# install fswitch binaries
+	$verbose off
+	!$(hlib)/mkfloat.csh fswitch
+	!(cd $iraf/unix; setenv MACH mc68020; sh -x setarch.sh)
+	;
+fsoft:					# install fsoft binaries
+	$verbose off
+	!$(hlib)/mkfloat.csh fsoft
+	!(cd $iraf/unix; setenv MACH mc68020; sh -x setarch.sh)
+	;
+pg:					# install profiled binaries
+	$verbose off
+	!$(hlib)/mkfloat.csh pg
+	!(cd $iraf/unix; setenv MACH mc68020; sh -x setarch.sh)
+	;
+sparc:					# install sparc binaries
+	$verbose off
+	!$(hlib)/mkfloat.csh sparc
+	!(cd $iraf/unix; setenv MACH sparc; sh -x setarch.sh)
+	;
+ssun:					# install ssun binaries
+	$verbose off
+	!$(hlib)/mkfloat.csh ssun
+	!(cd $iraf/unix; setenv MACH ssol; sh -x setarch.sh)
+	;
+sf2c:					# install sf2c binaries
+	$verbose off
+	!$(hlib)/mkfloat.csh sf2c
+	!(cd $iraf/unix; setenv MACH ssol; sh -x setarch.sh)
+	;
+386i:
+i386:					# install 386i binaries
+	$verbose off
+	!$(hlib)/mkfloat.csh i386
+	!(cd $iraf/unix; setenv MACH i386; sh -x setarch.sh)
+	;
+alpha:					# install DEC Alpha/OSF binaries
+	$verbose off
+	!$(hlib)/mkfloat.csh alpha
+	!(cd $iraf/unix; setenv MACH alpha; sh -x setarch.sh)
+	;
+ddec:					# install DSUX DEC Fortran binaries
+	$verbose off
+	!$(hlib)/mkfloat.csh ddec
+	#!(cd $iraf/unix; setenv MACH ddec; sh -x setarch.sh)
+	;
+dmip:					# install DSUX MIPS Fortran binaries
+	$verbose off
+	!$(hlib)/mkfloat.csh dmip
+	#!(cd $iraf/unix; setenv MACH dmip; sh -x setarch.sh)
+	;
+rs6000:					# install rs6000 binaries
+	$verbose off
+	!$(hlib)/mkfloat.csh rs6000
+	!(cd $iraf/unix; setenv MACH rs6000; sh -x setarch.sh)
+	;
+mips:					# install mips binaries
+	$verbose off
+	!$(hlib)/mkfloat.csh mips
+	!(cd $iraf/unix; setenv MACH mips; sh -x setarch.sh)
+	;
+f2c:					# install F2C/GCC binaries
+	$verbose off
+	!$(hlib)/mkfloat.csh f2c
+	!(cd $iraf/unix; setenv MACH mac; sh -x setarch.sh)
+	;
+irix:                                   # install irix binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh irix
+        !(cd $iraf/unix; setenv MACH irix; sh -x setarch.sh)
+        ;
+hp300:                                  # install HPUX series 300 binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh hp300
+        !(cd $iraf/unix; setenv MACH hp300; sh -x setarch.sh)
+        ;
+hp700:                                  # install HPUX series 700 binaries
+hp800:					# install HPUX series 800/700 binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh hp700
+        !(cd $iraf/unix; setenv MACH hp700; sh -x setarch.sh)
+        ;
+freebsd:				# install freebsd binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh freebsd
+        !(cd $iraf/unix; setenv MACH freebsd; sh -x setarch.sh)
+        ;
+        ;
+sunos:					# install sunos binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh sunos
+        !(cd $iraf/unix; setenv MACH sunos; sh -x setarch.sh)
+        ;
+linux:					# install linux binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh linux
+        !(cd $iraf/unix; setenv MACH linux; sh -x setarch.sh)
+        ;
+redhat:					# install redhat binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh redhat
+        !(cd $iraf/unix; setenv MACH redhat; sh -x setarch.sh)
+        ;
+suse:					# install suse binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh suse
+        !(cd $iraf/unix; setenv MACH suse; sh -x setarch.sh)
+        ;
+linuxppc:				# install Linux PPC binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh linuxppc
+        !(cd $iraf/unix; setenv MACH linuxppc; sh -x setarch.sh)
+        ;
+macosx:					# install MacOS X (PPC) binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh macosx
+        !(cd $iraf/unix; setenv MACH macosx; sh -x setarch.sh)
+        ;
+macintel:				# install MacOS X (Intel) binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh macintel
+        !(cd $iraf/unix; setenv MACH macintel; sh -x setarch.sh)
+        ;
+cygwin:					# install WinXP/Cygwin binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh cygwin
+        !(cd $iraf/unix; setenv MACH cygwin; sh -x setarch.sh)
+        ;
+linuz:					# install linuz binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh linuz
+        !(cd $iraf/unix; setenv MACH linux; sh -x setarch.sh)
+        ;

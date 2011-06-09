@@ -1,0 +1,29 @@
+# Generic FITSIO-type routines
+
+define	RW	1
+define	NSPACE	1
+
+int	status			# status variable, must be initialized to 0
+int	lun			# unit number
+int	blksz
+
+int	tfields, nrows, rowlen
+int	tbcol[3]
+int	colnum, frow, felem
+
+char	fname[SZ_FNAME]		# hmmm, these are IRAF char strings
+char	extname[16]
+
+char	ttype[3], tform[3], tunit[3], name[6]
+
+
+####################################################################
+
+create table
+
+specify columns in table TBCOLn,TFORMn,TTYPEn,TUNITn.
+keep count of widths, grow the format string
+
+write row -- write into string of length 
+
+

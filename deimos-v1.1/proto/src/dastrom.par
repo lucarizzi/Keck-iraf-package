@@ -1,0 +1,9 @@
+input,f,a,,,,"input file of x,y pair (mm)"
+ra0,r,a,,,,"field RA"
+dec0,r,a,,,,"field Dec"
+pa_fld,r,a,,,,"field PA"
+mu,r,h,,,,"Grating tilt (deg)"
+roll3,r,h,,,,"Theta-X angle (deg)"
+amap,f,h,,,,"Output file mask<-->alpha mapping"
+bmap,f,h,,,,"Output file beta<-->ICS mapping"
+mode,s,h,"ql",,,

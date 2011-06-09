@@ -1,0 +1,184 @@
+## Need to figure out representation of coord inversions/ sense, etc - eg
+## tertiary vs cassegrain (or EVEN vs ODD?)
+
+Structure of the Slitmask Design tool:
+
+1. Read in file(s):
+
+there are 3 possible input files:
+A. Preselected objects
+B. Primary targets
+C. Secondary targets (although this -- and any further -- could be optional)
+
+Alternatively, this should be a _field_ in the input file -- what list of
+objects does a particular target belong to?  This would also allow "reference"
+objects to be included (bright stars, large galaxies, etc.); reference objects
+would be just that, and would not be selectable ever.
+
+In the interactive program, sources from _any_ of these lists may be added or
+subtracted.
+
+Vectors used:
+
+index
+RA DEC	(precessed to common equinox. These can be relative to field center
+	if desired)
+PA (on sky)
+len1	(North through E -- note potential problem for slits without fixed PA)
+len2	(South through W -- note potential problem for slits without fixed PA)
+priority	(are alignment stars etc. specified here??)
+list	(preselected, primary, 2ndry, etc, reference) [bound?]
+
+x,y	(in arcsec, relative to field* center, mask axes); plot as seen behind.
+stat	(OK, not OK - a toggle)
+select	(toggle; don't try to cleverly package this with list)
+rel_pa	(PA wrt "mask", ie. telescope)
+
+(*) Don't commit this position; leave definition open.
+
+Question: do we modify slit length by cos PA?  Ans: I wouldn't at this point;
+we really don't want people using absurd rel-PA (>30) and the difference is
+small (cos30 = 0.87, ie a loss of 13% _at_most_)
+
+
+NOTE that we DO NOT carry ID, mag, color, etc around.  These could well
+be in the input file, but we use `index' to point at them, and read/reread
+the additional data as needed.
+
+
+NOTE: Life become _much_ easier if we simply use the telescope center and
+on-axis PA.  We can translate from field "center" easily enough.  Do _not_
+use mask-PA precisely -- assume mask-PA == on-axis PA.
+NB: For long-slit work, though, we'd better calculate what the difference 
+between on- and off-axis PA actually is!
+
+
+2. When we change field center or mask_PA, we need to recalculate:
+x,y,stat
+
+Note that the limits used in stat are fixed in x,y ON SKY.
+
+x,y depend on ra0,dec0,mask_PA (linear) with higher order terms from
+distortion and differential atmospheric refraction.  The distortion must
+be recalucated when the mask position changes, the refracted coordinates
+if the HA changes.
+
+One possibility is to force the refraction calculation only of HA changes,
+in which case we could actually read the RA and DECs over again.  Or we
+could hold them in storage buffers until the end.
+
+
+
+
+3. Automatic selection:
+
+The "rules" for automatic prioritizing are yet TBD, and in fact may be user
+selectable in the end.  However, general rules apply:
+
+A. All preselected objects must be included.  ****
+B. Only primary-list targets (that do not conflict with preselected objects)
+are considered.
+
+[In fact, the rules here allow one to go down through lower priority lists,
+if this is desired]
+
+
+4. "Binding" objects:  must be able to select object(s) to go into same slit
+as another.  Rules:
+Since more than two objects can go into a slit, binding should be selected
+by _area_:
+
+"again"
+"select one object as principle target (or type `c' to cancel)"
+(repeated as needed until a valid PT is selected)
+"N objects bound"
+
+Only (pre)selected objects will be included.  The principle target will have
+its parameters (PA, len1, len2, priority) changed to reflect the binding.
+The PA will be done with least-squares fitting (do the coords of the PT
+change?).  The other(s)
+must go into another list (special number) to indicate they are bound. We may
+need another list/vector to point to the appropriate PT index.
+
+The alternative is to create a new pseudo object and bind all the objects
+to this new entity.  Code-wise, this is probably the more difficult approach.
+The preceeding method is probably equivalent, with the understanding that
+it has become simply a standin for the multiple objects.
+
+NOTE: as it stands in the current code, XARCS is used for sorting and therefore
+represents objects EVEN WHEN DEALING WITH SLITS.  When binding occurs, must
+figure out what to do with this (XARCS).
+
+
+4a. Unbinding objects -- done on PT; needs confirmation; old parameters
+must be input by rescanning the input data.
+
+4b. Other rules: one object cannot be bound to two others.
+Binding should show up in another color to indicate special status.
+
+
+5. An alternative approach again -- first select targets.  Assign a slit
+to each target.  Then, while resolving slit conflicts, allow objects to
+be "bound".  In this way, the numerical assignment of objects to slits is
+easily handled ...
+
+
+9. Output -- all selected objects would be output as "preselected", so the
+output file could be input again, ad nauseum.  Bound objects must be
+indicated so they get carried along.
+
+10. Supporting info:
+Keck-II Telescope limits
+Compass Rose
+Parallactic Angle
+	+ estimate of differential slit losses
+	+ suggested filter for aligning/guiding (and est. errors for others)
+
+
+MISC:
+-- we should probably set up refraction NOT as apparent RA,DEC but rather
+as a differential relation wrt the telescope center.  In this way it becomes
+trivial and _exact_ (although not necessarily correct) to go between the
+refracted and absolute coords.
+
+
+=============================================================================
+See sim.h for how the data structure is set up
+
+
+1. read in input; check equinox and correct immediately to standard equinox.
+2. refract RA,Dec
+3. convert to X,Y [this will be done repeatedly]  This depends on distortion
+and mapping to standard coordinates.  [in current simulator, I wonder if
+the mercator projection is needed?  Or have I bypassed the projection into
+standard coords.?]
+3a. calculate stat vector. Depends on mask outline and CCD gaps.
+
+4.  Plot.  Note that the straight edges in DEIMOS may not map into straight
+lines on the sky -- TBD.
+
+5. interaction, involve 3-4 for repositioning the mask.
+
+6. auto-selection
+First, must cull relevant objects. Then must sort in x. Then develop density
+param.  Order to select is based on density*priority.
+
+7.  More interaction (binding objects, etc)
+Note that binding must be something that can be input as well. Or perhaps not,
+as long as the slit has been properly adjusted/defined.
+
+8.  Mapping to metal -- at this point:
+Limits do NOT need to be checked, as they have already been determined on sky.
+a. Convert obj positions to slit centers (needs correct sky PA);
+	convert PAs? (should be tiny amount)
+b. convert RA,Dec in FP coordinates.
+	Note that this conversion is independent of the instrument EXCEPT
+	FOR FOCAL LENGTH. 
+c.  Project onto mask (instrument dependent).
+
+
+Commissioning tests:
+1. Obviously, some kind of confirmation test mask for the astrometry.
+	-- any corrections must be either explained/fixed or an emprical
+		correction applied.
+2. Measure the slitmask outline against sky coords. (ditto on action)

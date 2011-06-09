@@ -1,0 +1,24 @@
+#------------------------------------------------------------------------
+procedure add_fits_chunks( in, chunks, out)
+#------------------------------------------------------------------------
+
+string	in	{ prompt="Input image" }
+string	chunks	{ prompt="FITS chunks to insert" }
+string	out	{ prompt="Output image" }
+
+begin
+	string	i_in
+	string	i_chunks
+	string	i_out
+
+	# prompt...
+	a = in
+	b = chunks
+	c = out
+
+	# copy image...
+	fxcopy( a, c, grp="0-8")
+	fxcopy( b, c//"[8]", grp="1-7")
+
+end
+

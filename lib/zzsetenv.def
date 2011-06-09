@@ -1,0 +1,17 @@
+# Global environment definitions for the KECK packages.
+
+set	pkglibs		= "keck$bin(arch)/,keck$lib/"
+set	keckbin		= "keck$bin(arch)/"
+set	kecklib		= "keck$lib/"
+
+set	deimos		= keck$deimos/
+set	dproto		= keck$dproto/
+set	lris		= keck$lris/
+set	lris2		= keck$lris2/
+set	lred		= keck$lred/
+set	lredtest	= keck$lredtest/
+set	lrisobs		= lris$lrisobs/
+set	lws		= keck$lws/
+set	nirspec		= keck$nirspec/
+
+keep

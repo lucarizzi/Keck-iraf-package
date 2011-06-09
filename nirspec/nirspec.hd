@@ -1,0 +1,12 @@
+# Help directory for the NIRSPEC package.
+
+$doc             = "./doc/"
+
+xdistcor	hlp=doc$xdistcor.hlp, src=xdistcor.cl
+ydistcor	hlp=doc$ydistcor.hlp, src=ydistcor.cl
+skyinterp	hlp=doc$skyinterp.hlp, src=skyinterp.cl
+plotcuts	hlp=doc$plotcuts.hlp, src=plotcuts.cl
+mktracer	hlp=doc$mktracer.hlp, src=mktracer.cl
+spec_s2n	hlp=doc$spec_s2n.hlp, src=spec_s2n.cl
+skyplot		hlp=doc$skyplot.hlp, src=skyplot.cl
+donspec		hlp=doc$donspec.hlp, src=donspec.cl

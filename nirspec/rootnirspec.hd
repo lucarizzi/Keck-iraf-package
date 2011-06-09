@@ -1,0 +1,8 @@
+# Root task entry for the NIRSPEC package help tree.  Defines
+# `nirspec' as both a task and a package in the nirspec help database.
+
+nirspec		men = nirspec$nirspec.men,
+		hlp = nirspec$nirspec.men,
+		sys = nirspec$nirspec.hlp,
+		pkg = nirspec$nirspec.hd,
+		src = nirspec$nirspec.cl

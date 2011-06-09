@@ -1,0 +1,10 @@
+input,f,a,,,,"input file"
+output,f,a,,,,"output file"
+idmask,f,a,,,,"name of mask"
+format,s,h,,"mill|punch",,"output format (mill|punch)"
+slit_width,r,h,1.0,0.,,"slit width (arcsec)"
+punch_width,r,h,0.5,0.,,"punch width (mm)"
+owner,s,h,,,,"mask owner"
+x_zpt,r,h,0.,,,"X zeropoint offset (normally 0)"
+y_zpt,r,h,0.,,,"Y zeropoint offset (normally 0)"
+mode,s,h,"ql",,,

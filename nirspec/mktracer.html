@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>mktracer 2001-Jan-04 nirspec.mktracer</title>
+  </head>
+  <body>
+    
+    <h1><a href="mktracer.cl">mktracer.cl</a></h1>
+    
+    <h2>Name</h2>
+    mktracer -- create a trace image from NIRSPEC low-dispersion flat
+    
+    <h3>Usage</h3>
+    <pre>mktracer input output</pre>
+    
+    <h3>Parameters</h3>
+    <dl>
+      
+      <dt> input
+      <dd> Name of input image.  This image should be a flat image taken
+	with NIRSPEC in low-dispersion mode.
+	
+      <dt> output
+      <dd> Name of output image.  This image should contain two lines
+	available for tracing.
+	
+    </dl>
+    
+    <h3>Description</h3>
+    
+    The <kbd>mktracer</kbd> task will take as input a NIRSPEC
+    low-dispersion flat and generate an image which can be used to map and 
+    remove the <em>x</em> distortions from accompanying NIRSPEC
+    images.  The following manipulations are performed on the input
+    image in order to generate the output image:
+    <ul>
+      <li> an 11&times;11 pixel boxcar filter is passed over the image 
+	to eliminate small-scale features such as hot pixels and
+	grunge on the slit, while still maintaining the large-scale
+	features of the image
+      <li> a gradient filter is used to locate places where the flux
+	changes along each image row
+      <li> the temporary image is renormalized to a maximum value of 1
+      <li> the temporary image is squared to make both the up and down 
+	slopes of the illuminated region be positive, and also to
+	reduce the width of the gradient peaks for easier detection
+      <li> an 11&times;1 median filter is passed over the image to
+	smooth over insignificant peaks in each row
+      <li> the temporary image is convolved with a wide Gaussian
+	filter in the <em>x</em> direction in order to merge double
+	peaks into single ones
+    </ul>
+
+    All operations take place on temporary images in the current
+    directory.  The input image is not affected by these operations.
+    The output image is suitable as input to the task <a
+    href="xdistcor.html">xdistcor</a>.
+    
+    <h3>Examples</h3>
+    
+    <OL>
+
+      <LI> Given an image <kbd>24des0057.fits</kbd> which is a NIRSPEC
+	low-dispersion flat, produce a trace image called
+	<kbd>trace</kbd>:
+
+	<pre>mktracer mktracer 24des0057 trace</pre>
+
+    </OL>
+    
+    <h3>Notes</h3>
+    
+    <UL>
+      <LI> Several temporary images will be created and deleted in the 
+	current working directory.
+    </UL>
+    
+    <h3>Bugs</h3>
+    
+    <h3>See Also</h3>
+    <a href="http://iraf.noao.edu/scripts/irafhelp?boxcar">boxcar</a>
+    <a href="http://iraf.noao.edu/scripts/irafhelp?gradient">gradient</a>
+    <a href="http://iraf.noao.edu/scripts/irafhelp?median">median</a>
+    <a href="http://iraf.noao.edu/scripts/irafhelp?gauss">gauss</a>
+    <br>
+    <a href="mktracer.cl">The cl script mktracer.cl</a>
+    <br>
+    <a href="index.html">The package nirspec</a>
+    
+    <hr>
+    <!-- hhmts start -->
+Last modified: Tue Aug  6 17:04:17 HST 2002
+<!-- hhmts end -->
+  </body> 
+</html>

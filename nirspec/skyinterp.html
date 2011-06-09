@@ -1,0 +1,102 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>skyinterp 2000-Dec-28 nirspec.skyinterp</title>
+  </head>
+  <body>
+    
+    <h1><a href="skyinterp.cl">skyinterp.cl</a></h1>
+    
+    <h2>Name</h2>
+    skyinterp -- interpolate over regions where background is strong
+    
+    <h3>Usage</h3>
+    <pre>skyinterp inimage outimage skyimage</pre>
+    
+    <h3>Parameters</h3>
+    <dl>
+      
+      <dt> inimage
+      <dd> Names of existing images to be cleaned
+	
+      <dt> outimage
+      <dd> Names of cleaned images to produce
+
+      <dt> skyimage
+      <dd> Name of reference sky spectrum
+
+      <dt> thresh
+      <dd> Threshold sky value.  Pixels in the input images which
+	correspond to pixels in the skyimage having sky values above
+	the threshold value will be interpolated over.
+	
+    </dl>
+    
+    <h3>Description</h3>
+
+    This task can be used to effectively clean extracted spectra of
+    regions which are degraded to to imperfect background subtraction
+    in the vicinity of strong emission features.  Such regions
+    commonly occur when spectra of faint objects are reduced.
+
+    <p>
+      First, inspect a plot of the reference sky spectrum.  Determine
+      the flux level which defines, in your judgement, a "strong"
+      emission line which is likely to cause trouble in subtraction.
+      Set the <em>thresh</em> parameter for this task to that value.
+
+    <p>
+      For each input image, this task will perform the following
+      operations:
+
+    <ul>
+      <li> Create a temporary image by passing a 29-point median
+	filter across the image to smooth on long scales.
+
+      <li> Create a temporary image whose pixels consist of data from
+	the science image (for regions of low sky background), or data 
+	from the median-smoothed image (for regions where the sky flux 
+	in the reference image exceeds the threshold).
+
+      <li> Pass a 9-point median filter over this image to generate an 
+	image smoothed on smaller scales.
+
+      <li> Create the output image, consisting of pixels from the
+	input image in areas of low sky background (sky value &lt;
+	threshold) and pixels from the smoothed image created in the
+	previous step in those regions where the sky exceeds the
+	threshold.
+
+    </ul>
+    
+    <h3>Examples</h3>
+    
+    <OL>
+      <LI> Replace sky-dominated pixels in the image
+	<kbd>foo.fits</kbd> based on sky values from the file
+	<kbd>sky.fits</kbd>, creating the output image <kbd>clean.fits</kbd>: 
+
+	<pre>    donspec foo.fits clean.fits sky.fits thresh=15000</pre>
+
+	The plot below shows NIRSPEC data before (white) and after
+	(red) cleaning via this task.
+
+	<p>
+	  <img alt="Screen shot of dirty and cleaner data" src="skyinterp.gif">
+    </OL>
+    
+    <h3>See Also</h3>
+    <a href="http://iraf.noao.edu/scripts/irafhelp?imexpr">imexpr</a>
+    <br>
+    <a href="skyinterp.cl">The cl script skyinterp.cl</a>
+    <br>
+    <a href="index.html">The package nirspec</a>
+    
+    <hr>
+    <address>Gregory D. Wirth</a> <a href="mailto:wirth@keck.hawaii.edu">&lt;wirth@keck.hawaii.edu&gt;</a></address>
+    <!-- Created: Fri Jan  5 09:05:27 HST 2001 -->
+    <!-- hhmts start -->
+Last modified: Tue Aug  6 17:08:14 HST 2002
+<!-- hhmts end -->
+  </body> 
+</html>

@@ -1,0 +1,25 @@
+DSIMULATOR Command Summary:
+ 
+       hjkl      translate mask (1" x speed) in the usual vi ways
+       p/n       rotate mask (1 deg x speed) in a Pos/Neg sense
+        .        cycle through speeds (10, 1, 0.1) for pnhjkl keys
+        c        move field Center to cursor position
+        a        Add a target
+        d        Delete a target
+        r        Redraw
+        i        Clear (initialize) the list of selected objects
+        s        Select workable set of primary objects
+        x        *experimental*  generate slits to go over targets.
+        ?        print this list
+        q        quit
+        I        interrupt task immediately
+
+Not yet implemented:
+        w        set field Width (arcsec)
+     <space>     print input line of nearest object
+
+  also missing: labelling; binding; editing slits; etc. etc
+
+
+DSIMULATOR News:
+(in development)

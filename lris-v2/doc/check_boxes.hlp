@@ -1,0 +1,125 @@
+.help check_boxes Sep01 ucsclris
+.ih
+NAME
+check_boxes -- define and verify slitmask alignment box coordinates
+.ih
+USAGE	
+check_boxes image input
+.ih
+PARAMETERS
+.ls images
+Name of the input LRIS image showing slitmask alignment boxes.
+.le
+.ls input
+Name of the file listing alignment box coordinates.
+.le
+.ls doxbox = yes
+Launch xbox task after boxes have been marked and verified?
+.le
+
+.ih
+DESCRIPTION
+
+\fBcheck_boxes\fR allows you to define interactively the list of box
+coordinates required by the \fBxbox\fR program for slitmask alignment,
+and to verify visually that existing coordinates match up with their
+respective boxes.  The program applies the same shifts to the
+coordinates as does \fBxbox\fR, and hence prevents confusion caused by 
+the change in coordinates between IRAF and FIGDISP coordinates.  
+
+The task starts by sending the input image on the image display tool.
+If the specified input file exists, the task reads alignment box
+coordinates and labels from the file and draws red circles around
+these coordinates on the image.  The program then enters interactive
+mode, in which you can issue the following keyboard commands:
+
+.ls m
+Mark a new box at the current cursor location.
+.le
+.ls d
+Delete the box nearest to the current cursor position.
+.le
+.ls D
+Delete all boxes.
+.le
+.ls s
+Shift one box.  The program will ask you to indicate which box to shift
+and the new location of the box.
+.le
+.ls S
+Shift all boxes.  The program will ask you to indicate one box to shift
+and its new location.  All boxes will be shifted this amount.
+.le
+.ls +
+Shift all boxes to the right by 21 pixels.
+.le
+.ls -4 -
+Shift all boxes to the right by 21 pixels.
+.le
+
+The image display is updated whenever the box locations are changed.
+
+By default, \fBcheck_boxes\fR will run \fBxbox\fR after the box list
+is defined.
+
+.ih EXAMPLES
+
+.ce
+Creating a New Coordinate List
+
+It isn't necessary to spend time tabulating slitmask alignment box
+coordinates into files because with \fBcheck_boxes\fR you can do it in
+a few seconds.  Follow these steps to generate a new coordinate list
+and run \fBxbox\fR:
+.ls
+(1) Type "check_boxes doxbox+" to run the program; you will be
+prompted to enter the name of the input image and the name of the box
+file to create.  The program will send the image to the image display.
+.le
+.ls
+(2) For each alignment box, put the image cursor over the center of
+the box and press "m" to mark the box.  The program will draw a red
+circle around each box.
+.le
+.ls
+(3) Type "q" to quit the task and proceed with \fBxbox\fR.
+.le
+.ce
+Verifying an Existing Coordinate List
+
+If you have a coordinate list already, you can use \fBcheck_boxes\fR
+as a "sanity check" to preview your box coordinates and ensure that
+\fBxbox\fR will be able to find them.
+.ls
+(1) Type "check_boxes doxbox+" to run the program; you will be
+prompted to enter the name of the input image and the name of the box
+file to create.  The program will send the image to the image display
+and mark the positions of the boxes you've defined.
+.le
+.ls
+(2) Visually inspect the image and verify that each alignment box lies 
+within the corresponding red circle, which indicates the coordinates
+you input.  If a single box requires adjustment, use the "s" key to
+shift it.  If all boxes are off by a constant amount, use the "S" key
+to shift them all in parallel.
+.le
+.ls
+(3) Type "q" to quit the task and proceed with \fBxbox\fR.
+.le
+.ih
+AUTHOR
+Gregory D. Wirth
+.br
+W. M. Keck Observatory
+.br
+lris@keck.hawaii.edu
+.ih
+REVISIONS
+.ls check_boxes v1.0 2001-Sep-11
+Original release.
+.le
+.ih
+SEE ALSO
+.nf
+xbox
+.endhelp

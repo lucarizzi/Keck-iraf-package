@@ -1,0 +1,7 @@
+# Global environment definitions for the LRED package.
+
+reset	lredbin	= "lred$bin(arch)/"
+reset	pkgbin		= lredbin$
+reset	pkglibs		= lred$lib/
+
+keep

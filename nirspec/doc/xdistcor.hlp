@@ -1,0 +1,172 @@
+.help xdistcor 2001-Jan-05 wmkonspec.xdistcor
+.ih
+NAME
+xdistcor -- remove 'x' (column) distortion from NIRSPEC low-d images
+.ih
+USAGE
+
+.sp
+.nf
+xdistcor input output ref
+
+.fi
+.sp
+
+.ih
+PARAMETERS
+
+.le
+.ls input
+ List of images to be corrected
+.le
+.ls output
+ List of corresponding names for corrected output images
+.le
+.ls ref
+ Name of the reference image to use for defining the ends of 
+the spectrum
+.le
+.ls verbose = yes
+ Print feedback on operations to the terminal?
+.le
+.ls useold = yes
+ If a solution for the reference image already exists, use
+it rather than define a new one?
+.le
+
+.ih
+DESCRIPTION
+This procedure is used to remove the row distortion inherent in
+NIRSPEC low-dispersion 2-D spectra, a correction that is required
+for subsequent alignment of night sky lines via the \fBydistcor\fR task.  Before running this
+program, you should generate an image which can be used to define
+the "trace" of the spectrum.  Here are two ways to do this:
+.ls (1)
+ Create an image with strong spectra at several place
+along the slit, perhaps by co-adding images of your
+target (if it's bright) or of standard stars (assuming
+the spectrograph was not moved in between your science
+images and the calibration star images).
+.le
+.ls (2)
+ If you have a flat image taken with the same
+instrumental setup as your science images, use the task
+\fBmktracer\fR to generate a trace 
+image from the flat; e.g. 
+.sp
+.nf
+mktracer 24des0057 trace
+.fi
+.sp
+
+.le
+The task will first check whether the database directory already
+contains a transform solution for your trace image (specified as
+parameter \fIref\fR).  If so, you will be prompted whether to
+use this existing solution to correct the images, or derive a new
+solution.  If no transform solution is found, the program will
+proceed with deriving a new one.
+
+
+If a solution is to be derived, the program will first invoke
+the \fBidentify\fR
+task and allow the user to mark features to be traced.  Mark the
+two (or more, if you used a stellar trace image) peaks by
+placing the cursor on them, pressing the 'm' key, and
+pressing the 'Enter' key when prompted for a wavelength
+of the feature.  The resulting plot should look like \fBthis\fR.
+
+ 
+Press 'f' to perform a fit to the two points, then
+'q' twice to quit this step.
+
+
+'xdistcor' will now try to re-identify the
+features you marked at other rows along the image.  If
+you specified 'verbose=yes' when you ran the
+program, you will see the results of the fit.  Check
+that all of your features were found in other rows.
+
+
+Next, the program will try to make a fit to the data in order to
+derive the coordinate tranformation required to straighten the
+image.  The program will prompt whether you want to perform a
+fit interactively; answer 'yes'.  It will show a plot
+of fit residuals; press 'x' to change the
+\fIx\fR-axis plotting coordinate, then enter 'y' to
+plot residuals versus row number, and press 'f' again
+to redo the plot.  The \fBresulting
+plot\fR may show some obvious outliers which you can delete
+manually by placing the cursor on them, pressing 'd'
+and then 'p' to nuke the offending point.  When
+outliers have been excised, press 'f' to redo the fit.
+Delete additional outliers and re-do the fit as needed.  Press
+'q' to quit the fitting, and press 'Enter'
+when prompted 
+.sp
+.nf
+Write coordinate map to the database
+(yes)?
+.fi
+.sp
+ 
+
+
+With the transformation now defined, the program will proceed to
+remove the \fIx\fR distortion from all of your images.
+
+
+If you included the reference image among those to be corrected,
+you should inspect the resulting corrected reference image to
+ensure that the spectra are now well aligned with the image
+columns.
+.ih
+EXAMPLES
+The user has already use the \fBmktracer\fR task
+to create a reference image called 'trace.fits'.  Given a 
+list of the input images ('in.lst') and output images
+('out.lst'), the following command will generate
+corrected images:
+
+.sp
+.nf
+xdistcor @in.lst @out.lst trace
+.fi
+.sp
+
+The corrected version of the trace image will be 'ctrace.fits'.
+.ih
+NOTES
+.ls (1)
+ User must have write access to the working directory.
+.le
+.ls (2)
+ Numerous temporary files will be generated in the working
+director.  These are removed on successful completion.
+.le
+.ih
+BUGS
+.ih
+SEE ALSO
+\fBidentify\fR
+\fBreidentify\fR
+\fBfitcoords\fR
+\fBtransform\fR
+\fBmktracer\fR
+\fBydistcor\fR
+.br
+\fBThe cl script xdistcor.cl\fR
+.br
+\fBThe package wmkonspec\fR
+
+.ih
+AUTHOR
+Gregory D. Wirth\fR \fB(wirth@keck.hawaii.edu)\fR
+
+
+.ih
+LAST MODIFIED
+ Fri Jan  5 13:25:57 HST 2001
+
+.sp
+Converted from source help file xdistcor.html via html2lroff

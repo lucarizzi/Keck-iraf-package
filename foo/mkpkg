@@ -1,0 +1,7 @@
+$call   update
+$exit
+
+update:
+	$echo "--------------------- LRISOBS ---------------------"
+        $call update@lrisobs
+        ;

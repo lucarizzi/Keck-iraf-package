@@ -1,0 +1,68 @@
+.help lspecfocus Jan2006 lris
+.ih
+NAME
+lspecfocus -- derive best focus from a series of LRIS arc exposures
+.ih
+USAGE	
+lspecfocus images
+.ih
+PARAMETERS
+.ls images
+List of input CCD images to process.  If the image list matches the
+special pattern "last N red" or "last N blue", where N is a positive
+integer, then the last N red or blue images are used in the analysis.
+.le
+.ls start1
+Number of the first row or column in the first image region to
+analyze.  Ignored unless interactive=yes.
+.le
+.ls end1
+Number of the last row or column in the first image region to
+analyze. Ignored unless interactive=yes.
+.le
+.ls start2
+Number of the first row or column in the second image region to
+analyze.  The second region is typically used only for the case of
+LRIS polarimetry.  Ignored unless interactive=yes.
+.le
+.ls end2
+Number of the last row or column in the second image region to
+analyze.  Ignored unless interactive=yes.
+.le
+.ls interactive = yes
+Define first and last row of slit regions interactively?  If yes
+(default), then a cut along the spatial axis is plotted and the user
+can use the graphics cursor to define the region to analyze.  If no,
+then the values of the parameters start1, end1, start2, and end2 are
+used to define the slit region.
+.le
+.ls bestfocus
+This parameter will contain the value of the measured best focus after
+the program runs successfully.
+.le
+
+.ih
+DESCRIPTION
+\fBlspecfocus\fR is a tool for computing the optimal focus for the
+LRIS spectrograph at the W. M. Keck Observatory via analysis of a
+sequence of arc lamp exposures acquired at various focus values
+bracketing best focus.  This script is merely a fancy front-end to the
+noao.obsutil.specfocus task which has been customized for use with the
+LRIS red and blue sides.
+.ih
+AUTHOR
+Gregory D. Wirth
+.br
+W. M. Keck Observatory
+.br
+lris@keck.hawaii.edu
+.ih
+REVISIONS
+.ls lspecfocus v1.0 2006-Jan-27
+Original release.
+.le
+.ih
+SEE ALSO
+.nf
+specfocus
+.endhelp

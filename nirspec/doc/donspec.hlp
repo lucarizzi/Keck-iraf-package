@@ -1,0 +1,225 @@
+.help donspec 2001-Jan-10 wmkonspec.donspec
+.ih
+NAME
+donspec -- rectify, extract, and calibrate NIRSPEC low-d spectra
+.ih
+USAGE
+
+.sp
+.nf
+donspec input root
+.fi
+.sp
+
+.ih
+PARAMETERS
+
+.le
+.ls input
+ List of input images to process.  These should be cleaned,
+2-D NIRSPEC images taken in low-dispersion spectroscopy mode
+for a single target and instrument setting.
+.le
+.ls root
+ Rootname for output spectra.
+.le
+.ls xref
+ Name of flat image to use for xdistcor.  This image will be 
+used to generate the trace image for use in removing
+\fIx\fR distortions.
+.le
+.ls yref
+ Name of line image to use for ydistcor.  If blank, the
+first input image will be used.
+.le
+.ls coordlist
+ Name of file listing emission lines to be identified in sky 
+spectrum.
+.le
+.ls x1
+ First illuminated column to extract, as measured in the middle line
+of the input images.
+.le
+.ls x2
+ Last illuminated column to extract, as measured in the middle line
+of the input images.
+.le
+.ls dy=0
+ Change in row (y) value for features as they move from
+column x1 to column x2.  Note that if the features move toward 
+lower row numbers (as generally done with NIRSPEC images), the 
+value for dy should be negative.
+.le
+.ls gain=5
+ (Inverse) detector gain [electrons/DN].  This is used to set
+noise parameters for extraction and image combining
+.le
+.ls rdnoise=30
+ Detector read noise [electrons/px].  This is used to set
+noise parameters for extraction and image combining.
+.le
+.ls thresh=-1
+ Threshold value which defines the flux level in the sky
+image which defines "bad" pixels to be removed via
+interpolation.  The default value of -1 allows this to be
+defined interactively by the user on a plot of the sky image.
+.le
+.ls logfile="logfile"
+ File into which to write results of the S/N measurements
+and image summing operation.
+.le
+.ls verbose=yes
+ Give feedback on operations while running?
+.le
+
+.ih
+DESCRIPTION
+This script coordinates the reduction of NIRSPEC low-dispersion
+spectral data.  The following tasks are accomplished:
+.ls (1)
+ Generate trace image from image specified in parameter
+\fIxref\fR
+.le
+.ls (2)
+ Remove \fIx\fR distortions using \fBxdistcor\fR 
+.le
+.ls (3)
+ Allow optional checking of \fIx\fR alignment
+.le
+.ls (4)
+ Remove \fIy\fR distortions using \fBydistcor\fR 
+.le
+.ls (5)
+ Allow optional checking of \fIy\fR alignment
+.le
+.ls (6)
+ Extract spectra interactively using \fIapall\fR
+.le
+.ls (7)
+ Measure median S/N using \fBspec_s2n\fR
+.le
+.ls (8)
+ Average spectra together using \fIscombine\fR
+.le
+.ls (9)
+ Extract sky band from first image
+.le
+.ls (10)
+ Derive wavelength solution using \fIidentify\fR
+.le
+.ls (11)
+ Apply wavelength solution using \fIdispcor\fR
+.le
+.ls (12)
+ Interactively obtain sky flux threshold
+.le
+.ls (13)
+ Remove regions affected by bright night sky lines using \fBskyinterp\fR
+.le
+The script will \fInot\fR do the following:
+.ls (1)
+ Cleaning of cosmic rays and bad pixels
+.le
+.ls (2)
+ Flatfielding
+.le
+.ls (3)
+ Flux calibration
+.le
+The script will create the following files:
+
+.le
+.ls *y.fits
+ Fully rectified spectra
+.le
+.ls *y.ms.fits
+ Extracted spectra
+.le
+.ls \fIroot\fR_trace
+ Trace image used for \fBxdistcor\fR
+.le
+.ls \fIroot\fR_sky
+ Sky band extracted from first image
+.le
+.ls \fIroot\fR_avsigclip
+ Average of extracted spectra with sigma clipping and median 
+weighting enabled
+.le
+.ls \fIroot\fR_dispcor
+ Wavelength-corrected spectrum
+.le
+.ls \fIroot\fR_skyinterp
+ Spectrum with regions near strong background emission
+features removed
+.le
+
+.ih
+EXAMPLE
+The current directory contains cleaned images named
+'*c.fits' and a flat called 'flat.fits'.  The
+target name for the observations is 'foo'.  Inspection of
+a science image shows that in the middle line, the illuminated
+columns run from 500 to 700 and night sky lines change position by
+-25 rows from one end to the other.  Determination of a flux
+threshold for bright night sky lines is to be done
+interactively. To rectify and extract spectra, type:
+
+.sp
+.nf
+  donspec *c.fits foo xref=flat x1=500 x2=700 dy=-25 thresh=-1
+.fi
+.sp
+
+.ih
+NOTES
+This script requires the following:
+.ls (1)
+ Target is a point source
+.le
+.ls (2)
+ Wavelength calibration can be done from night sky lines
+.le
+.ls (3)
+ Flat image must be available for generating trace image
+.le
+.ls (4)
+ Night sky emission line list must be available (see \fBskyplot\fR) 
+.le
+.ls (5)
+ Starting and ending columns for extraction and the shift in 
+row shift in night sky features must have been measured and
+entered in the corresponding task parameters (\fIx1\fR,
+\fIx2\fR, and \fIdy\fR)
+.le
+.ih
+BUGS
+.ls (1)
+ The script will try to delete any files or images which
+would conflict with its built-in naming scheme.  When no such
+files exist, the program will generate spurious warning
+messages about images which cannot be found.
+.le
+.ih
+SEE ALSO
+\fBmktracer\fR
+\fBxdistcor\fR
+\fBydistcor\fR
+\fBskyinterp\fR
+\fBskyplot\fR
+\fBspec_s2n\fR
+.br
+\fBThe cl script donspec.cl\fR
+.br
+\fBThe package wmkonspec\fR
+
+.ih
+AUTHOR
+Gregory D. Wirth\fR \fB(wirth@keck.hawaii.edu)\fR
+
+
+.ih
+LAST MODIFIED
+ Tue Apr 17 23:32:45 HST 2001
+
+.sp
+Converted from source help file donspec.html via html2lroff
