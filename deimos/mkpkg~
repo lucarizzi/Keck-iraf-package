@@ -98,3 +98,8 @@ linux:					# install linux binaries
 	$set DIRS = "lib src"
 	!$(hlib)/mkfloat.csh linux -d $(DIRS)
 	;
+linux64:				# install linux binaries
+	$verbose off
+	$set DIRS = "lib src"
+	!$(hlib)/mkfloat.csh linux64 -d $(DIRS)
+	;

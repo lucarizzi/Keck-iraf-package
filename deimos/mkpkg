@@ -103,3 +103,8 @@ linux64:				# install linux binaries
 	$set DIRS = "lib src"
 	!$(hlib)/mkfloat.csh linux64 -d $(DIRS)
 	;
+macintel:				# install linux binaries
+	$verbose off
+	$set DIRS = "lib src"
+	!$(hlib)/mkfloat.csh macintel -d $(DIRS)
+	;
