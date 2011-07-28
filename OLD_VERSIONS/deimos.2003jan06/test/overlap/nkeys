@@ -1,5 +1,0 @@
-xm2 xm2-xm1 limits -360 360 -0.5 0.5
-xm2 xm2-xm3 limits -360 360 -0.5 0.5
-xm2 xm2-xm4 limits -360 360 -0.5 0.5
-xm2 xm4-xm1 limits -360 360 -0.5 0.5
-xm2-xm1 xm2-xm4 limits -1 1 -1 1

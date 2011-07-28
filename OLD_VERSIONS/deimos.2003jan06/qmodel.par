@@ -1,7 +1,0 @@
-wave,r,h,,,,"wavelength to trace (A)"
-mu,r,h,,,,"Grating tilt (deg)"
-o3,r,h,,,,"3rd yaw angle (deg)"
-roll3,r,h,,,,"Grating roll"
-norder,i,h,1,,,"grating order"
-gmm,r,h,900.,,,"grooves/mm"
-mode,s,h,"ql",,,

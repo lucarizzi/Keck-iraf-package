@@ -1,5 +1,0 @@
-image,f,a,,,,"Image to measure"
-xref,i,h,0,,,"X reference pix (lower corner of cc subsection)"
-yref,i,h,0,,,"Y reference pix (lower corner of cc subsection)"
-border,i,h,2,1,,"border around peak pixel for fit"
-mode,s,h,"ql",,,

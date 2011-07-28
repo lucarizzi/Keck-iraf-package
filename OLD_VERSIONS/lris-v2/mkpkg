@@ -1,8 +1,0 @@
-# Make the LRIS package.
-
-$call	relink
-$exit
-
-update:
-	$call	update@src
-	;

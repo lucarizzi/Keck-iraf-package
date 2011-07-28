@@ -1,9 +1,0 @@
-procedure do_xbox()
-
-begin
-	string	image
-
-	wfi() | scan( image)
-	beep()
-	xbox( image)	
-end

@@ -1,8 +1,0 @@
-The effect of grating/tilt was studied.  For one location (-186 arcsec),
-the tilt is as follows:
-
- 600gmm (-7.2;7000A) ==>  = (0.622+0.176) / (434.485-207.206) 0.0035111
- 900gmm ( 0.0;7000A) ==>  = (0.785+0.193) / (468.353-201.413) 0.0036637
-1200gmm (11.0;8000A) ==>  = (0.808+0.167) / (475.190-218.104) 0.0037925
-
-Thus the slope varies by only 8% (full range) over realistic values

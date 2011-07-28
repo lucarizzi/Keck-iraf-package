@@ -1,5 +1,0 @@
-# Root help directory for the LRED packages.  This dummy package is
-# needed to have `lred' appear as a module in some package, so that
-# the user can type "help lred" (with `lred' given as a task).
-
-_lred	pkg = lred$lib/rootlred.hd

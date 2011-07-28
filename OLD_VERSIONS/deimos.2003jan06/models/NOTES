@@ -1,6 +1,0 @@
-For sutin.cam, need to convert angles-->radians, r-->atan(r/15")
-
-Then, simply theta = theta * (1 + t**2 + t**4) etc
-or
-             theta = theta / (1 + t**2 + t**4) etc
-

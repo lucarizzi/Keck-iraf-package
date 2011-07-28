@@ -1,9 +1,0 @@
-# OBJNO  RA    DEC     MAGR   SLITPA    TOPDIST    BOTDIST
-
-id	int	%5d
-ra	real	%12.8f
-dec	real	%12.8f
-magr	real	%5.2f
-slitpa	real	%10.6f
-top	real	%5f
-bot	real	%5f

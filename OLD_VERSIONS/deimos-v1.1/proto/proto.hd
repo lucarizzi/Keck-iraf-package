@@ -1,7 +1,0 @@
-# Help directory for the PROTO package.
-
-$defdir		= "proto$src/"
-$doc		= "proto$doc/"
-
-xbox		hlp=doc$xbox.hlp,	src=xbox.x
-qbox		hlp=doc$qbox.hlp,	src=qbox.cl

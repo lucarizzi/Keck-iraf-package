@@ -1,7 +1,0 @@
-# Root task entry for the LRISOBS package help tree.  Defines
-# `lrisobs' as both a task and a package in the lrisobs help database.
-
-lrisobs        men = lrisobs$lrisobs.men,
-                hlp = lrisobs$lrisobs.men,
-                sys = lrisobs$lrisobs.hlp,
-                pkg = lrisobs$lrisobs.hd,

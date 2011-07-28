@@ -1,8 +1,0 @@
-x,r,a,,,,"x coord (pix)"
-y,r,a,,,,"x coord (pix)"
-rot,r,a,,,,"rotator angle (degree)"
-el,r,a,,,,"elevation (degree)"
-rrot,r,h,,,,"ref rotator angle (degree)"
-rel,r,h,,,,"ref elevation (degree)"
-mode,s,h,"ql",,,
-

@@ -1,8 +1,0 @@
-# Root task entry for the LREDTEST package help tree.  Defines `lredtest'
-# as both a task and a package in the lredtest help database.
-
-lredtest	men  = lredtest$lredtest.men,
-		hlp  = lredtest$lredtest.men,
-		sys  = lredtest$lredtest.hlp,
-		pkg  = lredtest$lredtest.hd,
-		src  = lredtest$lredtest.cl

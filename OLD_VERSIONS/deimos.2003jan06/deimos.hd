@@ -1,7 +1,0 @@
-# Help directory for the DEIMOS package.
-
-$defdir		= "deimos$src/"
-$doc		= "deimos$doc/"
-
-xbox		hlp=doc$xbox.hlp,	src=xbox.x
-qbox		hlp=doc$qbox.hlp,	src=qbox.cl
