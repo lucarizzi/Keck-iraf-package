@@ -4,7 +4,6 @@ Must point to the correct flavor, eg,
 
 !ln -s lib.redhat/libcfitsio.a libcfitsio.a
 !ln -s lib.ssun/libcfitsio.a libcfitsio.a
-!ln -s lib.macosx/libcfitsio.a libcfitsio.a
 
 #
 # Also, if rebuild done, need to copy into the correct directory from:

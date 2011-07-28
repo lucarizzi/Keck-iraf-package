@@ -89,6 +89,10 @@ ssun:					# install ssun binaries
 	!$(hlib)/mkfloat.csh ssun
 	!(cd $iraf/unix; setenv MACH ssol; sh -x setarch.sh)
 	;
+linux64: !$(hlib)/mkfloat.csh linux64
+         !(cd $iraf/unix; setenv MACH linux64; sh -x setatch.sh)
+	;
+
 sf2c:					# install sf2c binaries
 	$verbose off
 	!$(hlib)/mkfloat.csh sf2c

@@ -9,7 +9,7 @@ update:
 	;
 
 relink:
-	$set   LIBS = ""
+	$set   LIBS = "-/Bdynamic"
 	$update libpkg.a
 	$omake	x_lws.x
 	$link	x_lws.o libpkg.a $(LIBS) -lxtools -o xx_lws.e

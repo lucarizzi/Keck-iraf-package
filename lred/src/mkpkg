@@ -9,7 +9,7 @@ update:
 	;
 
 relink:
-	$set	LIBS = "-lxtools -liminterp -lsurfit -lgsurfit -lcurfit -lslalib ../cfitsio/libcfitsio.a"
+	$set	LIBS = "-/Bdynamic -lxtools -liminterp -lsurfit -lgsurfit -lcurfit -lslalib ../cfitsio/libcfitsio.a"
 ## The following should work, but for some reason libtbtables gets overwritten
 ##	$set	LIBS = "-lxtools -liminterp -lsurfit -lgsurfit -lcurfit -lslalib /Users/iraf/iraf/extern/tables/bin.macintel/libtbtables.a"
 
@@ -19,7 +19,7 @@ relink:
 	;
 
 install:
-	$move	xx_lred.e lredbin$x_lred.e
+	$move	xx_lred.e ../../bin$(arch)/x_lred.e
 	;
 
 libpkg.a:

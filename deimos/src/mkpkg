@@ -9,7 +9,7 @@ update:
 	;
 
 relink:
-	$set	LIBS = "-lxtools -liminterp -lsurfit -lgsurfit -lcurfit -lslalib ../cfitsio/libcfitsio.a"
+	$set	LIBS = "-/Bdynamic -lxtools -liminterp -lsurfit -lgsurfit -lcurfit -lslalib ../cfitsio/libcfitsio.a"
 
 	$update	libpkg.a
 	$omake	x_deimos.x

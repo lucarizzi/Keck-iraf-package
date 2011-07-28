@@ -9,7 +9,7 @@ update:
 	;
 
 relink:
-	$set	LIBS = "-lxtools -liminterp -lsurfit -lgsurfit -lcurfit"
+	$set	LIBS = "-/Bdynamic -lxtools -liminterp -lsurfit -lgsurfit -lcurfit"
 	$update	libpkg.a
 	$omake	x_lris.x
 	$link	x_lris.o libpkg.a $(LIBS) -o xx_lris.e
