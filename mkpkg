@@ -11,6 +11,7 @@ update:
 	$call deimos
 	$call lris
 	$call lris2
+	$call lred
 	$call lws
 	$call nirspec
 
@@ -29,6 +30,10 @@ lris:
 lris2:
 	$echo "--------------------- LRIS2 ---------------------"
 	$call update@lris2
+	;
+lred:
+	$echo "--------------------- LRED ---------------------"
+	$call update@lred
 	;
 lws:
 	$echo "--------------------- LWS ---------------------"

@@ -19,7 +19,7 @@ relink:
 	;
 
 install:
-	$move	xx_lred.e ../../bin$(arch)/x_lred.e
+	$move	xx_lred.e ../bin$(arch)/x_lred.e
 	;
 
 libpkg.a:

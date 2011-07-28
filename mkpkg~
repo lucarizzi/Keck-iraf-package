@@ -199,3 +199,8 @@ sunos:					# install SUNOS (Solaris x86) binaries
 	$set DIRS = "deimos lris lris2 lws nirspec"
 	!$(hlib)/mkfloat.csh sunos -d $(DIRS)
 	;
+macintel:				# install SUNOS (Solaris x86) binaries
+	$verbose off
+	$set DIRS = "deimos lris lris2 lws nirspec"
+	!$(hlib)/mkfloat.csh macintel -d $(DIRS)
+	;
