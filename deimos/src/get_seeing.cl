@@ -20,6 +20,9 @@ begin
 	string	subimage	# image extension to display
 	string	ampmode
 	real	xc,yc		# centroids
+        string  xcs             # auxiliary variable to read the xc as string
+
+        string xcs
 	real	fwhm_px
 	real	fwhm_asec
 	real	crval2
@@ -169,7 +172,11 @@ begin
 	# parse the file...
 	ilist = box_file
 	n = 0
-	while( fscan( ilist, xc, yc) != EOF){
+	while( fscan( ilist, xcs, yc) != EOF){
+
+                
+                if (xcs=="#") next
+                if (xcs!="#") xc=real(xcs)
 		n = n + 1
 
 		# convert position in whole image to position in subimage...
